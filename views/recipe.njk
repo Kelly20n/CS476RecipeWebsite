@@ -1,26 +1,20 @@
-<!DOCTYPE html>
-<html lang-="en">
-<head>
 
-</head>
-<body>
+{% include './includes/head.njk' %}
 
-<header></header>
+<div class="topnav">
+        <a class="active" href="/">Home</a>
+        <a href="#news">News</a>
+        <a href="#contact">Contact</a>
+        <a href="#about">About</a>
+        <div class="right">
+            <a href="/login">Login</a>
+            <a href="/signup">Signup</a>
+        </div>
+</div>
 
+<div class='recipe'>
+    <div>{{post.title}}</div><br><Br>
+    <div>Ingredients:<br><Br>{{post.ingredients}}</div><br><Br>
+    <div>Instructions:<br><Br>{{post.instructions}}</div><br><Br>
+</div>
 
-<body>
-    <div class='recipe'>
-        <div>{{post.title}}</div><br><Br>
-        <div>Ingredients:<br><Br>{{post.ingredients}}</div><br><Br>
-        <div>Instructions:<br><Br>{{post.instructions}}</div><br><Br>
-    </div>
-
-</body>
-
-
-
-<footer></footer>
-
-
-</body>
-</html>

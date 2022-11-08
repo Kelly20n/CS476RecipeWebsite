@@ -31,6 +31,7 @@ db.on('open', () => console.log ('Connection Made!'));
 //Model Schema
 //////////////////////////
 const Recipe = require('./model/recipe.js');
+const User = require('./model/user.js');
 
 
 //////////////////////////
@@ -39,7 +40,7 @@ const Recipe = require('./model/recipe.js');
 const logger = require('koa-logger')
 const koa = require('koa');
 const server = new koa();
-server.use(logger());
+
 
 //////////////////////////
 //Create Our Static Folder
@@ -53,6 +54,14 @@ const static = require('koa-static');
 //////////////////////////
 const Router = require('koa-router');
 const route = Router();
+
+//////////////////////////
+//Setting up authentication
+//npm i koa-passport
+//npm i koa-session
+//////////////////////////
+const passport = require('koa-passport');
+const session = require('koa-session');
 
 //////////////////////////
 //Initializing views
@@ -124,6 +133,18 @@ route.post('/admin', async (ctx, next) => {
     });
 });
 
+route.get('/login', async (ctx, next) => {
+    await ctx.render('login');
+});
+
+route.get('/signup', async (ctx, next) => {
+    await ctx.render('signup');
+});
+
+route.get('/forgotpassword', async (ctx, next) => {
+    await ctx.render('signup');
+});
+
 // route.get('/', (ctx, next) => {
 //     return ctx.render('index.html', {
 //         name: process.env.NAME
@@ -140,6 +161,7 @@ route.post('/admin', async (ctx, next) => {
 //Middleware
 //////////////////////////
 // server.use(views('./views', {map: {html: 'nunjucks'}}));
+server.use(logger());
 server.use(override('_method'));
 server.use(parser());
 server.use(koaNunjucks({
