@@ -113,6 +113,7 @@ route.get('/view/:id', async (ctx, next) => {
     });
 });
 
+// Add functionality to make admin login
 route.post('/admin', async (ctx, next) => {
     return Recipe.find({}).then(async function(results) {
         console.log(ctx.request.body)
@@ -132,6 +133,8 @@ route.post('/admin', async (ctx, next) => {
     });
 });
 
+
+// Add login functionality (check database for matches)
 route.get('/login', async (ctx, next) => {
     await ctx.render('login');
 });
@@ -139,6 +142,23 @@ route.get('/login', async (ctx, next) => {
 
 route.get('/signup', async (ctx, next) => {
     await ctx.render('signup');
+});
+
+route.post('/signup', async (ctx, next) => {
+    return Recipe.find({}).then(async function(results) {
+        console.log(ctx.request.body)
+        console.log(process.env.userPass)
+        if(ctx.request.body.userPass === ctx.request.body.userPassConfirm)
+        {
+            console.log('Successful Sign Up');
+            await ctx.redirect("/");
+        }
+        else
+        {
+            console.log('Unsuccessful Sign Up');
+            await ctx.render("/signup");
+        }
+    });
 });
 
 route.get('/forgotpassword', async (ctx, next) => {

@@ -23,20 +23,29 @@
               <h2 class="fw-bold mb-2 text-uppercase">Signup</h2>
               <p class="text-white-50 mb-5">Please enter your email and a password!</p>
 
-              <div class="form-outline form-white mb-4">
-                <input type="email" id="typeEmailX" class="form-control form-control-lg" placeholder="Email"/>
-                <label class="form-label" for="typeEmailX"></label>
-              </div>
 
-              <div class="form-outline form-white mb-4">
-                <input type="password" id="typePasswordX" class="form-control form-control-lg" placeholder="Password"/>
-                <label class="form-label" for="typePasswordX"></label>
-              </div>
+              <!-- Need to add functionality to push into database-->
+              <form action="/signup" method="POST">
 
-              <div class="form-outline form-white mb-4">
-                <input type="password" id="typePasswordX" class="form-control form-control-lg" placeholder="Confirm Password"/>
-                <label class="form-label" for="typePasswordX"></label>
-              </div>
+
+              
+                <div class="form-outline form-white mb-4">
+                  <input type="email" id="typeEmailX" class="form-control form-control-lg" placeholder="Email"/>
+                  <label class="form-label" for="typeEmailX"></label>
+                </div>
+
+                <div class="form-outline form-white mb-4">
+                  <input type="password" id="typePasswordX" class="form-control form-control-lg" placeholder="Password"/>
+                  <label class="form-label" for="typePasswordX"></label>
+                </div>
+
+                <div class="form-outline form-white mb-4">
+                  <input type="password" id="typePasswordX" class="form-control form-control-lg" placeholder="Confirm Password"/>
+                  <label class="form-label" for="typePasswordX"></label>
+                </div>
+              
+              
+              </form>
 
 
               <button class="btn btn-outline-light btn-lg px-5" type="submit">Signup</button>
