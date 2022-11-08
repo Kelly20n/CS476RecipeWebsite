@@ -33,7 +33,6 @@ db.on('open', () => console.log ('Connection Made!'));
 const Recipe = require('./model/recipe.js');
 const User = require('./model/user.js');
 
-
 //////////////////////////
 //Create Our Server Object
 //////////////////////////
@@ -137,6 +136,7 @@ route.get('/login', async (ctx, next) => {
     await ctx.render('login');
 });
 
+
 route.get('/signup', async (ctx, next) => {
     await ctx.render('signup');
 });
@@ -144,6 +144,10 @@ route.get('/signup', async (ctx, next) => {
 route.get('/forgotpassword', async (ctx, next) => {
     await ctx.render('signup');
 });
+
+
+
+
 
 // route.get('/', (ctx, next) => {
 //     return ctx.render('index.html', {
