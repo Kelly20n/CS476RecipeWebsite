@@ -139,24 +139,52 @@ route.get('/login', async (ctx, next) => {
     await ctx.render('login');
 });
 
+route.post('/login',async (ctx, next) => {
+    return User.findOne({username: ctx.request.body.userEmail}).then(async function(results) {
+        /////////////////////////
+        //RESULTS HOLDS THE QUERY VARIABLES
+        /////////////////////////
+        console.log("results" + results + "\n")
+        console.log("ctx userEmail: " + ctx.request.body.userEmail + " userPass: " + ctx.request.body.userPass + "\n")
+        if(ctx.request.body.userEmail === results.username && ctx.request.body.userPass === results.password)
+        {
+            console.log('Successful Login');
+            await ctx.redirect("/");
+        }
+        else
+        {
+            console.log('Unsuccessful Login');
+            await ctx.redirect("/login");
+        }
+    });
+});
 
 route.get('/signup', async (ctx, next) => {
     await ctx.render('signup');
 });
 
 route.post('/signup', async (ctx, next) => {
-    return Recipe.find({}).then(async function(results) {
-        console.log(ctx.request.body)
-        console.log(process.env.userPass)
-        if(ctx.request.body.userPass === ctx.request.body.userPassConfirm)
+    /////////////////////////
+    //RESULTS HOLDS THE QUERY VARIABLES
+    /////////////////////////
+    return User.findOne({username: ctx.request.body.userEmail}).then(async function(err, results) {
+        //console.log("ctx: " + ctx.request.body.userPass + "\n")
+        console.log(err + "\n")
+        //Checks if password is equal
+        //Checks if there isnt another account with same email
+        //if all checks pass then successful signup
+        // Add logic to update mongoose of account
+        if (ctx.request.body.userPass == ctx.request.body.userPassConfirm && err == null)
         {
             console.log('Successful Sign Up');
             await ctx.redirect("/");
         }
+
+        
         else
         {
             console.log('Unsuccessful Sign Up');
-            await ctx.render("/signup");
+            await ctx.redirect("/signup");
         }
     });
 });

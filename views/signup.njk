@@ -27,29 +27,24 @@
               <!-- Need to add functionality to push into database-->
               <form action="/signup" method="POST">
 
-
-              
                 <div class="form-outline form-white mb-4">
-                  <input type="email" id="typeEmailX" class="form-control form-control-lg" placeholder="Email"/>
+                  <input type="email" id="typeEmailX" class="form-control form-control-lg" placeholder="Email" name="userEmail"/>
                   <label class="form-label" for="typeEmailX"></label>
                 </div>
 
                 <div class="form-outline form-white mb-4">
-                  <input type="password" id="typePasswordX" class="form-control form-control-lg" placeholder="Password"/>
+                  <input type="password" id="typePasswordX" class="form-control form-control-lg" placeholder="Password" name="userPass"/>
                   <label class="form-label" for="typePasswordX"></label>
                 </div>
 
                 <div class="form-outline form-white mb-4">
-                  <input type="password" id="typePasswordX" class="form-control form-control-lg" placeholder="Confirm Password"/>
+                  <input type="password" id="typePasswordX" class="form-control form-control-lg" placeholder="Confirm Password" name="userPassConfirm"/>
                   <label class="form-label" for="typePasswordX"></label>
                 </div>
-              
-              
+
+
+                <button class="btn btn-outline-light btn-lg px-5" type="submit">Signup</button>
               </form>
-
-
-              <button class="btn btn-outline-light btn-lg px-5" type="submit">Signup</button>
-
             </div>
 
           </div>
