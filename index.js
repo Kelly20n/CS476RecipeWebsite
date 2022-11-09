@@ -152,7 +152,12 @@ route.post('/login',async (ctx, next) => {
         /////////////////////////
         console.log("results" + results + "\n")
         console.log("ctx userEmail: " + ctx.request.body.userEmail + " userPass: " + ctx.request.body.userPass + "\n")
-        if(ctx.request.body.userEmail === results.username && ctx.request.body.userPass === results.password)
+        if(results === null)
+        {
+            console.log('Unsuccessful Login');
+            await ctx.redirect("/login");
+        }
+        else if(ctx.request.body.userEmail === results.username && ctx.request.body.userPass === results.password)
         {
             console.log('Successful Login');
             
