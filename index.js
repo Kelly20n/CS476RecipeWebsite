@@ -170,17 +170,31 @@ route.post('/signup', async (ctx, next) => {
     return User.findOne({username: ctx.request.body.userEmail}).then(async function(err, results) {
         //console.log("ctx: " + ctx.request.body.userPass + "\n")
         console.log(err + "\n")
+        console.log(ctx.request.body.userEmail)
         //Checks if password is equal
         //Checks if there isnt another account with same email
         //if all checks pass then successful signup
         // Add logic to update mongoose of account
+
         if (ctx.request.body.userPass == ctx.request.body.userPassConfirm && err == null)
         {
             console.log('Successful Sign Up');
+            
+            var newUser = new User({
+                //_id: newObjectID(),
+                username: ctx.request.body.userEmail,
+                password: ctx.request.body.userPass,
+                isAdmin: false,
+            });
+
+            newUser.save((err, res) => {
+                if(err) return handleError(err);
+                else return console.log("Result: ", res)
+            });
+
             await ctx.redirect("/");
         }
 
-        
         else
         {
             console.log('Unsuccessful Sign Up');
