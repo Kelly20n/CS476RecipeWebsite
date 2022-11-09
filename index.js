@@ -116,11 +116,17 @@ route.get('/view/:id', async (ctx, next) => {
 // Add functionality to make admin login
 route.post('/admin', async (ctx, next) => {
     return User.findOne({username: ctx.request.body.userEmail}).then(async function(results) {
-        if(ctx.request.body.pw === results.password && results.isAdmin)
+        if(results === null)
+        {
+            console.log("Admin Sign In Failed");
+            console.log('Connected to Index Route');
+            await ctx.redirect('/');
+        }
+        else if(ctx.request.body.pw === results.password && results.isAdmin)
         {
             console.log("Admin Sign In Successful");
             console.log('Connected to Admin Route');
-            await ctx.render('admin', {
+            await ctx.render('/admin', {
                 posts: results
             });
         }
