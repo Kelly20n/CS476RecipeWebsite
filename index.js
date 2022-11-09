@@ -115,11 +115,14 @@ route.get('/view/:id', async (ctx, next) => {
 
 // Add functionality to make admin login
 route.post('/admin', async (ctx, next) => {
-    return Recipe.find({}).then(async function(results) {
-        console.log(ctx.request.body)
-        console.log(process.env.pw)
-        if(ctx.request.body.pw === process.env.pw)
+    return User.findOne({username: ctx.request.body.userEmail}).then(async function(results) {
+        //console.log(ctx.request.body)
+
+        //console.log("!!!!!!!!!!!!!!!!!")
+        //console.log(process.env.pw)
+        if(ctx.request.body.pw === results.password && results.isAdmin)
         {
+            console.log("Admin Sign In Successful");
             console.log('Connected to Admin Route');
             await ctx.render('admin', {
                 posts: results
@@ -127,6 +130,7 @@ route.post('/admin', async (ctx, next) => {
         }
         else
         {
+            console.log("Admin Sign In Failed");
             console.log('Connected to Index Route');
             await ctx.redirect('/');
         }
