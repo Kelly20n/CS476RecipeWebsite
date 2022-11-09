@@ -116,10 +116,6 @@ route.get('/view/:id', async (ctx, next) => {
 // Add functionality to make admin login
 route.post('/admin', async (ctx, next) => {
     return User.findOne({username: ctx.request.body.userEmail}).then(async function(results) {
-        //console.log(ctx.request.body)
-
-        //console.log("!!!!!!!!!!!!!!!!!")
-        //console.log(process.env.pw)
         if(ctx.request.body.pw === results.password && results.isAdmin)
         {
             console.log("Admin Sign In Successful");
@@ -153,6 +149,7 @@ route.post('/login',async (ctx, next) => {
         if(ctx.request.body.userEmail === results.username && ctx.request.body.userPass === results.password)
         {
             console.log('Successful Login');
+            
             await ctx.redirect("/");
         }
         else
@@ -185,7 +182,6 @@ route.post('/signup', async (ctx, next) => {
             console.log('Successful Sign Up');
             
             var newUser = new User({
-                //_id: newObjectID(),
                 username: ctx.request.body.userEmail,
                 password: ctx.request.body.userPass,
                 isAdmin: false,
