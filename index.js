@@ -198,6 +198,12 @@ route.post('/search', async (ctx, next) => {
                 loop1:
                 for(var j = 0; j < searchTerm_Array.length; j++)
                 {
+                    /*
+                    if(searchTerm_Array[j] == undefined)
+                    {
+                        break loop1;
+                    }
+                    */
                     //console.log("Console [" + i + "] " + results[i]);
                     // Iterate through each ingredient in each item from the db
                     loop2:
