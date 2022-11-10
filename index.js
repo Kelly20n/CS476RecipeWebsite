@@ -94,7 +94,7 @@ const { getCipherInfo } = require('crypto');
 route.get('/', async (ctx, next) => {
     // console.log('connected to root route');
     return Recipe.find({}).then(async function(results) {
-        console.log(results);
+        //console.log(results);
         await ctx.render('index', {
             posts: results,
             name: process.env.NAME
@@ -143,10 +143,10 @@ route.post('/admin', async (ctx, next) => {
 });
 
 route.post('/search', async (ctx, next) => {
-    return Recipe.find({title: ctx.request.body.searchTerm}).then(async function(results){
-        
-        console.log(ctx.request.body.searchTerm)
-        console.log(results)
+    /*return Recipe.find({title: ctx.request.body.searchTerm}).then(async function(results){*/
+    return Recipe.find({}).then(async function(results){    
+        //console.log(ctx.request.body.searchTerm)
+        //console.log(results)
         
         if(results === null)
         {
@@ -154,7 +154,45 @@ route.post('/search', async (ctx, next) => {
         }
         else
         {
+            //Turns search terms seperated by commas into an array
+            var searchTerm_Array = ctx.request.body.searchTerm.split(/\s*,\s*/);
+            let isIngredientInEntry = false;
+            var dbIngredients;
+            // Iterate through items from db
+            loop0:
+            for(var i = 0; i < results.length; i++)
+            {
+                console.log("Viewing: " + results[i]);
+                //Turns ingredients in recipe tree into lists with each db entry
+                dbIngredients = results[i].ingredients.split(/\s*,\s*/);
+
+                // Iterate through each search term
+                loop1:
+                for(var j = 0; j < searchTerm_Array.length; j++)
+                {
+                    //console.log("Console [" + i + "] " + results[i]);
+                    // Iterate through each ingredient in each item from the db
+                    loop2:
+                    for(var k = 0; k < dbIngredients.length; k++)
+                    {
+                        if(searchTerm_Array[j] == dbIngredients[k])
+                        {
+                            console.log("Hit on: " + searchTerm_Array + results[i]);
+                            isIngredientInEntry = true;
+                            break loop1;
+                        }
+                    }
+
+                }
+                if(!isIngredientInEntry)
+                {
+                    console.log("Removed " + searchTerm_Array[j] + " wasn't found: " + results[i]);
+                    results.splice(i, 1);
+                }
+                isIngredientInEntry = false;
+            }
             await ctx.render('search', {
+                searchTerm: ctx.request.body.searchTerm,
                 posts: results
             });
         }
