@@ -1,4 +1,3 @@
-
 {% include './includes/head.njk' %}
 
 <div class="topnav">
@@ -16,5 +15,19 @@
     <div>{{post.title}}</div><br><Br>
     <div>Ingredients:<br><Br>{{post.ingredients}}</div><br><Br>
     <div>Instructions:<br><Br>{{post.instructions}}</div><br><Br>
+</div>
+
+<div class='comment'>
+    <div>Comments</div>
+    
+    
+    {% for comment in comments %}
+    <div class='comment'>
+        <div> {{comment.commentBody}}</div><br><Br>
+    </div>
+
+    {% endfor %}
+    
+    
 </div>
 

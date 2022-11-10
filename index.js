@@ -32,6 +32,7 @@ db.on('open', () => console.log ('Connection Made!'));
 //////////////////////////
 const Recipe = require('./model/recipe.js');
 const User = require('./model/user.js');
+const Comment = require('./model/comments.js');
 
 //////////////////////////
 //Create Our Server Object
@@ -108,11 +109,22 @@ route.get('/view/:id', async (ctx, next) => {
     console.log('connected to recipe route');
     return Recipe.findById(ctx.params.id).then(async function(results) {
         console.log(results)
+        var commentsOnPosts = await Comment.find({postId: ctx.params.id});
+        console.log("Comments: " + commentsOnPosts);
         await ctx.render('recipe', {
-            post: results
+            post: results,
+            comments: commentsOnPosts
         });
     });
 });
+
+/*
+route.post('/view/:id', async (ctx, next) => {
+    return Recipe.findById(ctx.params.id).then(async function(results) {
+       
+    });
+});
+*/
 
 // Add functionality to make admin login
 route.post('/admin', async (ctx, next) => {
