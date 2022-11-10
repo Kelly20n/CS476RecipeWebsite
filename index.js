@@ -103,6 +103,7 @@ route.get('/', async (ctx, next) => {
 });
 
 
+
 route.get('/view/:id', async (ctx, next) => {
     console.log('connected to recipe route');
     return Recipe.findById(ctx.params.id).then(async function(results) {
@@ -126,8 +127,10 @@ route.post('/admin', async (ctx, next) => {
         {
             console.log("Admin Sign In Successful");
             console.log('Connected to Admin Route');
-            await ctx.render('/admin', {
-                posts: results
+            var recipeResults = await Recipe.find({});
+            console.log(recipeResults);
+            await ctx.render('admin', {
+                posts: recipeResults
             });
         }
         else
@@ -135,6 +138,25 @@ route.post('/admin', async (ctx, next) => {
             console.log("Admin Sign In Failed");
             console.log('Connected to Index Route');
             await ctx.redirect('/');
+        }
+    });
+});
+
+route.post('/search', async (ctx, next) => {
+    return Recipe.find({title: ctx.request.body.searchTerm}).then(async function(results){
+        
+        console.log(ctx.request.body.searchTerm)
+        console.log(results)
+        
+        if(results === null)
+        {
+            await ctx.redirect('/');
+        }
+        else
+        {
+            await ctx.render('search', {
+                posts: results
+            });
         }
     });
 });
