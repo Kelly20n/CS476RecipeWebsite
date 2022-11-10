@@ -20,6 +20,12 @@
 <div class='comment'>
     <div>Comments</div>
     
+    <form action="/view/{{post.id}}" onsubmit="setTimeout(function(){window.location.reload();},50);" method="POST">
+        <div>
+            <textarea placeholder="Add a Comment" name="userComment"></textarea>
+            <input type="submit"/>
+        </div>
+    </form>
     
     {% for comment in comments %}
     <div class='comment'>

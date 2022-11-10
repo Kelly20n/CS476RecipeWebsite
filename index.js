@@ -118,13 +118,29 @@ route.get('/view/:id', async (ctx, next) => {
     });
 });
 
-/*
+
 route.post('/view/:id', async (ctx, next) => {
     return Recipe.findById(ctx.params.id).then(async function(results) {
-       
+        var newComment = new Comment({
+            postId: ctx.params.id,
+            commentBody: ctx.request.body.userComment,
+
+        });
+        newComment.save((err, res) => {
+            if(err) return handleError(err);
+            else return console.log("Result: ", res)
+        });
+        /*
+        var commentsOnPosts = await Comment.find({postId: ctx.params.id});
+        console.log("Comments: " + commentsOnPosts);
+        await ctx.render('/view/{ctx.params.id}', {
+            post: results,
+            comments: commentsOnPosts
+        });
+        */
     });
 });
-*/
+
 
 // Add functionality to make admin login
 route.post('/admin', async (ctx, next) => {
