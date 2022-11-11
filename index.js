@@ -184,13 +184,17 @@ route.post('/search', async (ctx, next) => {
         {
             //Turns search terms seperated by commas into an array
             var searchTerm_Array = ctx.request.body.searchTerm.split(/\s*,\s*/);
+            console.log("Search Terms: " + searchTerm_Array.length);
             let isIngredientInEntry = false;
             var dbIngredients;
+            var listOfIngredientsToRemove = [];
             // Iterate through items from db
             loop0:
             for(var i = 0; i < results.length; i++)
             {
-                console.log("Viewing: " + results[i]);
+                console.log("Loop: " + i);
+                console.log("Results Lenght:" + results.length);
+                console.log("Viewing: " + results[i].ingredients);
                 //Turns ingredients in recipe tree into lists with each db entry
                 dbIngredients = results[i].ingredients.split(/\s*,\s*/);
 
@@ -198,30 +202,25 @@ route.post('/search', async (ctx, next) => {
                 loop1:
                 for(var j = 0; j < searchTerm_Array.length; j++)
                 {
-                    /*
-                    if(searchTerm_Array[j] == undefined)
-                    {
-                        break loop1;
-                    }
-                    */
-                    //console.log("Console [" + i + "] " + results[i]);
-                    // Iterate through each ingredient in each item from the db
                     loop2:
                     for(var k = 0; k < dbIngredients.length; k++)
                     {
                         if(searchTerm_Array[j] == dbIngredients[k])
                         {
-                            console.log("Hit on: " + searchTerm_Array + results[i]);
+                            console.log("Hit on: " + searchTerm_Array[j] + results[i]);
                             isIngredientInEntry = true;
-                            break loop1;
+                            //break loop1;
                         }
                     }
 
                 }
                 if(!isIngredientInEntry)
                 {
-                    console.log("Removed " + searchTerm_Array[j] + " wasn't found: " + results[i]);
+                    console.log("Removed " + searchTerm_Array + " wasn't found: " + results[i]);
+                    //listOfIngredientsToRemove += i;
                     results.splice(i, 1);
+                    i--;
+                    // Removes item from results and decrements i to make algorithm look at index i again (new value now in the place)
                 }
                 isIngredientInEntry = false;
             }
