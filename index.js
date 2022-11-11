@@ -184,7 +184,7 @@ route.post('/search', async (ctx, next) => {
         {
             //Turns search terms seperated by commas into an array
             var searchTerm_Array = ctx.request.body.searchTerm.split(/\s*,\s*/);
-            console.log("Search Terms: " + searchTerm_Array.length);
+            console.log("Search Terms: " + searchTerm_Array);
             let isIngredientInEntry = false;
             var dbIngredients;
             var listOfIngredientsToRemove = [];
@@ -192,9 +192,8 @@ route.post('/search', async (ctx, next) => {
             loop0:
             for(var i = 0; i < results.length; i++)
             {
-                console.log("Loop: " + i);
-                console.log("Results Lenght:" + results.length);
-                console.log("Viewing: " + results[i].ingredients);
+                
+                //console.log("Viewing: " + results[i].ingredients);
                 //Turns ingredients in recipe tree into lists with each db entry
                 dbIngredients = results[i].ingredients.split(/\s*,\s*/);
 
@@ -207,7 +206,7 @@ route.post('/search', async (ctx, next) => {
                     {
                         if(searchTerm_Array[j] == dbIngredients[k])
                         {
-                            console.log("Hit on: " + searchTerm_Array[j] + results[i]);
+                            //console.log("Hit on: " + searchTerm_Array[j] + results[i]);
                             isIngredientInEntry = true;
                             //break loop1;
                         }
@@ -216,7 +215,7 @@ route.post('/search', async (ctx, next) => {
                 }
                 if(!isIngredientInEntry)
                 {
-                    console.log("Removed " + searchTerm_Array + " wasn't found: " + results[i]);
+                    //console.log("Removed " + searchTerm_Array + " wasn't found: " + results[i]);
                     //listOfIngredientsToRemove += i;
                     results.splice(i, 1);
                     i--;
