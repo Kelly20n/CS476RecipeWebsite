@@ -28,18 +28,18 @@ db.on('disconnected', () => console.log ('Mongo is disconnected'));
 db.on('open', () => console.log ('Connection Made!'));
 
 //////////////////////////
-//Model Schema
-//////////////////////////
-const Recipe = require('./model/recipe.js');
-const User = require('./model/user.js');
-const Comment = require('./model/comments.js');
-
-//////////////////////////
 //Create Our Server Object
 //////////////////////////
 const logger = require('koa-logger')
 const koa = require('koa');
 const server = new koa();
+
+//////////////////////////
+//Bring in controllers
+//////////////////////////
+
+const recipeController = require('./controller/recipecontroller');
+const userController = require('./controller/usercontroller');
 
 
 //////////////////////////
@@ -47,13 +47,6 @@ const server = new koa();
 //npm i koa-static
 //////////////////////////
 const static = require('koa-static');
-
-//////////////////////////
-//Creating Our Router
-//npm i koa-router
-//////////////////////////
-const Router = require('koa-router');
-const route = Router();
 
 //////////////////////////
 //Setting up authentication
@@ -77,256 +70,6 @@ const { append } = require('koa/lib/response.js');
 const { getCipherInfo } = require('crypto');
 
 //////////////////////////
-//Routes
-//Route.get - route.post - route.patch - post.put - route.delete
-//////////////////////////
-// route.get('/', (ctx, next) => {
-//     console.log('connected to root route');
-//     return Recipe.find({}, async (error, results) => {
-//         console.log(results);
-//         await ctx.render('index', {
-//             posts: results,
-//             name: process.env.NAME
-//         });
-        
-//     }).clone()
-// });
-
-route.get('/', async (ctx, next) => {
-    // console.log('connected to root route');
-    return Recipe.find({}).then(async function(results) {
-        //console.log(results);
-        await ctx.render('index', {
-            posts: results,
-            name: process.env.NAME
-        });
-    });
-});
-
-
-
-route.get('/view/:id', async (ctx, next) => {
-    console.log('connected to recipe route');
-    return Recipe.findById(ctx.params.id).then(async function(results) {
-        console.log(results)
-        var commentsOnPosts = await Comment.find({postId: ctx.params.id});
-        console.log("Comments: " + commentsOnPosts);
-        await ctx.render('recipe', {
-            post: results,
-            comments: commentsOnPosts
-        });
-    });
-});
-
-
-route.post('/view/:id', async (ctx, next) => {
-    return Recipe.findById(ctx.params.id).then(async function(results) {
-        var newComment = new Comment({
-            postId: ctx.params.id,
-            commentBody: ctx.request.body.userComment,
-
-        });
-        newComment.save((err, res) => {
-            if(err) return handleError(err);
-            else return console.log("Result: ", res)
-        });
-        /*
-        var commentsOnPosts = await Comment.find({postId: ctx.params.id});
-        console.log("Comments: " + commentsOnPosts);
-        await ctx.render('/view/{ctx.params.id}', {
-            post: results,
-            comments: commentsOnPosts
-        });
-        */
-    });
-});
-
-
-// Add functionality to make admin login
-route.post('/admin', async (ctx, next) => {
-    return User.findOne({username: ctx.request.body.userEmail}).then(async function(results) {
-        if(results === null)
-        {
-            console.log("Admin Sign In Failed");
-            console.log('Connected to Index Route');
-            await ctx.redirect('/');
-        }
-        else if(ctx.request.body.pw === results.password && results.isAdmin)
-        {
-            console.log("Admin Sign In Successful");
-            console.log('Connected to Admin Route');
-            var recipeResults = await Recipe.find({});
-            console.log(recipeResults);
-            await ctx.render('admin', {
-                posts: recipeResults
-            });
-        }
-        else
-        {
-            console.log("Admin Sign In Failed");
-            console.log('Connected to Index Route');
-            await ctx.redirect('/');
-        }
-    });
-});
-
-route.post('/search', async (ctx, next) => {
-    /*return Recipe.find({title: ctx.request.body.searchTerm}).then(async function(results){*/
-    return Recipe.find({}).then(async function(results){    
-        //console.log(ctx.request.body.searchTerm)
-        //console.log(results)
-        
-        if(results === null)
-        {
-            await ctx.redirect('/');
-        }
-        else
-        {
-            //Turns search terms seperated by commas into an array
-            var searchTerm_Array = ctx.request.body.searchTerm.split(/\s*,\s*/);
-            console.log("Search Terms: " + searchTerm_Array);
-            let isIngredientInEntry = false;
-            var dbIngredients;
-            var listOfIngredientsToRemove = [];
-            // Iterate through items from db
-            loop0:
-            for(var i = 0; i < results.length; i++)
-            {
-                
-                //console.log("Viewing: " + results[i].ingredients);
-                //Turns ingredients in recipe tree into lists with each db entry
-                dbIngredients = results[i].ingredients.split(/\s*,\s*/);
-
-                // Iterate through each search term
-                loop1:
-                for(var j = 0; j < searchTerm_Array.length; j++)
-                {
-                    loop2:
-                    for(var k = 0; k < dbIngredients.length; k++)
-                    {
-                        if(searchTerm_Array[j] == dbIngredients[k])
-                        {
-                            //console.log("Hit on: " + searchTerm_Array[j] + results[i]);
-                            isIngredientInEntry = true;
-                            //break loop1;
-                        }
-                    }
-
-                }
-                if(!isIngredientInEntry)
-                {
-                    //console.log("Removed " + searchTerm_Array + " wasn't found: " + results[i]);
-                    //listOfIngredientsToRemove += i;
-                    results.splice(i, 1);
-                    i--;
-                    // Removes item from results and decrements i to make algorithm look at index i again (new value now in the place)
-                }
-                isIngredientInEntry = false;
-            }
-            await ctx.render('search', {
-                searchTerm: ctx.request.body.searchTerm,
-                posts: results
-            });
-        }
-    });
-});
-
-
-// Add login functionality (check database for matches)
-route.get('/login', async (ctx, next) => {
-    await ctx.render('login');
-});
-
-route.post('/login',async (ctx, next) => {
-    return User.findOne({username: ctx.request.body.userEmail}).then(async function(results) {
-        /////////////////////////
-        //RESULTS HOLDS THE QUERY VARIABLES
-        /////////////////////////
-        console.log("results" + results + "\n")
-        console.log("ctx userEmail: " + ctx.request.body.userEmail + " userPass: " + ctx.request.body.userPass + "\n")
-        if(results === null)
-        {
-            console.log('Unsuccessful Login');
-            await ctx.redirect("/login");
-        }
-        else if(ctx.request.body.userEmail === results.username && ctx.request.body.userPass === results.password)
-        {
-            console.log('Successful Login');
-            
-            await ctx.redirect("/");
-        }
-        else
-        {
-            console.log('Unsuccessful Login');
-            await ctx.redirect("/login");
-        }
-    });
-});
-
-route.get('/signup', async (ctx, next) => {
-    await ctx.render('signup');
-});
-
-route.post('/signup', async (ctx, next) => {
-    /////////////////////////
-    //RESULTS HOLDS THE QUERY VARIABLES
-    /////////////////////////
-    return User.findOne({username: ctx.request.body.userEmail}).then(async function(err, results) {
-        //console.log("ctx: " + ctx.request.body.userPass + "\n")
-        console.log(err + "\n")
-        console.log(ctx.request.body.userEmail)
-        //Checks if password is equal
-        //Checks if there isnt another account with same email
-        //if all checks pass then successful signup
-        // Add logic to update mongoose of account
-
-        if (ctx.request.body.userPass == ctx.request.body.userPassConfirm && err == null)
-        {
-            console.log('Successful Sign Up');
-            
-            var newUser = new User({
-                username: ctx.request.body.userEmail,
-                password: ctx.request.body.userPass,
-                isAdmin: false,
-            });
-
-            newUser.save((err, res) => {
-                if(err) return handleError(err);
-                else return console.log("Result: ", res)
-            });
-
-            await ctx.redirect("/");
-        }
-
-        else
-        {
-            console.log('Unsuccessful Sign Up');
-            await ctx.redirect("/signup");
-        }
-    });
-});
-
-route.get('/forgotpassword', async (ctx, next) => {
-    await ctx.render('signup');
-});
-
-
-
-
-
-// route.get('/', (ctx, next) => {
-//     return ctx.render('index.html', {
-//         name: process.env.NAME
-//     })
-// });
-
-// route.get('/:name', (ctx, next) => {
-//     return ctx.render('./index.html', {
-//         name: ctx.params.name
-//     })
-// });
-
-//////////////////////////
 //Middleware
 //////////////////////////
 // server.use(views('./views', {map: {html: 'nunjucks'}}));
@@ -340,11 +83,9 @@ server.use(koaNunjucks({
         trimBlocks: true
     }
 }));
-server.use(route.routes());
+server.use(recipeController.routes());
+server.use(userController.routes());
 server.use(static('./public'));
-
-
-
 
 
 //////////////////////////
