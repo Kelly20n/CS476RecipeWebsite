@@ -107,7 +107,7 @@ route.post('/signup', async (ctx, next) => {
 });
 
 route.get('/forgotpassword', async (ctx, next) => {
-    await ctx.render('signup');
+    await ctx.render('forgotpassword');
 });
 
 
