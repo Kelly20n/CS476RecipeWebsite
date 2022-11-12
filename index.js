@@ -33,6 +33,7 @@ db.on('open', () => console.log ('Connection Made!'));
 const Recipe = require('./model/recipe.js');
 const User = require('./model/user.js');
 const Comment = require('./model/comments.js');
+const ToBeApproved = require('./model/approval.js');
 
 //////////////////////////
 //Create Our Server Object
@@ -103,7 +104,43 @@ route.get('/', async (ctx, next) => {
     });
 });
 
+//get and post for posting a recipe
+route.get('/postPage', async (ctx, next) => {
+// console.log('connected to root route');
+    //console.log(results);
+    await ctx.render('postPage');
+});
 
+route.post('/postPage', async (ctx, next) => {
+   
+    var newRecipe = new Recipe({
+       title: ctx.request.body.recipeTitle,
+       ingredients: ctx.request.body.recipeIngredients,
+       instructions: ctx.request.body.recipeInstructions,
+    });
+
+    newRecipe.save((err, res) => {
+        if(err) return handleError(err);
+        else return console.log("Result: ", res)
+    });
+
+    //Approval of recipe functionality
+    var userInfo = await User.find({username});
+    if(userInfo.isAdmin == true)
+    {
+        await ctx.redirect('/postPage');
+    }
+    await ctx.redirect('/');
+
+    /*
+    var commentsOnPosts = await Comment.find({postId: ctx.params.id});
+    console.log("Comments: " + commentsOnPosts);
+    await ctx.render('/view/{ctx.params.id}', {
+        post: results,
+        comments: commentsOnPosts
+    });
+    */
+});
 
 route.get('/view/:id', async (ctx, next) => {
     console.log('connected to recipe route');
