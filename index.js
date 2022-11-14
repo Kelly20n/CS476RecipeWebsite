@@ -125,12 +125,12 @@ route.post('/postPage', async (ctx, next) => {
     });
 
     //Approval of recipe functionality
-    var userInfo = await User.find({username});
-    if(userInfo.isAdmin == true)
-    {
-        await ctx.redirect('/postPage');
-    }
-    await ctx.redirect('/');
+    // var userInfo = await User.find({username});
+    // if(userInfo.isAdmin == true)
+    // {
+    //     await ctx.redirect('/postPage');
+    // }
+    // await ctx.redirect('/');
 
     /*
     var commentsOnPosts = await Comment.find({postId: ctx.params.id});
@@ -140,6 +140,23 @@ route.post('/postPage', async (ctx, next) => {
         comments: commentsOnPosts
     });
     */
+});
+
+//get and post for approval page
+// route.get('/approval', async (ctx, next) => {
+//     // console.log('connected to root route');
+//         //console.log(results);
+//         await ctx.render('approval');
+// });
+
+route.get('/approval', async (ctx, next) => {
+    // console.log('connected to root route');
+    return Recipe.find({}).then(async function(results) {
+        //console.log(results);
+        await ctx.render('approval', {
+            posts: results
+        });
+    });
 });
 
 route.get('/view/:id', async (ctx, next) => {
