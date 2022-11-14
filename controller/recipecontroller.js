@@ -3,6 +3,7 @@ const Koa = require('koa');
 const Recipe = require('../model/recipe.js');
 const Comment = require('../model/comments.js');
 const Router = require('koa-router');
+const jwt = require('jsonwebtoken');
 
 const route = Router();
 
@@ -31,28 +32,48 @@ route.get('/view/:id', async (ctx, next) => {
 });
 
 route.post('/view/:id', async (ctx, next) => {
-    return Recipe.findById(ctx.params.id).then(async function(results) {
-        var newComment = new Comment({
-            postId: ctx.params.id,
-            commentBody: ctx.request.body.userComment,
-
-        });
-        newComment.save((err, res) => {
-            if(err) return handleError(err);
-            else return console.log("Result: ", res)
-        });
-        /*
-        var commentsOnPosts = await Comment.find({postId: ctx.params.id});
-        console.log("Comments: " + commentsOnPosts);
-        await ctx.render('/view/{ctx.params.id}', {
-            post: results,
-            comments: commentsOnPosts
-        });
-        */
+    return jwt.verify(ctx.cookies.get('token'), process.env.TOKEN_SECRET, async (err, info) => {
+        if(err){
+            console.log('Not valid token!')
+            return await ctx.redirect('/login')
+        }
+        else {
+            console.log(info)
+        }
+       
+        if(ctx.request.body.userComment === '')
+        {
+            return Recipe.findById(ctx.params.id).then(async function(results) {
+                console.log(results)
+                var commentsOnPosts = await Comment.find({postId: ctx.params.id});
+                console.log("Comments: " + commentsOnPosts);
+                await ctx.render('recipe', {
+                    post: results,
+                    comments: commentsOnPosts
+                });
+            });
+        }
+        else{
+            return Recipe.findById(ctx.params.id).then(async function(results) {
+                var newComment = new Comment({
+                    postId: ctx.params.id,
+                    commentBody: ctx.request.body.userComment,
+                });
+                newComment.save();
+                await new Promise(r => setTimeout(r, 1000));
+                var commentsOnPosts = await Comment.find({postId: ctx.params.id});
+                console.log("Comments: " + commentsOnPosts);
+                await ctx.render('recipe', {
+                    post: results,
+                    comments: commentsOnPosts
+                });
+            
+            });
+        }
     });
 });
 
-route.post('/search', async (ctx, next) => {
+route.post('/public/search', async (ctx, next) => {
     /*return Recipe.find({title: ctx.request.body.searchTerm}).then(async function(results){*/
     return Recipe.find({}).then(async function(results){    
         //console.log(ctx.request.body.searchTerm)
@@ -116,6 +137,5 @@ route.post('/search', async (ctx, next) => {
         }
     });
 });
-
 
 module.exports = route;

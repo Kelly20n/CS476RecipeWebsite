@@ -3,6 +3,7 @@ const Koa = require('koa');
 const User = require('../model/user');
 const Recipe = require('../model/recipe');
 const Router = require('koa-router');
+const jwt = require('jsonwebtoken');
 
 const route = Router();
 
@@ -33,12 +34,8 @@ route.post('/admin', async (ctx, next) => {
     });
 });
 
-route.get('/login', async (ctx, next) => {
-        await ctx.render('login');
-    });
-
-route.post('/login',async (ctx, next) => {
-    return User.findOne({username: ctx.request.body.userEmail}).then(async function(results) {
+route.post('/login', async (ctx, next) => {
+        return User.findOne({username: ctx.request.body.userEmail}).then(async function(results) {
         /////////////////////////
         //RESULTS HOLDS THE QUERY VARIABLES
         /////////////////////////
@@ -47,24 +44,48 @@ route.post('/login',async (ctx, next) => {
         if(results === null)
         {
             console.log('Unsuccessful Login');
-            await ctx.redirect("/login");
+            await ctx.redirect("login");
         }
         else if(ctx.request.body.userEmail === results.username && ctx.request.body.userPass === results.password)
         {
-            console.log('Successful Login');
+            const secret = process.env.TOKEN_SECRET
+            const jwtToken = jwt.sign(ctx.request.body, secret, {expiresIn: 60 * 60})
+            ctx.cookies.set('token', jwtToken)
+            console.log(ctx.cookies.get('token'))
+
+            console.log(jwtToken);
+
+
+            jwt.verify(ctx.cookies.get('token'), process.env.TOKEN_SECRET, (err, results) => {
+                if(err){
+                    console.log('Not valid token!')
+                    ctx.redirect('/')
+                }
+                else {
+                    console.log(results)
+                }
+            });
+
+            // ctx.cookies.set('token', token, { httpOnly: true})
+            // const test = ctx.cookies.get('token')
+            // console.log(test)
+            // try {
+            //     const decoded = jwt.verify(test, secret);
+            //   } catch(err) {
+            //     // err
+            //   }
             
+            // const jwtToken = jwt.sign(ctx.request.body.userEmail, process.env.TOKEN_SECRET, {expiresIn: '2h'})
+
+            // console.log('Successful Login');
             await ctx.redirect("/");
         }
         else
         {
             console.log('Unsuccessful Login');
-            await ctx.redirect("/login");
+            await ctx.redirect("login");
         }
     });
-});
-
-route.get('/signup', async (ctx, next) => {
-    await ctx.render('signup');
 });
 
 route.post('/signup', async (ctx, next) => {
@@ -101,14 +122,25 @@ route.post('/signup', async (ctx, next) => {
         else
         {
             console.log('Unsuccessful Sign Up');
-            await ctx.redirect("/signup");
+            await ctx.redirect("signup");
         }
     });
+});
+
+route.get('/signedin', async (ctx, next) => {
+    await ctx.render('signedin');
+})
+
+route.get('/login', async (ctx, next) => {
+    await ctx.render('login');
+});
+
+route.get('/signup', async (ctx, next) => {
+    await ctx.render('signup');
 });
 
 route.get('/forgotpassword', async (ctx, next) => {
     await ctx.render('forgotpassword');
 });
-
 
 module.exports = route;

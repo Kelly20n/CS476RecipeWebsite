@@ -37,10 +37,8 @@ const server = new koa();
 //////////////////////////
 //Bring in controllers
 //////////////////////////
-
 const recipeController = require('./controller/recipecontroller');
 const userController = require('./controller/usercontroller');
-
 
 //////////////////////////
 //Create Our Static Folder
@@ -61,9 +59,6 @@ const session = require('koa-session');
 //npm i koa-views
 //npm i nunjucks
 //////////////////////////
-// const views = require('koa-views');
-// const nunj = require('nunjucks');
-// nunj.configure('./views', {autoescape: true});
 const koaNunjucks = require('koa-nunjucks-2');
 const path = require('path');
 const { append } = require('koa/lib/response.js');
@@ -72,7 +67,6 @@ const { getCipherInfo } = require('crypto');
 //////////////////////////
 //Middleware
 //////////////////////////
-// server.use(views('./views', {map: {html: 'nunjucks'}}));
 server.use(logger());
 server.use(override('_method'));
 server.use(parser());
@@ -84,7 +78,9 @@ server.use(koaNunjucks({
     }
 }));
 server.use(recipeController.routes());
+server.use(recipeController.allowedMethods());
 server.use(userController.routes());
+server.use(userController.allowedMethods());
 server.use(static('./public'));
 
 
