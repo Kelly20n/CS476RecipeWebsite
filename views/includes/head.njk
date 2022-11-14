@@ -4,6 +4,10 @@
 <title>Recipe Website</title>
 <link rel="stylesheet" href="https://bootswatch.com/5/darkly/bootstrap.min.css">
 <style>
+#admin {
+  visibility: hidden;
+}
+
 body {
   margin: 0;
   font-family: Arial, Helvetica, sans-serif;
@@ -38,3 +42,28 @@ body {
     margin-right: 10px;
 }
 </style>
+
+<body onload="checkAdmin()">
+
+<div class="topnav">
+        <a class="active" href="/">Home</a>
+        <a href="#news">News</a>
+        <a href="#contact">Contact</a>
+        <a href="#about">About</a>
+        <div class="right">
+            <a id="admin" href="/admin">Admin
+            <a href="/postPage">Add Recipe</a>
+            <a href="/login">Login</a>
+            <a href="/signout">Signout</a>
+            <a href="/signup">Signup</a>
+        </div>
+</div>
+
+<script>
+  function checkAdmin() {
+    var x = document.getElementById("admin");
+    if({{admin.isAdmin}} === true) {
+      x.style.visibility = "visible";
+    }
+  }
+</script>

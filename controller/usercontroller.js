@@ -7,30 +7,23 @@ const jwt = require('jsonwebtoken');
 
 const route = Router();
 
-route.post('/admin', async (ctx, next) => {
-    return User.findOne({username: ctx.request.body.userEmail}).then(async function(results) {
-        if(results === null)
-        {
-            console.log("Admin Sign In Failed");
-            console.log('Connected to Index Route');
-            await ctx.redirect('/');
+route.get('/admin', async (ctx, next) => {
+    return jwt.verify(ctx.cookies.get('token'), process.env.TOKEN_SECRET, async (err, info) => {
+        if(err){
+            console.log('Not valid token!')
+            return await ctx.redirect('/login')
         }
-        else if(ctx.request.body.pw === results.password && results.isAdmin)
-        {
-            console.log("Admin Sign In Successful");
-            console.log('Connected to Admin Route');
+        else {
+            // console.log(info)
+        }
+        return User.find({}).then(async function(results) {
             var recipeResults = await Recipe.find({});
             console.log(recipeResults);
             await ctx.render('admin', {
+                users: results,
                 posts: recipeResults
             });
-        }
-        else
-        {
-            console.log("Admin Sign In Failed");
-            console.log('Connected to Index Route');
-            await ctx.redirect('/');
-        }
+        });
     });
 });
 
@@ -65,19 +58,6 @@ route.post('/login', async (ctx, next) => {
                     console.log(results)
                 }
             });
-
-            // ctx.cookies.set('token', token, { httpOnly: true})
-            // const test = ctx.cookies.get('token')
-            // console.log(test)
-            // try {
-            //     const decoded = jwt.verify(test, secret);
-            //   } catch(err) {
-            //     // err
-            //   }
-            
-            // const jwtToken = jwt.sign(ctx.request.body.userEmail, process.env.TOKEN_SECRET, {expiresIn: '2h'})
-
-            // console.log('Successful Login');
             await ctx.redirect("/");
         }
         else
@@ -116,7 +96,7 @@ route.post('/signup', async (ctx, next) => {
                 else return console.log("Result: ", res)
             });
 
-            await ctx.redirect("/");
+            await ctx.redirect("/login");
         }
 
         else
@@ -126,6 +106,11 @@ route.post('/signup', async (ctx, next) => {
         }
     });
 });
+
+route.get('/signout', async (ctx, next) => {
+    ctx.cookies.set('token', null);
+    await ctx.redirect('/');
+})
 
 route.get('/signedin', async (ctx, next) => {
     await ctx.render('signedin');

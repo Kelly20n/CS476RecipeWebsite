@@ -2,6 +2,7 @@ require('dotenv').config();
 const Koa = require('koa');
 const Recipe = require('../model/recipe.js');
 const Comment = require('../model/comments.js');
+const User = require('../model/user.js');
 const Router = require('koa-router');
 const jwt = require('jsonwebtoken');
 
@@ -9,13 +10,33 @@ const route = Router();
 
 route.get('/', async (ctx, next) => {
     // console.log('connected to root route');
-    return Recipe.find({}).then(async function(results) {
-        //console.log(results);
-        await ctx.render('index', {
-            posts: results,
-            name: process.env.NAME
+    if(ctx.cookies.get("token") != null) {
+        const decoded = jwt.decode(ctx.cookies.get("token"), {complete: true});
+        const payload = decoded.payload
+        return User.findOne({username: payload.userEmail}).then(async function(firstresults) {
+            return Recipe.find({}).then(async function(results) {
+                //console.log(results);
+                console.log(firstresults);
+                await ctx.render('index', {
+                    posts: results,
+                    name: process.env.NAME,
+                    admin: firstresults
+                });
+            });
         });
-    });
+    }
+    else {
+        return Recipe.find({}).then(async function(results) {
+            //console.log(results);
+            await ctx.render('index', {
+                posts: results,
+                name: process.env.NAME,
+            });
+        });
+    }
+    // const adminCheck = User.findOne({username: payload.userEmail});
+    
+    
 });
 
 route.get('/view/:id', async (ctx, next) => {
@@ -38,7 +59,7 @@ route.post('/view/:id', async (ctx, next) => {
             return await ctx.redirect('/login')
         }
         else {
-            console.log(info)
+            // console.log(info)
         }
        
         if(ctx.request.body.userComment === '')
@@ -73,7 +94,25 @@ route.post('/view/:id', async (ctx, next) => {
     });
 });
 
-route.post('/public/search', async (ctx, next) => {
+route.get('/postPage', async (ctx, next) => {
+    await ctx.render('postPage');
+});
+    
+route.post('/postPage', async (ctx, next) => {
+    
+    var newRecipe = new Recipe({
+        title: ctx.request.body.recipeTitle,
+        ingredients: ctx.request.body.recipeIngredients,
+        instructions: ctx.request.body.recipeInstructions,
+    });
+
+    newRecipe.save((err, res) => {
+        if(err) return handleError(err);
+        else return console.log("Result: ", res)
+    });
+});
+
+route.post('/search', async (ctx, next) => {
     /*return Recipe.find({title: ctx.request.body.searchTerm}).then(async function(results){*/
     return Recipe.find({}).then(async function(results){    
         //console.log(ctx.request.body.searchTerm)
