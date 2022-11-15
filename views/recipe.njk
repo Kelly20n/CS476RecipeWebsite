@@ -8,15 +8,8 @@
 
 <div class='comment'>
     <div>Comments</div>
-    
-    {# <form action="/view/{{post.id}}" onsubmit="setTimeout(function(){window.location.reload();},100);" method="POST">
-        <div>
-            <textarea placeholder="Add a Comment" name="userComment"></textarea>
-            <input type="submit"/>
-        </div>
-    </form> #}
 
-    <form action="/view/{{post.id}}" method="POST">
+    <form action="/view/{{post.id}}" onsubmit="return loginValidate()" method="POST">
         <div>
             <textarea placeholder="Add a Comment" name="userComment"></textarea>
             <input type="submit"/>
@@ -32,4 +25,3 @@
     
     
 </div>
-
