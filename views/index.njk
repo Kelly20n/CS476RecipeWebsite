@@ -1,28 +1,5 @@
 {% include './includes/head.njk' %}
 
-
-
-<div class="topnav">
-    <a class="active" href="/">Home</a>
-    <a href="#news">News</a>
-    <a href="#contact">Contact</a>
-    <a href="#about">About</a>
-    <div class="right"> 
-        <a href = "/postPage"> postPage </a>
-        <a href="/login">Login</a>
-        <a href="/signup">Signup</a>
-    </div>
-</div>
-
-<div class = 'form-floating mb-3'>
-
-    <form action="/admin" method="POST">
-    <input type = "email" placeholder="Email" name="userEmail">
-    <input type = "password" placeholder="Password" name="pw"/>
-    <input type = "submit" value="ADMIN ACCESS"/>
-    </form>
-</div>
-
 <div class = 'form-floating mb-3'>
 
     <form action="/search" method="POST">
@@ -30,8 +7,7 @@
     <input type = "submit" />
     </form>
 </div>
-
-Welcome to this website, {{name}}.<br><Br>
+Welcome to this website, {{admin.username}}<br><Br>
 {% for post in posts %}
 <div class='post'>
     <a href="/view/{{post.id}}"> <div>{{post.title}}</div></a><br><Br>
