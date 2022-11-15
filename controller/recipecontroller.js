@@ -1,10 +1,12 @@
 require('dotenv').config();
 const Koa = require('koa');
 const Recipe = require('../model/recipe.js');
-const Comment = require('../model/comments.js');
 const User = require('../model/user.js');
 const Router = require('koa-router');
+const CommentFunctions = require('../functions/commentfunctions.js')
+const GeneralFunctions = require('../functions/generalfunctions.js')
 const jwt = require('jsonwebtoken');
+
 
 const route = Router();
 
@@ -33,66 +35,28 @@ route.get('/', async (ctx, next) => {
                 name: process.env.NAME,
             });
         });
-    }
-    // const adminCheck = User.findOne({username: payload.userEmail});
-    
-    
+    }  
 });
 
 route.get('/view/:id', async (ctx, next) => {
-    console.log('connected to recipe route');
-    return Recipe.findById(ctx.params.id).then(async function(results) {
-        console.log(results)
-        var commentsOnPosts = await Comment.find({postId: ctx.params.id});
-        console.log("Comments: " + commentsOnPosts);
-        await ctx.render('recipe', {
-            post: results,
-            comments: commentsOnPosts
-        });
-    });
+    return CommentFunctions.displayComments(ctx);
 });
 
 route.post('/view/:id', async (ctx, next) => {
-    return jwt.verify(ctx.cookies.get('token'), process.env.TOKEN_SECRET, async (err, info) => {
-        if(err){
-            console.log('Not valid token!')
-            return await ctx.redirect('/login')
+    if(GeneralFunctions.verifyUser(ctx) === true)
+    {
+        if(ctx.request.body.userComment === '') {
+            return CommentFunctions.postComments(ctx);
         }
         else {
-            // console.log(info)
+            CommentFunctions.createComment(ctx);
+            GeneralFunctions.sleep();
+            return CommentFunctions.displayComments(ctx);
         }
-       
-        if(ctx.request.body.userComment === '')
-        {
-            return Recipe.findById(ctx.params.id).then(async function(results) {
-                console.log(results)
-                var commentsOnPosts = await Comment.find({postId: ctx.params.id});
-                console.log("Comments: " + commentsOnPosts);
-                await ctx.render('recipe', {
-                    post: results,
-                    comments: commentsOnPosts
-                });
-            });
-        }
-        else{
-            return Recipe.findById(ctx.params.id).then(async function(results) {
-                var newComment = new Comment({
-                    postId: ctx.params.id,
-                    commentBody: ctx.request.body.userComment,
-                });
-                newComment.save();
-                await new Promise(r => setTimeout(r, 1000));
-                var commentsOnPosts = await Comment.find({postId: ctx.params.id});
-                console.log("Comments: " + commentsOnPosts);
-                await ctx.render('recipe', {
-                    post: results,
-                    comments: commentsOnPosts
-                });
-            
-            });
-        }
-    });
+    }
+    else return;
 });
+        
 
 route.get('/postPage', async (ctx, next) => {
     await ctx.render('postPage');
