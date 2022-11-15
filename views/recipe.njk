@@ -1,16 +1,5 @@
 {% include './includes/head.njk' %}
 
-<div class="topnav">
-        <a class="active" href="/">Home</a>
-        <a href="#news">News</a>
-        <a href="#contact">Contact</a>
-        <a href="#about">About</a>
-        <div class="right">
-            <a href="/login">Login</a>
-            <a href="/signup">Signup</a>
-        </div>
-</div>
-
 <div class='recipe'>
     <div>{{post.title}}</div><br><Br>
     <div>Ingredients:<br><Br>{{post.ingredients}}</div><br><Br>
@@ -20,7 +9,14 @@
 <div class='comment'>
     <div>Comments</div>
     
-    <form action="/view/{{post.id}}" onsubmit="setTimeout(function(){window.location.reload();},50);" method="POST">
+    {# <form action="/view/{{post.id}}" onsubmit="setTimeout(function(){window.location.reload();},100);" method="POST">
+        <div>
+            <textarea placeholder="Add a Comment" name="userComment"></textarea>
+            <input type="submit"/>
+        </div>
+    </form> #}
+
+    <form action="/view/{{post.id}}" method="POST">
         <div>
             <textarea placeholder="Add a Comment" name="userComment"></textarea>
             <input type="submit"/>

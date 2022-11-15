@@ -1,0 +1,14 @@
+{% include './includes/head.njk' %}
+
+<div class='postRecipe'>
+    <div>Post Recipe</div>
+
+    <form action="/postPage" method="POST">
+        <div>
+            <input placeholder="Recipe Title" name="recipeTitle"></input><br></br>
+            <input placeholder="Recipe Ingredients" name="recipeIngredients"></input><br></br>
+            <input placeholder="Recipe Instructions" name="recipeInstructions"></input><br></br>
+            <input type="submit"/>
+        </div>
+    </form>
+</div>

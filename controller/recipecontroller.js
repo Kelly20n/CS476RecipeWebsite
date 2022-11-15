@@ -1,102 +1,82 @@
 require('dotenv').config();
 const Koa = require('koa');
 const Recipe = require('../model/recipe.js');
-const Comment = require('../model/comments.js');
 const User = require('../model/user.js');
 const Router = require('koa-router');
+const CommentFunctions = require('../functions/commentfunctions.js')
+const GeneralFunctions = require('../functions/generalfunctions.js')
 const jwt = require('jsonwebtoken');
+
 
 const route = Router();
 
 route.get('/', async (ctx, next) => {
     // console.log('connected to root route');
-    return Recipe.find({}).then(async function(results) {
-        //console.log(results);
-        await ctx.render('index', {
-            posts: results,
-            name: process.env.NAME
+    if(ctx.cookies.get("token") != null) {
+        const decoded = jwt.decode(ctx.cookies.get("token"), {complete: true});
+        const payload = decoded.payload
+        return User.findOne({username: payload.userEmail}).then(async function(firstresults) {
+            return Recipe.find({}).then(async function(results) {
+                //console.log(results);
+                console.log(firstresults);
+                await ctx.render('index', {
+                    posts: results,
+                    name: process.env.NAME,
+                    admin: firstresults
+                });
+            });
         });
-    });
+    }
+    else {
+        return Recipe.find({}).then(async function(results) {
+            //console.log(results);
+            await ctx.render('index', {
+                posts: results,
+                name: process.env.NAME,
+            });
+        });
+    }  
 });
 
 route.get('/view/:id', async (ctx, next) => {
-    console.log('connected to recipe route');
-    return Recipe.findById(ctx.params.id).then(async function(results) {
-        //console.log(results)
-        var commentsOnPosts = await Comment.find({postId: ctx.params.id});
-        //console.log("Comments: " + commentsOnPosts);
-        //var decoded = jwt.verify(ctx.cookies.get('token'), process.env.TOKEN_SECRET); 
-        var decoded = jwt.decode(ctx.cookies.get('token', {complete: true}))
-        console.log("Amogus: ");
-        console.log(decoded);
-        // find in user db then return isAdmin
-        if(decoded != null)
-        {
-            console.log("Checks user cluster");
-            var userInfo = await User.findOne({username: decoded.userEmail});
-            console.log(userInfo);
-
-            await ctx.render('recipe', {
-                post: results,
-                comments: commentsOnPosts,
-                isAdmin: decoded.isAdmin,
-            });
-        }
-        else
-        {
-            console.log("Default Look");
-            await ctx.render('recipe', {
-                post: results,
-                comments: commentsOnPosts,
-                isAdmin: false,
-            });
-        }
-    });
+    return CommentFunctions.displayComments(ctx);
 });
 
 route.post('/view/:id', async (ctx, next) => {
-    return jwt.verify(ctx.cookies.get('token'), process.env.TOKEN_SECRET, async (err, info) => {
-        if(err){
-            console.log('Not valid token!')
-            return await ctx.redirect('/login')
+    if(GeneralFunctions.verifyUser(ctx) === true)
+    {
+        if(ctx.request.body.userComment === '') {
+            return CommentFunctions.postComments(ctx);
         }
         else {
-            console.log(info)
+            CommentFunctions.createComment(ctx);
+            GeneralFunctions.sleep();
+            return CommentFunctions.displayComments(ctx);
         }
-       
-        if(ctx.request.body.userComment === '')
-        {
-            return Recipe.findById(ctx.params.id).then(async function(results) {
-                console.log(results)
-                var commentsOnPosts = await Comment.find({postId: ctx.params.id});
-                console.log("Comments: " + commentsOnPosts);
-                await ctx.render('recipe', {
-                    post: results,
-                    comments: commentsOnPosts
-                });
-            });
-        }
-        else{
-            return Recipe.findById(ctx.params.id).then(async function(results) {
-                var newComment = new Comment({
-                    postId: ctx.params.id,
-                    commentBody: ctx.request.body.userComment,
-                });
-                newComment.save();
-                await new Promise(r => setTimeout(r, 1000));
-                var commentsOnPosts = await Comment.find({postId: ctx.params.id});
-                console.log("Comments: " + commentsOnPosts);
-                await ctx.render('recipe', {
-                    post: results,
-                    comments: commentsOnPosts
-                });
-            
-            });
-        }
+    }
+    else return;
+});
+        
+
+route.get('/postPage', async (ctx, next) => {
+    await ctx.render('postPage');
+});
+    
+route.post('/postPage', async (ctx, next) => {
+    
+    var newRecipe = new Recipe({
+        title: ctx.request.body.recipeTitle,
+        ingredients: ctx.request.body.recipeIngredients,
+        instructions: ctx.request.body.recipeInstructions,
+    });
+
+    newRecipe.save((err, res) => {
+        if(err) return handleError(err);
+        else return console.log("Result: ", res)
     });
 });
 
-route.post('/public/search', async (ctx, next) => {
+route.post('/search', async (ctx, next) => {
     /*return Recipe.find({title: ctx.request.body.searchTerm}).then(async function(results){*/
     return Recipe.find({}).then(async function(results){    
         //console.log(ctx.request.body.searchTerm)
