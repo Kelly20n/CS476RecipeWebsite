@@ -24,28 +24,29 @@ route.get('/', async (ctx, next) => {
     });
 });     
 
-route.get('/view/:id', async (ctx, next) => {
+route.get('/view/:id/:db', async (ctx, next) => {
     const payload = GeneralFunctions.decodeUser(ctx)
     return User.findOne({username: payload.userEmail}).then(async function(loggedUser) {
         const page = 'recipe';
-        return RecipeFunctions.displayPostAndComments(ctx, loggedUser, page);
+        console.log("db: " + ctx.params.db);
+        return RecipeFunctions.displayPostAndComments(ctx, loggedUser, page, ctx.params.db);
     });
 });
 
-route.post('/view/:id', async (ctx, next) => {
+route.post('/view/:id/:db', async (ctx, next) => {
     if(GeneralFunctions.verifyUser(ctx) === true)
     {
         const payload = GeneralFunctions.decodeUser(ctx)
         return User.findOne({username: payload.userEmail}).then(async function(loggedUser) {
             const page = 'recipe';
+            console.log("db: " + ctx.params.db);
             if(ctx.request.body.userComment === '') {
-                return RecipeFunctions.displayPostAndComments(ctx, loggedUser, page);
+                return RecipeFunctions.displayPostAndComments(ctx, loggedUser, page, ctx.params.db);
             }
             else {
-                
                 RecipeFunctions.createComment(ctx);
                 GeneralFunctions.sleep();
-                return RecipeFunctions.displayPostAndComments(ctx, loggedUser, page);
+                return RecipeFunctions.displayPostAndComments(ctx, loggedUser, page, ctx.params.db);
             }
         });
     }
@@ -87,8 +88,6 @@ route.post('/search', async (ctx, next) => {
     {
         console.log('Breakfast');
         return Breakfast.find({}).then(async function(breakfastResults){
-            //console.log("about to be in func" + breakfastResults);
-            //console.log("Space");
             return GeneralFunctions.searchSingleDataBase(ctx, breakfastResults, "Breakfast");    
         });
     }
@@ -96,20 +95,12 @@ route.post('/search', async (ctx, next) => {
     {
         console.log('Lunch');
         return Lunch.find({}).then(async function(lunchResults){    
-            //console.log(ctx.request.body.searchIngredients);
-            //console.log("AMOGUS: " + ctx.request.body.searchAlgorithm);
-            //console.log("about to be in func" + lunchResults);
-            //console.log("Space");
             return GeneralFunctions.searchSingleDataBase(ctx, lunchResults, "Lunch");
         });
     }
     else{
         console.log('Supper');
         return Supper.find({}).then(async function(supperResults){    
-            //console.log(ctx.request.body.searchIngredients);
-            //console.log("AMOGUS: " + ctx.request.body.searchAlgorithm);
-            //console.log("about to be in func" + supperResults);
-            //console.log("Space");
             return GeneralFunctions.searchSingleDataBase(ctx, supperResults, "Supper");
         });
     }

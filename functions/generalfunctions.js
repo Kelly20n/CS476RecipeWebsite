@@ -32,9 +32,6 @@ function verifyUser(ctx) {
 }
 
 async function searchSingleDataBase(ctx, results, database) {
-    //console.log(results);    
-            //console.log(ctx.request.body.searchIngredients);
-            //console.log("AMOGUS: " + ctx.request.body.searchAlgorithm);
             console.log(database);
             if(results === null)
             {
@@ -145,6 +142,7 @@ function checkAllDatabases(){
 async function sleep() {
     await new Promise(r => setTimeout(r, 1000));
     return;
+}
 function decodeUser(ctx) {
     if(ctx.cookies.get("token") != null) {
         const decoded = jwt.decode(ctx.cookies.get("token"), {complete: true});
@@ -169,5 +167,4 @@ module.exports.verifyUser = verifyUser;
 module.exports.sleep = sleep;
 module.exports.searchSingleDataBase = searchSingleDataBase;
 module.exports.decodeUser = decodeUser;
-module.exports.displayNoDBinfo = displayNoDBinfo
-
+module.exports.displayNoDBinfo = displayNoDBinfo;
