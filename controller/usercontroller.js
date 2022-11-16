@@ -1,6 +1,7 @@
 require('dotenv').config();
 const Koa = require('koa');
 const User = require('../model/user');
+const Banned = require('../model/banned');
 const Recipe = require('../model/recipe');
 const Router = require('koa-router');
 const GeneralFunctions = require('../functions/generalfunctions.js')
@@ -13,8 +14,8 @@ route.get('/admin', async (ctx, next) => {
     if(GeneralFunctions.verifyUser(ctx) === true)
     {
         payload = GeneralFunctions.decodeUser(ctx);
+        const page = 'admin';
         return User.findOne({username: payload.userEmail}).then(async function(loggedUser) {
-            const page = 'admin';
             return UserFunctions.displayUsers(ctx, loggedUser, page);
         });
     }
@@ -26,8 +27,8 @@ route.post('/login', async (ctx, next) => {
     return User.findOne({username: ctx.request.body.userEmail}).then(async function(results) {
         if(results === null)
         {
-            console.log('Unsuccessful Login');
-            await ctx.redirect("login");
+        console.log('Unsuccessful Login2');
+        return await ctx.render('incorrectlogin');
         }
         if(ctx.request.body.userEmail === results.username && ctx.request.body.userPass === results.password)
         {
@@ -36,8 +37,8 @@ route.post('/login', async (ctx, next) => {
         }
         else
         {
-            console.log('Unsuccessful Login');
-            await ctx.redirect("login");
+            console.log('Unsuccessful Login3');
+            return await ctx.render('incorrectlogin');
         }
     });
 });
@@ -106,5 +107,41 @@ route.get('/forgotpassword', async (ctx, next) => {
         return GeneralFunctions.displayNoDBinfo(ctx, loggedUser, page);
     })
 });
+
+route.post('/mod/:id', async (ctx, next) => {
+    if(GeneralFunctions.verifyUser(ctx) === true)
+    {
+        const doc = await User.findById(ctx.params.id);
+        doc.isAdmin = true;
+        await doc.save();
+        console.log(doc);
+        ctx.redirect('/admin');
+    }
+    else return
+})
+
+route.post('/unmod/:id', async (ctx, next) => {
+    if(GeneralFunctions.verifyUser(ctx) === true)
+    {
+        const doc = await User.findById(ctx.params.id);
+        doc.isAdmin = false;
+        await doc.save();
+        console.log(doc);
+        ctx.redirect('/admin');
+    }
+    else return
+})
+
+route.post('/ban/:id', async (ctx, next) => {
+    if(GeneralFunctions.verifyUser(ctx) === true)
+    {
+        const doc = await User.findByIdAndRemove(ctx.params.id);
+        var newBanned = new Banned({
+            username: doc.username
+        });
+        newBanned.save();
+        ctx.redirect('/admin');
+    }
+})
 
 module.exports = route;

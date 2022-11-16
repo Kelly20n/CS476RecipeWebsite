@@ -44,6 +44,7 @@
 </section>
 
 <script>
+
   function validate() {
     var email = document.getElementById('typeEmailX').value;
     var emailRGEX = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
@@ -67,7 +68,7 @@
       alert('Passwords do not match');
       return false;
     }
-    alert('Signup successful, please login');
+    alert('If redirected to login page, Signup successful, please login! Otherwise email is already registered!');
     return true;
   }
 </script>

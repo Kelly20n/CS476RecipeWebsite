@@ -38,5 +38,3 @@ async function displayPostTitles(ctx, adminUser, page) {
 module.exports.createComment = createComment;
 module.exports.displayPostAndComments = displayPostAndComments;
 module.exports.displayPostTitles = displayPostTitles;
-
-

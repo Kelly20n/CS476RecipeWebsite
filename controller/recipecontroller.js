@@ -13,6 +13,7 @@ const route = Router();
 route.get('/', async (ctx, next) => {
     const payload = GeneralFunctions.decodeUser(ctx)
     return User.findOne({username: payload.userEmail}).then(async function(loggedUser) {
+        console.log(loggedUser);
         const page = 'index';
         return RecipeFunctions.displayPostTitles(ctx, loggedUser, page);
     });

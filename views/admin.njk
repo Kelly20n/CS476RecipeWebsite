@@ -1,1 +1,26 @@
 {% include './includes/head.njk' %}
+
+<div class="row">
+    <div class="column">
+        {% for user in users %}
+        <form action="/mod/{{user.id}}" method="post">
+            {{user.username}}
+            <input type="submit" value="Mod">
+        </form>
+        <form action="/ban/{{user.id}}" method="post">
+            <input type="submit" value="Ban">
+        </form>
+        {% endfor %}
+    </div>
+    <div class="column">
+        {% for adminuser in adminusers%}
+        <form action="/unmod/{{adminuser.id}}" method="post">
+            {{adminuser.username}}
+            <input type="submit" value="Unmod">
+        </form>
+        <form action="/ban/{{adminuser.id}}" method="post">
+            <input type="submit" value="Ban">
+        </form>
+        {% endfor %}
+    </div>
+</div>
