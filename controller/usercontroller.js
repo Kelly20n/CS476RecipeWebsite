@@ -1,11 +1,13 @@
 require('dotenv').config();
 const Koa = require('koa');
 const User = require('../model/user');
+const Banned = require('../model/banned');
 const Recipe = require('../model/recipe');
 const Router = require('koa-router');
 const toBeApproved = require('../model/approval');
+const GeneralFunctions = require('../functions/generalfunctions.js')
+const UserFunctions = require('../functions/userfunctions.js')
 const jwt = require('jsonwebtoken');
-const GeneralFunctions = require('../functions/generalfunctions.js');
 const Application = require('koa');
 const { db } = require('../model/user');
 const { mquery, Query } = require('mongoose');
@@ -15,70 +17,45 @@ const Supper = require('../model/supper.js');
 
 
 route.get('/admin', async (ctx, next) => {
-    return jwt.verify(ctx.cookies.get('token'), process.env.TOKEN_SECRET, async (err, info) => {
-        if(err){
-            console.log('Not valid token!')
-            return await ctx.redirect('/login')
-        }
-        else {
-            // console.log(info)
-        }
-        return User.find({}).then(async function(results) {
-            var recipeResults = await Recipe.find({});
-            console.log(recipeResults);
-            await ctx.render('admin', {
-                users: results,
-                posts: recipeResults
-            });
+    if(GeneralFunctions.verifyUser(ctx) === true)
+    {
+        payload = GeneralFunctions.decodeUser(ctx);
+        const page = 'admin';
+        return User.findOne({username: payload.userEmail}).then(async function(loggedUser) {
+            if(loggedUser.isAdmin == true) {
+                return UserFunctions.displayUsers(ctx, loggedUser, page);
+            }
+            else {
+                ctx.cookies.set('token', null);
+                return await ctx.redirect("/");
+            }
         });
-    });
+    }
+    else return
 });
+        
 
 route.post('/login', async (ctx, next) => {
-        return User.findOne({username: ctx.request.body.userEmail}).then(async function(results) {
-        /////////////////////////
-        //RESULTS HOLDS THE QUERY VARIABLES
-        /////////////////////////
-        console.log("results" + results + "\n")
-        console.log("ctx userEmail: " + ctx.request.body.userEmail + " userPass: " + ctx.request.body.userPass + "\n")
+    return User.findOne({username: ctx.request.body.userEmail}).then(async function(results) {
         if(results === null)
         {
-            console.log('Unsuccessful Login');
-            await ctx.redirect("login");
+        console.log('Unsuccessful Login2');
+        return await ctx.render('incorrectlogin');
         }
-        else if(ctx.request.body.userEmail === results.username && ctx.request.body.userPass === results.password)
+        if(ctx.request.body.userEmail === results.username && ctx.request.body.userPass === results.password)
         {
-            const secret = process.env.TOKEN_SECRET
-            const jwtToken = jwt.sign(ctx.request.body, secret, {expiresIn: 60 * 60})
-            ctx.cookies.set('token', jwtToken)
-            console.log(ctx.cookies.get('token'))
-
-            console.log(jwtToken);
-
-
-            jwt.verify(ctx.cookies.get('token'), process.env.TOKEN_SECRET, (err, results) => {
-                if(err){
-                    console.log('Not valid token!')
-                    ctx.redirect('/')
-                }
-                else {
-                    console.log(results)
-                }
-            });
+            GeneralFunctions.createToken(ctx);
             await ctx.redirect("/");
         }
         else
         {
-            console.log('Unsuccessful Login');
-            await ctx.redirect("login");
+            console.log('Unsuccessful Login3');
+            return await ctx.render('incorrectlogin');
         }
     });
 });
 
 route.post('/signup', async (ctx, next) => {
-    /////////////////////////
-    //RESULTS HOLDS THE QUERY VARIABLES
-    /////////////////////////
     return User.findOne({username: ctx.request.body.userEmail}).then(async function(err, results) {
         //console.log("ctx: " + ctx.request.body.userPass + "\n")
         console.log(err + "\n")
@@ -162,19 +139,73 @@ route.get('/signout', async (ctx, next) => {
     await ctx.redirect('/');
 });
 
-route.get('/signedin', async (ctx, next) => {
-    await ctx.render('signedin');
-});
 route.get('/login', async (ctx, next) => {
-    await ctx.render('login');
+    const payload = GeneralFunctions.decodeUser(ctx);
+    const page = 'login'
+    return User.findOne({username: payload.userEmail}).then(async function(loggedUser) {
+        return GeneralFunctions.displayNoDBinfo(ctx, loggedUser, page);
+    })
 });
 
 route.get('/signup', async (ctx, next) => {
-    await ctx.render('signup');
+    const payload = GeneralFunctions.decodeUser(ctx);
+    const page = 'signup'
+    return User.findOne({username: payload.userEmail}).then(async function(loggedUser) {
+        return GeneralFunctions.displayNoDBinfo(ctx, loggedUser, page);
+    })
 });
 
 route.get('/forgotpassword', async (ctx, next) => {
-    await ctx.render('forgotpassword');
+    const payload = GeneralFunctions.decodeUser(ctx);
+    const page = 'forgotpassword'
+    return User.findOne({username: payload.userEmail}).then(async function(loggedUser) {
+        return GeneralFunctions.displayNoDBinfo(ctx, loggedUser, page);
+    })
+});
+
+route.post('/mod/:id', async (ctx, next) => {
+    if(GeneralFunctions.verifyUser(ctx) === true)
+    {
+        const doc = await User.findById(ctx.params.id);
+        doc.isAdmin = true;
+        await doc.save();
+        console.log(doc);
+        await ctx.redirect('/admin');
+    }
+    else return
+})
+
+route.post('/unmod/:id', async (ctx, next) => {
+    if(GeneralFunctions.verifyUser(ctx) === true)
+    {
+        const doc = await User.findById(ctx.params.id);
+        doc.isAdmin = false;
+        await doc.save();
+        console.log(doc);
+        await ctx.redirect('/admin');
+    }
+    else return
+})
+
+route.post('/ban/:id', async (ctx, next) => {
+    if(GeneralFunctions.verifyUser(ctx) === true)
+    {
+        const doc = await User.findByIdAndRemove(ctx.params.id);
+        var newBanned = new Banned({
+            username: doc.username
+        });
+        newBanned.save();
+        await ctx.redirect('/admin');
+    }
+    else return
+})
+
+route.post('/unban/:id', async (ctx, next) => {
+    if(GeneralFunctions.verifyUser(ctx) === true)
+    {
+        await Banned.findByIdAndRemove(ctx.params.id);
+        await ctx.redirect('/admin');
+    }
 });
 
 module.exports = route;
