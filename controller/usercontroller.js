@@ -16,7 +16,13 @@ route.get('/admin', async (ctx, next) => {
         payload = GeneralFunctions.decodeUser(ctx);
         const page = 'admin';
         return User.findOne({username: payload.userEmail}).then(async function(loggedUser) {
-            return UserFunctions.displayUsers(ctx, loggedUser, page);
+            if(loggedUser.isAdmin == true) {
+                return UserFunctions.displayUsers(ctx, loggedUser, page);
+            }
+            else {
+                ctx.cookies.set('token', null);
+                return await ctx.redirect("/");
+            }
         });
     }
     else return
@@ -115,7 +121,7 @@ route.post('/mod/:id', async (ctx, next) => {
         doc.isAdmin = true;
         await doc.save();
         console.log(doc);
-        ctx.redirect('/admin');
+        await ctx.redirect('/admin');
     }
     else return
 })
@@ -127,7 +133,7 @@ route.post('/unmod/:id', async (ctx, next) => {
         doc.isAdmin = false;
         await doc.save();
         console.log(doc);
-        ctx.redirect('/admin');
+        await ctx.redirect('/admin');
     }
     else return
 })
@@ -140,8 +146,17 @@ route.post('/ban/:id', async (ctx, next) => {
             username: doc.username
         });
         newBanned.save();
-        ctx.redirect('/admin');
+        await ctx.redirect('/admin');
     }
+    else return
 })
+
+route.post('/unban/:id', async (ctx, next) => {
+    if(GeneralFunctions.verifyUser(ctx) === true)
+    {
+        await Banned.findByIdAndRemove(ctx.params.id);
+        await ctx.redirect('/admin');
+    }
+});
 
 module.exports = route;
