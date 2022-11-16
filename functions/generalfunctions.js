@@ -2,7 +2,7 @@ require('dotenv').config();
 const Koa = require('koa');
 const jwt = require('jsonwebtoken');
 
-async function verifyUser(ctx) {
+function verifyUser(ctx) {
     var bool = true;
     jwt.verify(ctx.cookies.get('token'), process.env.TOKEN_SECRET, async (err, info) => {
         if(err){

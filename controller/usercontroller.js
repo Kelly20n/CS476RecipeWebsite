@@ -3,9 +3,16 @@ const Koa = require('koa');
 const User = require('../model/user');
 const Recipe = require('../model/recipe');
 const Router = require('koa-router');
+const toBeApproved = require('../model/approval');
 const jwt = require('jsonwebtoken');
+const GeneralFunctions = require('../functions/generalfunctions.js');
+const Application = require('koa');
+const { db } = require('../model/user');
+const { mquery, Query } = require('mongoose');
+const Breakfast = require('../model/breakfast.js');
+const Lunch = require('../model/lunch.js');
+const Supper = require('../model/supper.js');
 
-const route = Router();
 
 route.get('/admin', async (ctx, next) => {
     return jwt.verify(ctx.cookies.get('token'), process.env.TOKEN_SECRET, async (err, info) => {
@@ -107,15 +114,57 @@ route.post('/signup', async (ctx, next) => {
     });
 });
 
+//get and post for approval page
+route.get('/approval', async (ctx, next) => {
+     return jwt.verify(ctx.cookies.get('token'), process.env.TOKEN_SECRET, async (err, info) => {
+        if(GeneralFunctions.verifyUser(ctx) === true){
+            return Recipe.find({}).then(async function(results) {
+                await ctx.render('approval', {
+                    posts: results
+                });
+            });
+            
+        }
+        else return;
+        
+    });
+});
+
+//post for approve
+route.post('/approval', async (ctx, next) => {
+    var mybreakfast = {_id: ''};
+    if(ctx.request.body.ar == "Approval Recipe")
+    {
+        db.collection('breakfastposts').deleteOne()
+    }
+    else return
+});
+
+//post for delete
+route.post('/approval2', async (ctx, next) => {
+    var myquery = {};
+    db.collection('recipeposts').deleteOne(myquery,function(err, obj){
+        if(err) throw err;
+        console.log("deleted");
+    });
+    await ctx.redirect('approval');
+});
+
+//post for delete and delete in db
+route.post('/approval3', async (ctx, next) => {
+    console.log('button3');
+    await ctx.redirect('approval');
+});
+
+
 route.get('/signout', async (ctx, next) => {
     ctx.cookies.set('token', null);
     await ctx.redirect('/');
-})
+});
 
 route.get('/signedin', async (ctx, next) => {
     await ctx.render('signedin');
-})
-
+});
 route.get('/login', async (ctx, next) => {
     await ctx.render('login');
 });

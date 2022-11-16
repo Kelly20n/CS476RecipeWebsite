@@ -3,9 +3,14 @@ const Koa = require('koa');
 const Recipe = require('../model/recipe.js');
 const User = require('../model/user.js');
 const Router = require('koa-router');
+const Breakfast = require('../model/breakfast.js');
+const Lunch = require('../model/lunch.js');
+const Supper = require('../model/supper.js');
 const CommentFunctions = require('../functions/commentfunctions.js')
 const GeneralFunctions = require('../functions/generalfunctions.js')
 const jwt = require('jsonwebtoken');
+const toBeAproved = require('../model/approval.js');
+
 
 
 const route = Router();
@@ -63,17 +68,49 @@ route.get('/postPage', async (ctx, next) => {
 });
     
 route.post('/postPage', async (ctx, next) => {
+    if(ctx.request.body.database == "breakfast")
+    {
+        var newBreakfast = new Breakfast({
+            title: ctx.request.body.recipeTitle,
+            ingredients: ctx.request.body.recipeIngredients,
+            instructions: ctx.request.body.recipeInstructions,
+        });   
+        newBreakfast.save((err, res) => {
+            if(err) return handleError(err);
+            else return console.log("Result: ", res)
+        });
+        console.log('breakfast added');
+        await ctx.redirect('postPage');
+    }
+    else if(ctx.request.body.database == "lunch")
+    {
+        var newLunch = new Lunch({
+            title: ctx.request.body.recipeTitle,
+            ingredients: ctx.request.body.recipeIngredients,
+            instructions: ctx.request.body.recipeInstructions,
+        }); 
+        newLunch.save((err, res) => {
+            if(err) return handleError(err);
+            else return console.log("Result: ", res)
+         });
+         console.log('lunch added');
+         await ctx.redirect('postPage');
+    }
     
-    var newRecipe = new Recipe({
-        title: ctx.request.body.recipeTitle,
-        ingredients: ctx.request.body.recipeIngredients,
-        instructions: ctx.request.body.recipeInstructions,
-    });
-
-    newRecipe.save((err, res) => {
-        if(err) return handleError(err);
-        else return console.log("Result: ", res)
-    });
+    else
+    {
+         var newSupper = new Supper({
+            title: ctx.request.body.recipeTitle,
+            ingredients: ctx.request.body.recipeIngredients,
+            instructions: ctx.request.body.recipeInstructions,
+        });
+        newSupper.save((err, res) => {
+            if(err) return handleError(err);
+            else return console.log("Result: ", res)
+        });
+        console.log('supper added');
+        await ctx.redirect('postPage');
+    }
 });
 
 route.post('/search', async (ctx, next) => {

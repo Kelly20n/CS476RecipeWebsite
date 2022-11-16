@@ -1,25 +1,19 @@
 {% include './includes/head.njk' %}
 
-<div class="topnav">
-        <a class="active" href="/">Home</a>
-        <a href="#news">News</a>
-        <a href="#contact">Contact</a>
-        <a href="#about">About</a>
-        <div class="right">
-            <a href = "/postPage"> postPage </a>
-            <a href="/login">Login</a>
-            <a href="/signup">Signup</a>
-        </div>
-</div>
-
 <div class='postRecipe'>
     <div>Post Recipe</div>
-    
+
     <form action="/postPage" method="POST">
         <div>
             <input placeholder="Recipe Title" name="recipeTitle"></input><br></br>
             <input placeholder="Recipe Ingredients" name="recipeIngredients"></input><br></br>
             <input placeholder="Recipe Instructions" name="recipeInstructions"></input><br></br>
+            <input type="radio" id="breakfastFood" value='breakfast' name="database">
+            <label for="breakfastFood">BreakFast</label></input>
+            <input type="radio" id="lunchFood" value='lunch' name="database">
+            <label for="lunchFood">Lunch</label></input>
+            <input type="radio" id="supperFood" value='supper' name="database">
+            <label for="supperFood">Supper</label></input><br></br>
             <input type="submit"/>
         </div>
     </form>
