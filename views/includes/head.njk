@@ -62,7 +62,7 @@ body {
     display: none;
     position: absolute;
     background-color: #000000;
-    min-width: 160px;
+    min-width: 300px;
     box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
     z-index: 1;
   }
@@ -99,13 +99,22 @@ body {
         </div>
         <div class="center">
           <div class="dropdown">
-            <button class="dropbtn">Search By</button>
+            <button class="dropbtn">Search</button>
             <div class="dropdown-content">
               <form action="/search" method="POST">
                 <input type="radio" id="byTitle" value='title' name="searchAlgorithm">
                 <label for="byTitle">Title</label></input>
                 <input type="radio" id="byIngredient" value='ingredients' name="searchAlgorithm">
                 <label for="byIngredients">Ingredients</label></input>
+                <div>
+                <input type="radio" id="breakfastFood" value='breakfast' name="database">
+                <label for="breakfastFood">BreakFast</label></input>
+                <input type="radio" id="lunchFood" value='lunch' name="database">
+                <label for="lunchFood">Lunch</label></input>
+                <input type="radio" id="supperFood" value='supper' name="database">
+                <label for="supperFood">Supper</label></input>
+                </div>
+
                 <input type="text" placeholder="Search" name="searchTerms"/>
                 <input type="submit"/>
               </form>
