@@ -8,7 +8,7 @@ const Recipe = require('../model/recipe.js');
 
 const User = require('../model/user.js');
 const Router = require('koa-router');
-const CommentFunctions = require('../functions/commentfunctions.js')
+const RecipeFunctions = require('../functions/recipefunctions.js')
 const GeneralFunctions = require('../functions/generalfunctions.js')
 const jwt = require('jsonwebtoken');
 
@@ -16,61 +16,49 @@ const jwt = require('jsonwebtoken');
 const route = Router();
 
 route.get('/', async (ctx, next) => {
-
-    // return Supper.find({}).then(async function(results) {
-    //     console.log(results);
-    // });
-    // console.log('connected to root route');
-    //console.log(GeneralFunctions.checkAllDatabases);
-    if(ctx.cookies.get("token") != null) {
-        const decoded = jwt.decode(ctx.cookies.get("token"), {complete: true});
-        const payload = decoded.payload
-        return User.findOne({username: payload.userEmail}).then(async function(firstresults) {
-            return Recipe.find({}).then(async function(results) {
-                console.log(firstresults);
-                await ctx.render('index', {
-                    posts: results,
-                    name: process.env.NAME,
-                    admin: firstresults
-                });
-            });
-        });
-    }
-    else {
-        return Recipe.find({}).then(async function(results) {
-            //console.log(results);
-            await ctx.render('index', {
-                posts: results,
-                name: process.env.NAME,
-            });
-        });
-    }  
-});
+    const payload = GeneralFunctions.decodeUser(ctx)
+    return User.findOne({username: payload.userEmail}).then(async function(loggedUser) {
+        console.log(loggedUser);
+        const page = 'index';
+        return RecipeFunctions.displayPostTitles(ctx, loggedUser, page);
+    });
+});     
 
 route.get('/view/:id', async (ctx, next) => {
-    console.log(database);
-    return CommentFunctions.displayComments(ctx, database);
+    const payload = GeneralFunctions.decodeUser(ctx)
+    return User.findOne({username: payload.userEmail}).then(async function(loggedUser) {
+        const page = 'recipe';
+        return RecipeFunctions.displayPostAndComments(ctx, loggedUser, page);
+    });
 });
 
 route.post('/view/:id', async (ctx, next) => {
     if(GeneralFunctions.verifyUser(ctx) === true)
     {
-        if(ctx.request.body.userComment === '') {
-            return CommentFunctions.postComments(ctx);
-        }
-        else {
-            CommentFunctions.createComment(ctx);
-            GeneralFunctions.sleep();
-            
-            return CommentFunctions.displayComments(ctx, ctx.request.body.databaseUsed);
-        }
+        const payload = GeneralFunctions.decodeUser(ctx)
+        return User.findOne({username: payload.userEmail}).then(async function(loggedUser) {
+            const page = 'recipe';
+            if(ctx.request.body.userComment === '') {
+                return RecipeFunctions.displayPostAndComments(ctx, loggedUser, page);
+            }
+            else {
+                
+                RecipeFunctions.createComment(ctx);
+                GeneralFunctions.sleep();
+                return RecipeFunctions.displayPostAndComments(ctx, loggedUser, page);
+            }
+        });
     }
-    else return;
+    else return
 });
         
 
 route.get('/postPage', async (ctx, next) => {
-    await ctx.render('postPage');
+    const payload = GeneralFunctions.decodeUser(ctx);
+    const page = 'postPage'
+    return User.findOne({username: payload.userEmail}).then(async function(loggedUser) {
+        return GeneralFunctions.displayNoDBinfo(ctx, loggedUser, page);
+    })
 });
     
 route.post('/postPage', async (ctx, next) => {
@@ -85,6 +73,12 @@ route.post('/postPage', async (ctx, next) => {
         if(err) return handleError(err);
         else return console.log("Result: ", res)
     });
+
+    const payload = GeneralFunctions.decodeUser(ctx);
+    const page = 'postPage'
+    return User.findOne({username: payload.userEmail}).then(async function(loggedUser) {
+        return GeneralFunctions.displayNoDBinfo(ctx, loggedUser, page);
+    })
 });
 
 route.post('/search', async (ctx, next) => {

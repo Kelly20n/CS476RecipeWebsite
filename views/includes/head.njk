@@ -8,6 +8,23 @@
   visibility: hidden;
 }
 
+#signout {
+  visibility: hidden;
+  display: none;
+}
+
+.column {
+  float: left;
+  width: 33%;
+  padding: 10px;
+}
+
+.row:after {
+  content: "";
+  display: table;
+  clear: both;
+}
+
 body {
   margin: 0;
   font-family: Arial, Helvetica, sans-serif;
@@ -94,7 +111,7 @@ body {
             <a id="admin" href="/admin">Admin
             <a href="/postPage">Add Recipe</a>
             <a href="/login">Login</a>
-            <a href="/signout">Signout</a>
+            <a id="signout" href="/signout" onclick="alert('Signout Successful')">Signout</a>
             <a href="/signup">Signup</a>
         </div>
         <div class="center">
@@ -125,11 +142,19 @@ body {
         </div>
 </div>
 
+
+
 <script>
   function checkAdmin() {
     var x = document.getElementById("admin");
+    var y = document.getElementById("signout");
     if({{admin.isAdmin}} === true) {
       x.style.visibility = "visible";
+      
+    }
+    if({{admin != null}}) {
+      y.style.visibility = "visible";
+      y.style.display = "block";
     }
   }
 </script>

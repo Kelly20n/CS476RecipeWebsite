@@ -6,6 +6,14 @@ const Lunch = require('../model/lunch.js');
 const Supper = require('../model/supper.js');
 
 const jwt = require('jsonwebtoken');
+const alert = require('alert');
+
+function createToken(ctx) {
+    const secret = process.env.TOKEN_SECRET;
+    const jwtToken = jwt.sign(ctx.request.body, secret, {expiresIn: 60 * 60})
+    ctx.cookies.set('token', jwtToken)
+    return;
+}
 
 function verifyUser(ctx) {
     var bool = true;
@@ -13,6 +21,7 @@ function verifyUser(ctx) {
         if(err){
             console.log('Not valid token!')
             bool = false;
+            alert('Please sign in to complete this action');
             return await ctx.redirect('/login')
         } else {
             console.log(info);
@@ -136,7 +145,29 @@ function checkAllDatabases(){
 async function sleep() {
     await new Promise(r => setTimeout(r, 1000));
     return;
+function decodeUser(ctx) {
+    if(ctx.cookies.get("token") != null) {
+        const decoded = jwt.decode(ctx.cookies.get("token"), {complete: true});
+        const payload = decoded.payload;
+        return payload;
+    }
+    else return false
 }
+
+async function displayNoDBinfo(ctx, loggedUser, page) {
+    await ctx.render(page, {
+        admin: loggedUser
+    })
+}
+
+async function sleep() {
+    return await new Promise(r => setTimeout(r, 1000));
+}
+
+module.exports.createToken = createToken;
 module.exports.verifyUser = verifyUser;
 module.exports.sleep = sleep;
 module.exports.searchSingleDataBase = searchSingleDataBase;
+module.exports.decodeUser = decodeUser;
+module.exports.displayNoDBinfo = displayNoDBinfo
+
