@@ -23,4 +23,12 @@
         </form>
         {% endfor %}
     </div>
+    <div class="column">
+        {% for banneduser in bannedusers%}
+        <form action="/unban/{{banneduser.id}}" method="post">
+            {{banneduser.username}}
+            <input type="submit" value="Unban">
+        </form>
+        {% endfor %}
+    </div>
 </div>
