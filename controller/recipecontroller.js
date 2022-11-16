@@ -48,7 +48,8 @@ route.get('/', async (ctx, next) => {
 });
 
 route.get('/view/:id', async (ctx, next) => {
-    return CommentFunctions.displayComments(ctx);
+    console.log(database);
+    return CommentFunctions.displayComments(ctx, database);
 });
 
 route.post('/view/:id', async (ctx, next) => {
@@ -60,7 +61,8 @@ route.post('/view/:id', async (ctx, next) => {
         else {
             CommentFunctions.createComment(ctx);
             GeneralFunctions.sleep();
-            return CommentFunctions.displayComments(ctx);
+            
+            return CommentFunctions.displayComments(ctx, ctx.request.body.databaseUsed);
         }
     }
     else return;
@@ -90,28 +92,31 @@ route.post('/search', async (ctx, next) => {
     if(ctx.request.body.database == "breakfast")
     {
         console.log('Breakfast');
-        return Breakfast.find({}).then(async function(results){
-            console.log(results);
-            return GeneralFunctions.searchSingleDataBase(ctx, results);    
+        return Breakfast.find({}).then(async function(breakfastResults){
+            //console.log("about to be in func" + breakfastResults);
+            //console.log("Space");
+            return GeneralFunctions.searchSingleDataBase(ctx, breakfastResults, "Breakfast");    
         });
     }
     else if(ctx.request.body.database == "lunch")
     {
         console.log('Lunch');
-        return Lunch.find({}).then(async function(results){    
+        return Lunch.find({}).then(async function(lunchResults){    
             //console.log(ctx.request.body.searchIngredients);
             //console.log("AMOGUS: " + ctx.request.body.searchAlgorithm);
-            console.log(results);
-            return GeneralFunctions.searchSingleDataBase(ctx, results);
+            //console.log("about to be in func" + lunchResults);
+            //console.log("Space");
+            return GeneralFunctions.searchSingleDataBase(ctx, lunchResults, "Lunch");
         });
     }
     else{
         console.log('Supper');
-        return Supper.find({}).then(async function(results){    
+        return Supper.find({}).then(async function(supperResults){    
             //console.log(ctx.request.body.searchIngredients);
             //console.log("AMOGUS: " + ctx.request.body.searchAlgorithm);
-            console.log(results);
-            return GeneralFunctions.searchSingleDataBase(ctx, results);
+            //console.log("about to be in func" + supperResults);
+            //console.log("Space");
+            return GeneralFunctions.searchSingleDataBase(ctx, supperResults, "Supper");
         });
     }
 });

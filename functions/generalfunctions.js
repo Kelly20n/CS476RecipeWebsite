@@ -22,13 +22,14 @@ function verifyUser(ctx) {
     return bool;
 }
 
-function searchSingleDataBase(ctx, results) {
-    console.log(results);    
+async function searchSingleDataBase(ctx, results, database) {
+    //console.log(results);    
             //console.log(ctx.request.body.searchIngredients);
             //console.log("AMOGUS: " + ctx.request.body.searchAlgorithm);
+            console.log(database);
             if(results === null)
             {
-                return ctx.redirect('/')
+                return await ctx.redirect('/')
             }
             else if(ctx.request.body.searchAlgorithm == 'title')
             {
@@ -53,9 +54,11 @@ function searchSingleDataBase(ctx, results) {
                     }
                     isTitleInEntry = false;
                 }
-                return ctx.render('search', {
+                console.log("Database: " + database);
+                return await ctx.render('search', {
                     searchTerm: ctx.request.body.searchTerms,
-                    posts: results
+                    posts: results,
+                    databaseUsed: database
                 });
             }
             else if (ctx.request.body.searchAlgorithm == 'ingredients')
@@ -100,9 +103,11 @@ function searchSingleDataBase(ctx, results) {
                     }
                     isIngredientInEntry = false;
                 }
-                return ctx.render('search', {
+                console.log("Database: " + database);
+                return await ctx.render('search', {
                     searchTerm: ctx.request.body.searchTerm,
-                    posts: results
+                    posts: results,
+                    databaseUsed: database,
                 });
             }
 }
