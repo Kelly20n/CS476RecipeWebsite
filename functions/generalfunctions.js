@@ -118,27 +118,6 @@ async function searchSingleDataBase(ctx, results, database) {
             }
 }
 
-
-
-/*
-function checkAllDatabases(){
-    var allDataResults;
-    allDataResults += Breakfast.find({}).then(async function(results) {
-        allDataResults += results;
-        console.log("in function" + allDataResults);
-    });
-    allDataResults += Lunch.find({}).then(async function(results) {
-        allDataResults += results;
-        console.log("in function" + allDataResults);
-    });
-    allDataResults += Supper.find({}).then(async function(results) {
-        allDataResults += results;
-        console.log("in function" + allDataResults);
-    });
-    
-    return allDataResults;
-}
-*/
 async function sleep() {
     await new Promise(r => setTimeout(r, 1000));
     return;
