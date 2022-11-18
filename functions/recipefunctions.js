@@ -5,6 +5,7 @@ const Lunch = require('../model/lunch.js');
 const Supper = require('../model/supper.js');
 const Comment = require('../model/comments.js');
 const User = require('../model/user.js');
+const toBeApproved = require('../model/approval.js');
 
 
 function createComment(ctx) {
@@ -17,7 +18,16 @@ function createComment(ctx) {
 }
 
 async function displayPostAndComments(ctx, adminUser, page, databaseUsed) {
-    if(databaseUsed == "Breakfast")
+    if(ctx.params.check == 1)
+    {
+        return toBeApproved.findById(ctx.params.id).then(async function(results){
+            await ctx.render(page, {
+                post: results,
+                admin: adminUser
+            });
+        });
+    }
+    else if(databaseUsed == "breakfast")
     {
         return Breakfast.findById(ctx.params.id).then(async function(results) {
             var commentsOnPosts = await Comment.find({postId: ctx.params.id});
@@ -28,7 +38,7 @@ async function displayPostAndComments(ctx, adminUser, page, databaseUsed) {
             });
         })
     }
-    else if(databaseUsed == "Lunch")
+    else if(databaseUsed == "lunch")
     {
         return Lunch.findById(ctx.params.id).then(async function(results) {
             var commentsOnPosts = await Comment.find({postId: ctx.params.id});
@@ -39,7 +49,7 @@ async function displayPostAndComments(ctx, adminUser, page, databaseUsed) {
             });
         })
     }
-    else if (databaseUsed == "Supper")
+    else if (databaseUsed == "supper")
     {
         return Supper.findById(ctx.params.id).then(async function(results) {
             var commentsOnPosts = await Comment.find({postId: ctx.params.id});
@@ -63,11 +73,16 @@ async function displayPostAndComments(ctx, adminUser, page, databaseUsed) {
 }
 
 async function displayPostTitles(ctx, adminUser, page) {
-    return Recipe.find({}).then(async function(results) {
-        await ctx.render(page, {
-            posts: results,
-            admin: adminUser,
-            databaseUsed: "Recipe"
+    return Breakfast.find({}).then(async function(results1) {
+        return Lunch.find({}).then(async function(results2) {
+            return Supper.find({}).then(async function(results3) {
+                await ctx.render(page, {
+                    posts1: results1,
+                    posts2: results2,
+                    posts3: results3,
+                    admin: adminUser,
+                });
+            });
         });
     });
 }

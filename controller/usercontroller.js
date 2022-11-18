@@ -5,6 +5,7 @@ const Banned = require('../model/banned');
 const Recipe = require('../model/recipe');
 const Router = require('koa-router');
 const toBeApproved = require('../model/approval');
+const hasBeenApproved = require('../model/approval');
 const GeneralFunctions = require('../functions/generalfunctions.js')
 const UserFunctions = require('../functions/userfunctions.js')
 const jwt = require('jsonwebtoken');
@@ -14,7 +15,7 @@ const { mquery, Query } = require('mongoose');
 const Breakfast = require('../model/breakfast.js');
 const Lunch = require('../model/lunch.js');
 const Supper = require('../model/supper.js');
-
+const route = Router();
 
 route.get('/admin', async (ctx, next) => {
     if(GeneralFunctions.verifyUser(ctx) === true)
@@ -91,47 +92,18 @@ route.post('/signup', async (ctx, next) => {
     });
 });
 
-//get and post for approval page
-route.get('/approval', async (ctx, next) => {
-     return jwt.verify(ctx.cookies.get('token'), process.env.TOKEN_SECRET, async (err, info) => {
-        if(GeneralFunctions.verifyUser(ctx) === true){
-            return Recipe.find({}).then(async function(results) {
-                await ctx.render('approval', {
-                    posts: results
-                });
-            });
-            
-        }
-        else return;
-        
-    });
-});
-
-//post for approve
-route.post('/approval', async (ctx, next) => {
-    var mybreakfast = {_id: ''};
-    if(ctx.request.body.ar == "Approval Recipe")
-    {
-        db.collection('breakfastposts').deleteOne()
-    }
-    else return
-});
-
-//post for delete
-route.post('/approval2', async (ctx, next) => {
-    var myquery = {};
-    db.collection('recipeposts').deleteOne(myquery,function(err, obj){
-        if(err) throw err;
-        console.log("deleted");
-    });
-    await ctx.redirect('approval');
-});
-
-//post for delete and delete in db
-route.post('/approval3', async (ctx, next) => {
-    console.log('button3');
-    await ctx.redirect('approval');
-});
+// route.post('/approve/:id', async (ctx, next) => {
+//     const doc = await Recipe.findById(ctx.params.id);
+//     console.log('Document Approved');
+//     var newhasBeenApproved = new hasBeenApproved({
+//         title: ctx.request.body.recipeTitle,
+//         ingredients: ctx.request.body.recipeIngredients,
+//         instructions: ctx.request.body.recipeInstructions,
+//     });
+//     newhasBeenApproved.save();
+//     console.log(doc);
+//     await ctx.redirect('approval');
+// });
 
 
 route.get('/signout', async (ctx, next) => {

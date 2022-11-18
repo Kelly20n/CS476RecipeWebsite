@@ -4,7 +4,9 @@ const Schema = mongoose.Schema;
 const breakfastSchema = new Schema({
     title: String,
     ingredients: String,
-    instructions: String
+    instructions: String,
+    type: String,
+    checked: Number
 });
 
 const Breakfast = mongoose.model('breakfastposts', breakfastSchema);

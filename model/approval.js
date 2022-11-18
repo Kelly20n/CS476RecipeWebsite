@@ -1,14 +1,14 @@
 const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
 
-const toBeAprovedSchema = new Schema({
-    postId: String,
-    user: String,
+const toBeApprovedSchema = new Schema({
     title: String,
     ingredients: String,
-    instructions: String
+    instructions: String,
+    type: String,
+    checked: Number
 });
 
-const toBeAproved = mongoose.model('toBeApproved', toBeAprovedSchema);
+const toBeApproved = mongoose.model('tobeapproveds', toBeApprovedSchema);
 
-module.exports = toBeAproved;
+module.exports = toBeApproved;

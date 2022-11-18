@@ -3,18 +3,25 @@
 <div class='postRecipe'>
     <div>Post Recipe</div>
 
-    <form action="/postPage" method="POST">
+    <form name="myForm" action="/postPage" method="POST" onsubmit= "return validate()">
         <div>
-            <input placeholder="Recipe Title" name="recipeTitle"></input><br></br>
-            <input placeholder="Recipe Ingredients" name="recipeIngredients"></input><br></br>
-            <input placeholder="Recipe Instructions" name="recipeInstructions"></input><br></br>
-            <input type="radio" id="breakfastFood" value='breakfast' name="database">
+            <input placeholder="Recipe Title" name="recipeTitle" id="rt" required></input><br></br>
+            <input placeholder="Recipe Ingredients" name="recipeIngredients" id="ring" required></input><br></br>
+            <input placeholder="Recipe Instructions" name="recipeInstructions" id="rins" required></input><br></br>
+            <input type="radio" id="breakfastFood" value='breakfast' name="database" id="break" required>
             <label for="breakfastFood">BreakFast</label></input>
-            <input type="radio" id="lunchFood" value='lunch' name="database">
+            <input type="radio" id="lunchFood" value='lunch' name="database" id="lunch" required>
             <label for="lunchFood">Lunch</label></input>
-            <input type="radio" id="supperFood" value='supper' name="database">
+            <input type="radio" id="supperFood" value='supper' name="database" id="supper" required>
             <label for="supperFood">Supper</label></input><br></br>
-            <input type="submit"/>
+            <input type="submit">
         </div>
     </form>
 </div>
+
+<script>
+
+    function validate() {
+       alert("Recipe Posted");
+    }
+</script>
