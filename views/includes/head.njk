@@ -19,6 +19,15 @@
   display: none;
 }
 
+.comment {
+  width: 100%
+}
+
+.commentBorder{
+  border: 2px solid #333;
+  width: fit-content;
+}
+
 .entry {
   border: 2px solid #333;
   border-radius: 12px;
@@ -48,6 +57,10 @@ ul{
 
 li{
   display: inline-block;
+}
+
+div {
+  font-size: 20px;
 }
 
 body {
@@ -81,11 +94,12 @@ body {
 
 .right {
     float: right;
-    margin-right: 10px;
+    width: 40%;
 }
 .left {
     float: left;
-    margin-right: 10px;
+    width:60%;
+    
 }
 .dropbtn {
     background-color: #04AA6D;
@@ -130,6 +144,9 @@ body {
 <div class="topnav">
         <a class="active" href="/">Home</a>
         
+        <a id="breakfast" href="/views/breakfast">Breakfast</a>
+        <a id="lunch" href="/views/lunch">Lunch</a>
+        <a id="supper" href="/views/supper">Supper</a>
         <!--<a href="#news">News</a>
         <a href="#contact">Contact</a>
         <a href="#about">About</a>-->
@@ -150,7 +167,7 @@ body {
                 <label for="byTitle">Title</label></input>
                 <input type="radio" id="byIngredient" value='ingredients' name="searchAlgorithm">
                 <label for="byIngredients">Ingredients</label></input>
-                <div>
+                <!--<div>
                 <input type="radio" id="breakfastFood" value='breakfast' name="database">
                 <label for="breakfastFood">BreakFast</label></input>
                 <input type="radio" id="lunchFood" value='lunch' name="database">
@@ -158,7 +175,7 @@ body {
                 <input type="radio" id="supperFood" value='supper' name="database">
                 <label for="supperFood">Supper</label></input>
                 </div>
-
+                -->
                 <input type="text" placeholder="Search" name="searchTerms"/>
                 <input type="submit"/>
               </form>

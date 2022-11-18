@@ -1,31 +1,31 @@
 {% include './includes/head.njk' %}
 
-<div class='recipe'>
-    <div>{{post.title}}</div><br><Br>
-    <div>Ingredients:<br><Br>{{post.ingredients}}</div><br><Br>
-    <div>Instructions:<br><Br>{{post.instructions}}</div><br><Br>
-</div>
-
-<div class='comment'>
-    <div>Comments</div>
-    <form action="/view/{{post.id}}/{{post.type}}/{{post.checked}}" onsubmit="return loginValidate()" method="POST">
-        <div>
-            <textarea placeholder="Add a Comment" name="userComment"></textarea>
-            <input type="submit"/>
-        </div>
-    </form>
-    
-    {% for comment in comments %}
-    <div class='comment'>
-        <!-- Add for discrete Admin buttons Figure out functionality later <div id="adminButtons"> <input type="button" value="Sus"> </div>-->
-        <div> {{comment.commentBody}}</div><br><Br>
+<div class="left">
+    <div class='recipe'>
+        <div>{{post.title}}</div><br><Br>
+        <div>Ingredients:<br><Br>{{post.ingredients}}</div>
+        <div>Instructions:<br><Br>{{post.instructions}}</div>
     </div>
-
-    {% endfor %}
-    
-    
 </div>
+<div class="right">
+    <div class='comment'>
+        <div>Comments</div>
+        <form action="/view/{{post.id}}/{{post.type}}/{{post.checked}}" onsubmit="return loginValidate()" method="POST">
+            <div>
+                <textarea placeholder="Add a Comment" name="userComment"></textarea><br>
+                <input type="submit"/>
+            </div>
+        </form>
+        
+        {% for comment in comments %}
+        <div class='comment'>
+            Commented By: <u>{{comment.user}}</u> 
+            <p class="commentBorder">{{comment.commentBody}}</p>
+        </div>
 
+        {% endfor %}
+    </div>
+</div>
 <script>
     function loginValidate() {
         if(admin == '') {

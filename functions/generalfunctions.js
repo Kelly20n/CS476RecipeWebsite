@@ -110,10 +110,11 @@ async function searchSingleDataBase(ctx, results, database) {
             }
 }
 
-//function return post from specified database
 async function returnPostsAllDatabases(){
     var allDataResults;
 
+    //Need to check if this runs as wanted
+    //Want to return allDataResults as a collection of all the posts in all data bases
     allDataResults += await Breakfast.find({}).then(async function(results) {
         allDataResults += results;
         console.log("in function" + allDataResults);
@@ -126,8 +127,6 @@ async function returnPostsAllDatabases(){
         allDataResults += results;
         console.log("in function" + allDataResults);
     });
-    
-    return allDataResults;
 }
 
 
@@ -158,5 +157,6 @@ module.exports.createToken = createToken;
 module.exports.verifyUser = verifyUser;
 module.exports.sleep = sleep;
 module.exports.searchSingleDataBase = searchSingleDataBase;
+module.exports.returnPostsAllDatabases = returnPostsAllDatabases;
 module.exports.decodeUser = decodeUser;
 module.exports.displayNoDBinfo = displayNoDBinfo;
