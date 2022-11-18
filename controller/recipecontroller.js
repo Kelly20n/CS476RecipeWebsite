@@ -10,7 +10,6 @@ const User = require('../model/user.js');
 const Router = require('koa-router');
 const RecipeFunctions = require('../functions/recipefunctions.js')
 const GeneralFunctions = require('../functions/generalfunctions.js')
-const jwt = require('jsonwebtoken');
 const toBeApproved = require('../model/approval.js');
 
 
