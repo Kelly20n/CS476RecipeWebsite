@@ -39,12 +39,13 @@ route.post('/view/:id/:db', async (ctx, next) => {
         const payload = GeneralFunctions.decodeUser(ctx)
         return User.findOne({username: payload.userEmail}).then(async function(loggedUser) {
             const page = 'recipe';
-            console.log("db: " + ctx.params.db);
+            console.log(page);
+            //console.log("db: " + ctx.params.db);
             if(ctx.request.body.userComment === '') {
                 return RecipeFunctions.displayPostAndComments(ctx, loggedUser, page, ctx.params.db);
             }
             else {
-                RecipeFunctions.createComment(ctx);
+                RecipeFunctions.createComment(ctx, ctx.params.db);
                 GeneralFunctions.sleep();
                 return RecipeFunctions.displayPostAndComments(ctx, loggedUser, page, ctx.params.db);
             }

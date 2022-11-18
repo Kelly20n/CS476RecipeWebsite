@@ -9,7 +9,7 @@
 <div class='comment'>
     <div>Comments</div>
 
-    <form action="/view/{{post.id}}" onsubmit="return loginValidate()" method="POST">
+    <form action="/view/{{post.id}}/{{databaseUsed}}" onsubmit="return loginValidate()" method="POST">
         <div>
             <textarea placeholder="Add a Comment" name="userComment"></textarea>
             <input type="submit"/>

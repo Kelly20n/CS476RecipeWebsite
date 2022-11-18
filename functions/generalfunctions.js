@@ -118,6 +118,28 @@ async function searchSingleDataBase(ctx, results, database) {
             }
 }
 
+async function returnPostsAllDatabases(){
+    var allDataResults;
+
+    //Need to check if this runs as wanted
+    //Want to return allDataResults as a collection of all the posts in all data bases
+    allDataResults += await Breakfast.find({}).then(async function(results) {
+        allDataResults += results;
+        console.log("in function" + allDataResults);
+    });
+    allDataResults += await Lunch.find({}).then(async function(results) {
+        allDataResults += results;
+        console.log("in function" + allDataResults);
+    });
+    allDataResults += await Supper.find({}).then(async function(results) {
+        allDataResults += results;
+        console.log("in function" + allDataResults);
+    });
+    
+    return allDataResults;
+}
+
+
 async function sleep() {
     await new Promise(r => setTimeout(r, 1000));
     return;
