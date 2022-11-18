@@ -71,9 +71,7 @@ server.use(koaNunjucks({
     }
 }));
 server.use(recipeController.routes());
-server.use(recipeController.allowedMethods());
 server.use(userController.routes());
-server.use(userController.allowedMethods());
 server.use(static('./public'));
 
 

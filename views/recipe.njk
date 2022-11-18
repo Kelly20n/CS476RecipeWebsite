@@ -8,7 +8,6 @@
 
 <div class='comment'>
     <div>Comments</div>
-
     <form action="/view/{{post.id}}/{{post.type}}/{{post.checked}}" onsubmit="return loginValidate()" method="POST">
         <div>
             <textarea placeholder="Add a Comment" name="userComment"></textarea>
@@ -26,3 +25,13 @@
     
     
 </div>
+
+<script>
+    function loginValidate() {
+        if(admin == '') {
+            alert('Sign in to access this feature!')
+            return false;
+        }
+        else return true;
+    }
+</script>

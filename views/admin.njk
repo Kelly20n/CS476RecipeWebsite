@@ -6,7 +6,7 @@
 
 <div class="row">
     <div class="column">
-        <h1><u>Users</u></h1>
+        <h1><b><u>Users</b></u></h1>
         {% for user in users %}
         <div class="entry">
             <form action="/mod/{{user.id}}" method="post">
@@ -21,7 +21,7 @@
         {% endfor %}
     </div>
     <div class="column">
-        <h1><u>Admin Users</u></h1>
+        <h1><b><u>Admin Users</b></u></h1>
         {% for adminuser in adminusers%}
         <div class="entry">
             <form action="/unmod/{{adminuser.id}}" method="post">
@@ -36,7 +36,7 @@
         {% endfor %}
     </div>
     <div class="column">
-        <h1><u>Banned Users</u></h1>
+        <h1><b><u>Banned Users</b></u></h1>
         {% for banneduser in bannedusers%}
             <div class="entry">
             <form action="/unban/{{banneduser.id}}" method="post">
