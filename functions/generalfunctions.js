@@ -129,7 +129,6 @@ function returnPostsAllDatabases(ctx){
                     searchTerm: ctx.request.body.searchTerms,
                     posts: results,
                 });
-
             });
         });
     });

@@ -382,7 +382,6 @@ route.post('/search', async (ctx, next) => {
                                 //console.log(searchTerms[i].toLowerCase() + " vs. " + dbIngredients[k].toLowerCase());
                                 if(searchTerms[j].toLowerCase() == dbIngredients[k].toLowerCase())
                                 {
-                                    
                                     isIngredient = true;
                                 }
                             }
