@@ -1,6 +1,4 @@
 require('dotenv').config();
-const Koa = require('koa');
-
 const Upload = require('../gridfs/storage.js');
 const Breakfast = require('../model/breakfast.js');
 const Lunch = require('../model/lunch.js');
@@ -18,6 +16,7 @@ const route = Router();
 
 route.get('/', async (ctx, next) => {
     const payload = GeneralFunctions.decodeUser(ctx)
+    console.log(payload);
     return User.findOne({username: payload.userEmail}).then(async function(loggedUser) {
         console.log(loggedUser);
         const page = 'index';
@@ -160,7 +159,7 @@ route.get('/approval', async (ctx, next) => {
         const payload = GeneralFunctions.decodeUser(ctx);
         return User.findOne({username: payload.userEmail}).then(async function(loggedUser){
             return toBeApproved.find({}).then(async function(results) {
-                await ctx.render('approval',{
+                await ctx.render('approval', {
                     posts: results,
                     admin: loggedUser
                 });    

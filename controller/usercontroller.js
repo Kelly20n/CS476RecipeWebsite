@@ -168,7 +168,10 @@ route.post('/ban/:id', async (ctx, next) => {
     {
         const doc = await User.findByIdAndRemove(ctx.params.id);
         var newBanned = new Banned({
-            username: doc.username
+            username: doc.username,
+            password: doc.password,
+            isAdmin: doc.isAdmin,
+            name: doc.name
         });
         newBanned.save();
         await ctx.redirect('/admin');
@@ -179,7 +182,14 @@ route.post('/ban/:id', async (ctx, next) => {
 route.post('/unban/:id', async (ctx, next) => {
     if(GeneralFunctions.verifyUser(ctx) === true)
     {
-        await Banned.findByIdAndRemove(ctx.params.id);
+        const doc = await Banned.findByIdAndRemove(ctx.params.id);
+        var newUser = new User({
+            username: doc.username,
+            password: doc.password,
+            isAdmin: doc.isAdmin,
+            name: doc.name
+        });
+        newUser.save();
         await ctx.redirect('/admin');
     }
 });
