@@ -80,6 +80,36 @@ async function displayPostAndComments(ctx, adminUser, page) {
     }
 }
 
+async function displayBreakfastPostTitles(ctx, adminUser, page) {
+    return Breakfast.find({}).then(async function(results) {
+        
+                await ctx.render(page, {
+                    posts: results,
+                    admin: adminUser,
+                });
+            });
+}
+
+async function displayLunchPostTitles(ctx, adminUser, page) {
+    return Lunch.find({}).then(async function(results) {
+        
+                await ctx.render(page, {
+                    posts: results,
+                    admin: adminUser,
+                });
+            });
+}
+
+async function displaySupperPostTitles(ctx, adminUser, page) {
+    return Supper.find({}).then(async function(results) {
+        
+                await ctx.render(page, {
+                    posts: results,
+                    admin: adminUser,
+                });
+            });
+}
+
 async function displayPostTitles(ctx, adminUser, page) {
     return Breakfast.find({}).then(async function(results1) {
         return Lunch.find({}).then(async function(results2) {
@@ -100,3 +130,6 @@ async function displayPostTitles(ctx, adminUser, page) {
 module.exports.createComment = createComment;
 module.exports.displayPostAndComments = displayPostAndComments;
 module.exports.displayPostTitles = displayPostTitles;
+module.exports.displayBreakfastPostTitles = displayBreakfastPostTitles;
+module.exports.displayLunchPostTitles = displayLunchPostTitles;
+module.exports.displaySupperPostTitles = displaySupperPostTitles;
