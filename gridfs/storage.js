@@ -8,23 +8,6 @@ const Grid = require('gridfs-stream');
 const host = process.env.host;
 const conn = mongoose.createConnection(host);
 
-// let bucket;
-// mongoose.connection.on("connected", () => {
-//     var db = mongoose.connections[0].db;
-//     bucket = new mongoose.mongo.GridFSBucket(db, {
-//       bucketName: "newBucket"
-//     });
-//     console.log(bucket);
-//   });
-
-// let gfs = new mongoose.mongo.GridFSBucket(conn.db, {bucketName: 'files'});;
-
-// Grid(conn.db, mongoose.mongo);
-
-// conn.once('open', () => {
-//     var gfs = Grid(conn.db, mongoose.mongo);
-//     gfs.collection('uploads');
-// })
 conn.once('open', () => {
     var gfs = new mongoose.mongo.GridFSBucket(conn.db, {
         bucketName: 'images'
