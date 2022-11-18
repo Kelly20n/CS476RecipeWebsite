@@ -34,7 +34,7 @@ route.get('/view/:id/:db/:check', async (ctx, next) => {
     });
 });
 
-route.post('/view/:id/:db/check', async (ctx, next) => {
+route.post('/view/:id/:db/:check', async (ctx, next) => {
     if(GeneralFunctions.verifyUser(ctx) === true)
     {
         const payload = GeneralFunctions.decodeUser(ctx)
