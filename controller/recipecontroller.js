@@ -235,7 +235,7 @@ route.post('/search', async (ctx, next) => {
             return Lunch.find({}).then(async function(results2) {
                 return Supper.find({}).then(async function(results3) {
                     
-                    var results;
+                    //var results;
                     
                     var isTitleInEntry = false;
                     for(var i = 0; i < results1.length; i++)
@@ -243,9 +243,9 @@ route.post('/search', async (ctx, next) => {
                         //console.log(results1[i]);
                         //console.log(results1[i].title + " vs. " + ctx.request.body.searchTerms)
 
-                        if(results1[i].title == ctx.request.body.searchTerms)
+                        if(results1[i].title.toLowerCase() == ctx.request.body.searchTerms.toLowerCase())
                         {
-                            console.log("Hit" + results1);
+                            //console.log("Hit" + results1);
                             isTitleInEntry = true;
                         }
                         if(!isTitleInEntry)
@@ -263,9 +263,9 @@ route.post('/search', async (ctx, next) => {
                         //console.log(results2[i]);
                         //console.log(results2[i].title + " vs. " + ctx.request.body.searchTerms)
 
-                        if(results2[i].title == ctx.request.body.searchTerms)
+                        if(results2[i].title.toLowerCase() == ctx.request.body.searchTerms.toLowerCase())
                         {
-                            console.log("Hit" + results1);
+                            //console.log("Hit" + results1);
                             isTitleInEntry = true;
                         }
                         if(!isTitleInEntry)
@@ -283,9 +283,9 @@ route.post('/search', async (ctx, next) => {
                         //console.log(results3[i]);
                         //console.log(results3[i].title + " vs. " + ctx.request.body.searchTerms)
 
-                        if(results3[i].title == ctx.request.body.searchTerms)
+                        if(results3[i].title.toLowerCase() == ctx.request.body.searchTerms.toLowerCase())
                         {
-                            console.log("Hit" + results1);
+                            //console.log("Hit" + results1);
                             isTitleInEntry = true;
                         }
                         if(!isTitleInEntry)
@@ -298,8 +298,8 @@ route.post('/search', async (ctx, next) => {
                         }
                         isTitleInEntry = false;
                     }
-                    results = results1 + results2 + results3;
-                    console.log(results);
+                    //results = results1 + results2 + results3;
+                    //console.log(results);
                     return await ctx.render('search', {
                         searchTerm: ctx.request.body.searchTerms,
                         posts1: results1,
@@ -312,25 +312,81 @@ route.post('/search', async (ctx, next) => {
         });
     }
     else{
-        return Breakfast.find({ingredients: ctx.request.body.searchTerms}).then(async function(results1) {
-            return Lunch.find({ingredients: ctx.request.body.searchTerms}).then(async function(results2) {
-                return Supper.find({ingredients: ctx.request.body.searchTerms}).then(async function(results3) {
-                    
-                    var results = results1 + results2 + results3;
-                    console.log(results);
+        
+        return Breakfast.find({}).then(async function(results1) {
+            return Lunch.find({}).then(async function(results2) {
+                return Supper.find({}).then(async function(results3) {
+                    console.log("Ingredients!");
+                    //var results = results1 + results2 + results3;
+                    //console.log(results);
 
                     var searchTerms = ctx.request.body.searchTerms.split(/\s*,\s*/);
+                    var isIngredient = false;
                     for(var i = 0; i < results1.length; i++)
                     {
-                        for(var j = 0; j < searchTerms; j++)
+                        var dbIngredients = results1[i].ingredients.split(/\s*,\s*/);
+                        for(var j = 0; j < searchTerms.length; j++)
+                        {
+                            for(var k = 0; k < dbIngredients.length; k++)
+                            {
+                                //console.log(searchTerms[i].toLowerCase() + " vs. " + dbIngredients[k].toLowerCase());
+                                if(searchTerms[j].toLowerCase() == dbIngredients[k].toLowerCase())
+                                {
+                                    
+                                    isIngredient = true;
+                                }
+                            }
+                        }
+                        if(!isIngredient)
+                        {
+                            results1.splice(i, 1);
+                            i--;
+                        }
+                        isIngredient = false;
                     }
                     for(var i = 0; i < results2.length; i++)
                     {
-
+                        var dbIngredients = results2[i].ingredients.split(/\s*,\s*/);
+                        for(var j = 0; j < searchTerms.length; j++)
+                        {
+                            for(var k = 0; k < dbIngredients.length; k++)
+                            {
+                                //console.log(searchTerms[i].toLowerCase() + " vs. " + dbIngredients[k].toLowerCase());
+                                if(searchTerms[j].toLowerCase() == dbIngredients[k].toLowerCase())
+                                {
+                                    
+                                    isIngredient = true;
+                                }
+                            }
+                        }
+                        if(!isIngredient)
+                        {
+                            results2.splice(i, 1);
+                            i--;
+                        }
+                        isIngredient = false;
                     }
                     for(var i = 0; i < results3.length; i++)
                     {
-
+                        var dbIngredients = results3[i].ingredients.split(/\s*,\s*/);
+                        for(var j = 0; j < searchTerms.length; j++)
+                        {
+                            for(var k = 0; k < dbIngredients.length; k++)
+                            {
+                                //console.log(searchTerms[i].toLowerCase() + " vs. " + dbIngredients[k].toLowerCase());
+                                if(searchTerms[j].toLowerCase() == dbIngredients[k].toLowerCase())
+                                {
+                                    
+                                    isIngredient = true;
+                                }
+                            }
+                        }
+                        if(!isIngredient)
+                        {
+                            results3.splice(i, 1);
+                            i--;
+                        }
+                        isIngredient = false;
                     }
 
                     return await ctx.render('search', {
