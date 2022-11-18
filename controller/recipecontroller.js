@@ -1,11 +1,11 @@
 require('dotenv').config();
 const Koa = require('koa');
 
+const Upload = require('../gridfs/storage.js');
 const Breakfast = require('../model/breakfast.js');
 const Lunch = require('../model/lunch.js');
 const Supper = require('../model/supper.js');
 const Recipe = require('../model/recipe.js');
-
 const User = require('../model/user.js');
 const Router = require('koa-router');
 const RecipeFunctions = require('../functions/recipefunctions.js')
@@ -219,6 +219,15 @@ route.post('/search', async (ctx, next) => {
             return GeneralFunctions.searchSingleDataBase(ctx, supperResults, "Supper");
         });
     }
+});
+
+route.post('/upload', Upload.single('file'), (ctx, next) => {
+    console.log(ctx.request.file);
+    console.log(ctx.file);
+})
+
+route.get('/uploadtest', async (ctx, next) => {
+    await ctx.render('uploadtest')
 });
 
 module.exports = route;

@@ -15,7 +15,7 @@
 
 
               <!-- Need to add functionality to check database-->
-              <form action="/login" method="POST">
+              <form action="/login" method="POST" onsubmit="return validate()">
                 <div class="form-outline form-white mb-4">
                   <input type="email" id="typeEmailX" class="form-control form-control-lg" placeholder="Email" name="userEmail"/>
                   <label class="form-label" for="typeEmailX"></label>
@@ -44,3 +44,14 @@
   </div>
 </section>
 
+<script>
+  function validate() {
+    if({{admin != null}}) {
+      alert('You are already logged in!')
+      return false;
+    }
+    else { 
+      return true;
+    }
+  }
+</script>

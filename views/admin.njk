@@ -1,34 +1,50 @@
 {% include './includes/head.njk' %}
 
+<style>
+    form { display: inline; }
+</style>
+
 <div class="row">
     <div class="column">
+        <h1><u>Users</u></h1>
         {% for user in users %}
-        <form action="/mod/{{user.id}}" method="post">
-            {{user.username}}
-            <input type="submit" value="Mod">
-        </form>
-        <form action="/ban/{{user.id}}" method="post">
-            <input type="submit" value="Ban">
-        </form>
+        <div class="entry">
+            <form action="/mod/{{user.id}}" method="post">
+                {{user.username}}
+                <input type="submit" value="Mod">
+            </form>
+            <form action="/ban/{{user.id}}" method="post">
+                <input type="submit" value="Ban">
+            </form>
+            <br><br>
+        </div>
         {% endfor %}
     </div>
     <div class="column">
+        <h1><u>Admin Users</u></h1>
         {% for adminuser in adminusers%}
-        <form action="/unmod/{{adminuser.id}}" method="post">
-            {{adminuser.username}}
-            <input type="submit" value="Unmod">
-        </form>
-        <form action="/ban/{{adminuser.id}}" method="post">
-            <input type="submit" value="Ban">
-        </form>
+        <div class="entry">
+            <form action="/unmod/{{adminuser.id}}" method="post">
+                {{adminuser.username}}
+                <input type="submit" value="Unmod">
+            </form>
+            <form action="/ban/{{adminuser.id}}" method="post">
+                <input type="submit" value="Ban">
+            </form>
+            <br><br>
+        </div>
         {% endfor %}
     </div>
     <div class="column">
+        <h1><u>Banned Users</u></h1>
         {% for banneduser in bannedusers%}
-        <form action="/unban/{{banneduser.id}}" method="post">
-            {{banneduser.username}}
-            <input type="submit" value="Unban">
-        </form>
+            <div class="entry">
+            <form action="/unban/{{banneduser.id}}" method="post">
+                {{banneduser.username}}
+                <input type="submit" value="Unban">
+            </form>
+            <br><br>
+        </div>
         {% endfor %}
     </div>
 </div>

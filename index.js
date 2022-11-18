@@ -8,6 +8,7 @@ require('dotenv').config();
 const override = require('koa-methodoverride');
 const parser = require('koa-bodyparser');
 
+
 //////////////////////////
 //Connecting the DB
 //npm i mongoose
@@ -47,14 +48,6 @@ const userController = require('./controller/usercontroller');
 const static = require('koa-static');
 
 //////////////////////////
-//Setting up authentication
-//npm i koa-passport
-//npm i koa-session
-//////////////////////////
-const passport = require('koa-passport');
-const session = require('koa-session');
-
-//////////////////////////
 //Initializing views
 //npm i koa-views
 //npm i nunjucks
@@ -62,7 +55,7 @@ const session = require('koa-session');
 const koaNunjucks = require('koa-nunjucks-2');
 const path = require('path');
 const { append } = require('koa/lib/response.js');
-const { getCipherInfo } = require('crypto');
+
 
 //////////////////////////
 //Middleware

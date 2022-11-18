@@ -1,29 +1,25 @@
 require('dotenv').config();
-const Koa = require('koa');
 const User = require('../model/user');
 const Banned = require('../model/banned');
-const Recipe = require('../model/recipe');
 const Router = require('koa-router');
-const toBeApproved = require('../model/approval');
-const hasBeenApproved = require('../model/approval');
 const GeneralFunctions = require('../functions/generalfunctions.js')
 const UserFunctions = require('../functions/userfunctions.js')
-const jwt = require('jsonwebtoken');
-const Application = require('koa');
-const { db } = require('../model/user');
-const { mquery, Query } = require('mongoose');
-const Breakfast = require('../model/breakfast.js');
-const Lunch = require('../model/lunch.js');
-const Supper = require('../model/supper.js');
+
+
+
 const route = Router();
 
 route.get('/admin', async (ctx, next) => {
     if(GeneralFunctions.verifyUser(ctx) === true)
     {
-        payload = GeneralFunctions.decodeUser(ctx);
+        const payload = GeneralFunctions.decodeUser(ctx);
         const page = 'admin';
         return User.findOne({username: payload.userEmail}).then(async function(loggedUser) {
-            if(loggedUser.isAdmin == true) {
+            if(loggedUser == null) {
+                ctx.cookies.set('token', null);
+                return await ctx.redirect("/");
+            }
+            else if(loggedUser.isAdmin == true) {
                 return UserFunctions.displayUsers(ctx, loggedUser, page);
             }
             else {
@@ -59,36 +55,44 @@ route.post('/login', async (ctx, next) => {
 route.post('/signup', async (ctx, next) => {
     return User.findOne({username: ctx.request.body.userEmail}).then(async function(err, results) {
         //console.log("ctx: " + ctx.request.body.userPass + "\n")
-        console.log(err + "\n")
-        console.log(ctx.request.body.userEmail)
-        //Checks if password is equal
-        //Checks if there isnt another account with same email
-        //if all checks pass then successful signup
-        // Add logic to update mongoose of account
+        return Banned.findOne({username: ctx.request.body.userEmail}).then(async function(check) {
+            console.log(check);
+            if(check != null)
+            {
+                await ctx.redirect('/signup');
+            }
+            // console.log(err + "\n")
+            // console.log(ctx.request.body.userEmail)
+            //Checks if password is equal
+            //Checks if there isnt another account with same email
+            //if all checks pass then successful signup
+            // Add logic to update mongoose of account
 
-        if (ctx.request.body.userPass == ctx.request.body.userPassConfirm && err == null)
-        {
-            console.log('Successful Sign Up');
-            
-            var newUser = new User({
-                username: ctx.request.body.userEmail,
-                password: ctx.request.body.userPass,
-                isAdmin: false,
-            });
+            if (ctx.request.body.userPass == ctx.request.body.userPassConfirm && err == null)
+            {
+                console.log('Successful Sign Up');
+                
+                var newUser = new User({
+                    name: ctx.request.body.name,
+                    username: ctx.request.body.userEmail,
+                    password: ctx.request.body.userPass,
+                    isAdmin: false,
+                });
 
-            newUser.save((err, res) => {
-                if(err) return handleError(err);
-                else return console.log("Result: ", res)
-            });
+                newUser.save((err, res) => {
+                    if(err) return handleError(err);
+                    else return console.log("Result: ", res)
+                });
 
-            await ctx.redirect("/login");
-        }
+                await ctx.redirect("/login");
+            }
 
-        else
-        {
-            console.log('Unsuccessful Sign Up');
-            await ctx.redirect("signup");
-        }
+            else
+            {
+                console.log('Unsuccessful Sign Up');
+                await ctx.redirect("signup");
+            }
+        });
     });
 });
 
