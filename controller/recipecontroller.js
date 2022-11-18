@@ -1,21 +1,18 @@
 require('dotenv').config();
-const Koa = require('koa');
 
+//global variables
 const Upload = require('../gridfs/storage.js');
 const Breakfast = require('../model/breakfast.js');
 const Lunch = require('../model/lunch.js');
 const Supper = require('../model/supper.js');
-const Recipe = require('../model/recipe.js');
 const User = require('../model/user.js');
 const Router = require('koa-router');
 const RecipeFunctions = require('../functions/recipefunctions.js')
 const GeneralFunctions = require('../functions/generalfunctions.js')
 const toBeApproved = require('../model/approval.js');
-
-
-
 const route = Router();
 
+//route get for main/home page
 route.get('/', async (ctx, next) => {
     const payload = GeneralFunctions.decodeUser(ctx)
     return User.findOne({username: payload.userEmail}).then(async function(loggedUser) {
@@ -25,6 +22,7 @@ route.get('/', async (ctx, next) => {
     });
 });     
 
+//route get for geting
 route.get('/view/:id/:db/:check', async (ctx, next) => {
     const payload = GeneralFunctions.decodeUser(ctx)
     return User.findOne({username: payload.userEmail}).then(async function(loggedUser) {
@@ -55,7 +53,7 @@ route.post('/view/:id/:db/:check', async (ctx, next) => {
     else return
 });
         
-
+//route get for post page
 route.get('/postPage', async (ctx, next) => {
     const payload = GeneralFunctions.decodeUser(ctx);
     const page = 'postPage'
@@ -64,7 +62,9 @@ route.get('/postPage', async (ctx, next) => {
     })
 });
     
+//route post page to post to database when recipe is posted
 route.post('/postPage', async (ctx, next) => {
+    //adds to breakfast database and toBeApproved for admin duties
     if(ctx.request.body.database == "breakfast")
     {
         var newBreakfast = new Breakfast({
@@ -92,6 +92,7 @@ route.post('/postPage', async (ctx, next) => {
         console.log('breakfast added');
         await ctx.redirect('postPage');
     }
+    //adds to lunch database and toBeApproved for admin duties
     else if(ctx.request.body.database == "lunch")
     {
         var newLunch = new Lunch({
@@ -119,6 +120,7 @@ route.post('/postPage', async (ctx, next) => {
          console.log('lunch added');
          await ctx.redirect('postPage');
     }
+    //adds to supper database and toBeApproved for admin duties
     else
     {
          var newSupper = new Supper({
@@ -154,7 +156,7 @@ route.post('/postPage', async (ctx, next) => {
     })
 });
 
-//get and post for approval page
+//route get to get all recipes that need to be approved or rejected
 route.get('/approval', async (ctx, next) => {
     if(GeneralFunctions.verifyUser(ctx) === true){
         const payload = GeneralFunctions.decodeUser(ctx);
@@ -170,17 +172,20 @@ route.get('/approval', async (ctx, next) => {
     else return;    
 });
 
-//post for delete
+//route post for removal of posts based on databased
 route.post('/remove/:id', async (ctx, next) => {
     const doc = await toBeApproved.findOneAndRemove({title: ctx.params.id});
+    //remove post if recipe belongs to breakfast
     if(doc.type == "breakfast")
     {
         await Breakfast.findOneAndRemove({title: ctx.params.id});
     }
+    //remove post if recipe belongs to lunch
     else if(doc.type == "lunch")
     {
         await Lunch.findOneAndRemove({title: ctx.params.id});
     }
+     //remove post if recipe belongs to lunch
     else
     {
         await Supper.findOneAndRemove({title: ctx.params.id});
@@ -189,16 +194,16 @@ route.post('/remove/:id', async (ctx, next) => {
     await ctx.redirect('/approval');
 });
 
+//route post to approve recipe and get rid of it from recipe that still needs to be approved
 route.post('/approval/:id', async (ctx, next) => {
     await toBeApproved.findByIdAndRemove(ctx.params.id);
     console.log('Removed Document');
     await ctx.redirect('/approval');
 });
 
-
-
+//route post for searching recipe based on database
 route.post('/search', async (ctx, next) => {
-    /*return Recipe.find({title: ctx.request.body.searchTerm}).then(async function(results){*/
+    //search in breakfast database
     if(ctx.request.body.database == "breakfast")
     {
         console.log('Breakfast');
@@ -206,6 +211,7 @@ route.post('/search', async (ctx, next) => {
             return GeneralFunctions.searchSingleDataBase(ctx, breakfastResults, "Breakfast");    
         });
     }
+    //search in lunch database
     else if(ctx.request.body.database == "lunch")
     {
         console.log('Lunch');
@@ -213,6 +219,7 @@ route.post('/search', async (ctx, next) => {
             return GeneralFunctions.searchSingleDataBase(ctx, lunchResults, "Lunch");
         });
     }
+    //search in lunch database
     else{
         console.log('Supper');
         return Supper.find({}).then(async function(supperResults){    
@@ -221,6 +228,7 @@ route.post('/search', async (ctx, next) => {
     }
 });
 
+//route post for upload picture files
 route.post('/upload', Upload.single('file'), (ctx, next) => {
     console.log(ctx.request.file);
     console.log(ctx.file);

@@ -1,13 +1,12 @@
-const Koa = require('koa');
+//global variables
 const Recipe = require('../model/recipe.js');
 const Breakfast = require('../model/breakfast.js');
 const Lunch = require('../model/lunch.js');
 const Supper = require('../model/supper.js');
 const Comment = require('../model/comments.js');
-const User = require('../model/user.js');
 const toBeApproved = require('../model/approval.js');
 
-
+//function to create comment
 function createComment(ctx, databaseUsed) {
     console.log("Commment func" + databaseUsed);
     var newComment = new Comment({
@@ -20,6 +19,7 @@ function createComment(ctx, databaseUsed) {
     return;
 }
 
+//function to display posts and comments according database
 async function displayPostAndComments(ctx, adminUser, page, databaseUsed) {
     if(ctx.params.check == 1)
     {

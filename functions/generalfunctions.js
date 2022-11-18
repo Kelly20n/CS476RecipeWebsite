@@ -1,13 +1,13 @@
 require('dotenv').config();
-const Koa = require('koa');
 
+//global variables
 const Breakfast = require('../model/breakfast.js');
 const Lunch = require('../model/lunch.js');
 const Supper = require('../model/supper.js');
-
 const jwt = require('jsonwebtoken');
 const alert = require('alert');
 
+//function to create a token/secret token
 function createToken(ctx) {
     const secret = process.env.TOKEN_SECRET;
     const jwtToken = jwt.sign(ctx.request.body, secret, {expiresIn: 60 * 60})
@@ -15,6 +15,7 @@ function createToken(ctx) {
     return;
 }
 
+//function to check token/cookies against secret token/cookies
 function verifyUser(ctx) {
     var bool = true;
     jwt.verify(ctx.cookies.get('token'), process.env.TOKEN_SECRET, async (err, info) => {
@@ -31,12 +32,15 @@ function verifyUser(ctx) {
     return bool;
 }
 
+//function to search through a database
 async function searchSingleDataBase(ctx, results, database) {
             console.log(database);
+            //if nothing found redirect to title
             if(results === null)
             {
                 return await ctx.redirect('/')
             }
+            //searches for title
             else if(ctx.request.body.searchAlgorithm == 'title')
             {
                 // Iterate through items from db
@@ -46,17 +50,12 @@ async function searchSingleDataBase(ctx, results, database) {
                 {
                     if(results[i].title == ctx.request.body.searchTerms)
                     {
-                        //console.log("Hit on: " + searchTerm_Array[j] + results[i])
                         isTitleInEntry = true;
-                        //break loop1;
                     }
                     if(!isTitleInEntry)
                     {
-                        //console.log("Removed " + searchTerm_Array + " wasn't found: " + results[i]);
-                        //listOfIngredientsToRemove += i;
                         results.splice(i, 1);
                         i--;
-                        // Removes item from results and decrements i to make algorithm look at index i again (new value now in the place)
                     }
                     isTitleInEntry = false;
                 }
@@ -67,9 +66,9 @@ async function searchSingleDataBase(ctx, results, database) {
                     databaseUsed: database
                 });
             }
+            //searches for ingredients
             else if (ctx.request.body.searchAlgorithm == 'ingredients')
             {
-                //Turns search terms seperated by commas into an array
                 var searchTerm_Array = ctx.request.body.searchTerms.split(/\s*,\s*/);
                 console.log("Search Terms: " + searchTerm_Array);
                 let isIngredientInEntry = false;
@@ -79,8 +78,6 @@ async function searchSingleDataBase(ctx, results, database) {
                 loop0:
                 for(var i = 0; i < results.length; i++)
                 {
-                    //console.log("Viewing: " + results[i].ingredients);
-                    //Turns ingredients in recipe tree into lists with each db entry
                     dbIngredients = results[i].ingredients.split(/\s*,\s*/);
 
                     // Iterate through each search term
@@ -92,17 +89,12 @@ async function searchSingleDataBase(ctx, results, database) {
                         {
                             if(searchTerm_Array[j] == dbIngredients[k])
                             {
-                                //console.log("Hit on: " + searchTerm_Array[j] + results[i]);
                                 isIngredientInEntry = true;
-                                //break loop1;
                             }
                         }
-
                     }
                     if(!isIngredientInEntry)
                     {
-                        //console.log("Removed " + searchTerm_Array + " wasn't found: " + results[i]);
-                        //listOfIngredientsToRemove += i;
                         results.splice(i, 1);
                         i--;
                         // Removes item from results and decrements i to make algorithm look at index i again (new value now in the place)
@@ -118,11 +110,10 @@ async function searchSingleDataBase(ctx, results, database) {
             }
 }
 
+//function return post from specified database
 async function returnPostsAllDatabases(){
     var allDataResults;
 
-    //Need to check if this runs as wanted
-    //Want to return allDataResults as a collection of all the posts in all data bases
     allDataResults += await Breakfast.find({}).then(async function(results) {
         allDataResults += results;
         console.log("in function" + allDataResults);
@@ -139,10 +130,9 @@ async function returnPostsAllDatabases(){
     return allDataResults;
 }
 
-async function sleep() {
-    await new Promise(r => setTimeout(r, 1000));
-    return;
-}
+
+
+//function to breaks down user to check for token and cookies
 function decodeUser(ctx) {
     if(ctx.cookies.get("token") != null) {
         const decoded = jwt.decode(ctx.cookies.get("token"), {complete: true});
@@ -152,12 +142,14 @@ function decodeUser(ctx) {
     else return false
 }
 
+//funtion to get not display database info
 async function displayNoDBinfo(ctx, loggedUser, page) {
     await ctx.render(page, {
         admin: loggedUser
     })
 }
 
+//function to add delay
 async function sleep() {
     return await new Promise(r => setTimeout(r, 1000));
 }

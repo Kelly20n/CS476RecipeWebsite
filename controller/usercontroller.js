@@ -1,24 +1,26 @@
 require('dotenv').config();
+
+//global variables
 const User = require('../model/user');
 const Banned = require('../model/banned');
 const Router = require('koa-router');
 const GeneralFunctions = require('../functions/generalfunctions.js')
 const UserFunctions = require('../functions/userfunctions.js')
-
-
-
 const route = Router();
 
+//route get for admin to check if user is logged into an account with admin priveleges and displays ti
 route.get('/admin', async (ctx, next) => {
     if(GeneralFunctions.verifyUser(ctx) === true)
     {
         const payload = GeneralFunctions.decodeUser(ctx);
         const page = 'admin';
         return User.findOne({username: payload.userEmail}).then(async function(loggedUser) {
+            //check if user logged in
             if(loggedUser == null) {
                 ctx.cookies.set('token', null);
                 return await ctx.redirect("/");
             }
+            //check if user is admin
             else if(loggedUser.isAdmin == true) {
                 return UserFunctions.displayUsers(ctx, loggedUser, page);
             }
@@ -31,19 +33,22 @@ route.get('/admin', async (ctx, next) => {
     else return
 });
         
-
+//route post for login input
 route.post('/login', async (ctx, next) => {
     return User.findOne({username: ctx.request.body.userEmail}).then(async function(results) {
+        //check if input is empty
         if(results === null)
         {
-        console.log('Unsuccessful Login2');
-        return await ctx.render('incorrectlogin');
+            console.log('Unsuccessful Login2');
+            return await ctx.render('incorrectlogin');
         }
+        //checks if input matches existing account info
         if(ctx.request.body.userEmail === results.username && ctx.request.body.userPass === results.password)
         {
             GeneralFunctions.createToken(ctx);
             await ctx.redirect("/");
         }
+        //otherwise input is wrong
         else
         {
             console.log('Unsuccessful Login3');
@@ -52,22 +57,18 @@ route.post('/login', async (ctx, next) => {
     });
 });
 
+//route post for signup
 route.post('/signup', async (ctx, next) => {
+    //search through users and banned users database
     return User.findOne({username: ctx.request.body.userEmail}).then(async function(err, results) {
-        //console.log("ctx: " + ctx.request.body.userPass + "\n")
         return Banned.findOne({username: ctx.request.body.userEmail}).then(async function(check) {
             console.log(check);
+            //if signup not allowed/working redirect to signup
             if(check != null)
             {
                 await ctx.redirect('/signup');
             }
-            // console.log(err + "\n")
-            // console.log(ctx.request.body.userEmail)
-            //Checks if password is equal
-            //Checks if there isnt another account with same email
-            //if all checks pass then successful signup
-            // Add logic to update mongoose of account
-
+            //if signup matches condition means it was sucessfull
             if (ctx.request.body.userPass == ctx.request.body.userPassConfirm && err == null)
             {
                 console.log('Successful Sign Up');
@@ -96,25 +97,13 @@ route.post('/signup', async (ctx, next) => {
     });
 });
 
-// route.post('/approve/:id', async (ctx, next) => {
-//     const doc = await Recipe.findById(ctx.params.id);
-//     console.log('Document Approved');
-//     var newhasBeenApproved = new hasBeenApproved({
-//         title: ctx.request.body.recipeTitle,
-//         ingredients: ctx.request.body.recipeIngredients,
-//         instructions: ctx.request.body.recipeInstructions,
-//     });
-//     newhasBeenApproved.save();
-//     console.log(doc);
-//     await ctx.redirect('approval');
-// });
-
-
+//route get for sign out to sign a user out
 route.get('/signout', async (ctx, next) => {
     ctx.cookies.set('token', null);
     await ctx.redirect('/');
 });
 
+//route get for login getting login page
 route.get('/login', async (ctx, next) => {
     const payload = GeneralFunctions.decodeUser(ctx);
     const page = 'login'
@@ -123,6 +112,7 @@ route.get('/login', async (ctx, next) => {
     })
 });
 
+//route get for getting signup page
 route.get('/signup', async (ctx, next) => {
     const payload = GeneralFunctions.decodeUser(ctx);
     const page = 'signup'
@@ -131,6 +121,7 @@ route.get('/signup', async (ctx, next) => {
     })
 });
 
+//route get for getting forgetpassword page
 route.get('/forgotpassword', async (ctx, next) => {
     const payload = GeneralFunctions.decodeUser(ctx);
     const page = 'forgotpassword'
@@ -139,6 +130,7 @@ route.get('/forgotpassword', async (ctx, next) => {
     })
 });
 
+//route post for if admin decides to give a user admin priveleges
 route.post('/mod/:id', async (ctx, next) => {
     if(GeneralFunctions.verifyUser(ctx) === true)
     {
@@ -151,6 +143,7 @@ route.post('/mod/:id', async (ctx, next) => {
     else return
 })
 
+//route post for if admin decides to remove admin priveleges from a user
 route.post('/unmod/:id', async (ctx, next) => {
     if(GeneralFunctions.verifyUser(ctx) === true)
     {
@@ -163,6 +156,7 @@ route.post('/unmod/:id', async (ctx, next) => {
     else return
 })
 
+//route post for if admin decides to ban a user
 route.post('/ban/:id', async (ctx, next) => {
     if(GeneralFunctions.verifyUser(ctx) === true)
     {
@@ -176,6 +170,7 @@ route.post('/ban/:id', async (ctx, next) => {
     else return
 })
 
+//route post for if admin decides to unban a user
 route.post('/unban/:id', async (ctx, next) => {
     if(GeneralFunctions.verifyUser(ctx) === true)
     {

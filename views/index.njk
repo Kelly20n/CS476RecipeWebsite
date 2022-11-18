@@ -1,21 +1,32 @@
 {% include './includes/head.njk' %}
-
 <div class = 'form-floating mb-3'>
+</div>
 
-    
-</div>
-{% for post in posts1 %}
-<div class='post'>
-    <a href="/view/{{post.id}}/{{post.type}}/{{post.checked}}"> <div>{{post.title}}</div></a><br><Br>
-</div>
-{% endfor %}
-{% for post in posts2 %}
-<div class='post'>
-    <a href="/view/{{post.id}}/{{post.type}}/{{post.checked}}"> <div>{{post.title}}</div></a><br><Br>
-</div>
-{% endfor %}
-{% for post in posts3 %}
-<div class='post'>
-    <a href="/view/{{post.id}}/{{post.type}}/{{post.checked}}"> <div>{{post.title}}</div></a><br><Br>
-</div>
-{% endfor %}
+<ul>
+    <h1><b><u>BreakFast</b></u></h1>
+    {% for post in posts1 %}
+    <div class='post'>
+        <li>
+            <a href="/view/{{post.id}}/{{post.type}}/{{post.checked}}"> {{post.title}}</a>
+        </li>
+    </div>
+    {% endfor %}
+
+    <h1><b><u>Lunch</b></u></h1>
+    {% for post in posts2 %}
+    <div class='post'>
+        <li>
+            <a href="/view/{{post.id}}/{{post.type}}/{{post.checked}}"> {{post.title}}</a>
+        </li>
+    </div>
+    {% endfor %}
+
+    <h1><b><u>Supper</b></u></h1>
+    {% for post in posts3 %}
+    <div class='post'>
+        <li>
+            <a href="/view/{{post.id}}/{{post.type}}/{{post.checked}}"> {{post.title}}</a>
+        </li>
+    </div>
+    {% endfor %}
+</ul>

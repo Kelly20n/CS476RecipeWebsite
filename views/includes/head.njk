@@ -42,6 +42,14 @@
   clear: both;
 }
 
+ul{
+  list-style-type: none;
+}
+
+li{
+  display: inline-block;
+}
+
 body {
   margin: 0;
   font-family: Arial, Helvetica, sans-serif;
@@ -121,12 +129,13 @@ body {
 
 <div class="topnav">
         <a class="active" href="/">Home</a>
-        <a id = "approve" href="/approval">Approval</a>
+        
         <!--<a href="#news">News</a>
         <a href="#contact">Contact</a>
         <a href="#about">About</a>-->
         <div class="right">
-            <a id="admin" href="/admin">Admin
+            <a id="admin" href="/admin">Admin</a>
+            <a id = "approve" href="/approval">Approval</a>
             <a href="/postPage">Add Recipe</a>
             <a href="/login">Login</a>
             <a id="signout" href="/signout" onclick="alert('Signout Successful')">Signout</a>
