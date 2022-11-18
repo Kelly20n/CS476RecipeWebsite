@@ -42,12 +42,13 @@ route.post('/view/:id/:db/:check', async (ctx, next) => {
             console.log(page);
             //console.log("db: " + ctx.params.db);
             if(ctx.request.body.userComment === '') {
-                return RecipeFunctions.displayPostAndComments(ctx, loggedUser, page, ctx.params.db);
+                console.log(loggedUser);
+                return RecipeFunctions.displayPostAndComments(ctx, loggedUser, page);
             }
             else {
-                RecipeFunctions.createComment(ctx, ctx.params.db);
+                RecipeFunctions.createComment(ctx, loggedUser.name);
                 GeneralFunctions.sleep();
-                return RecipeFunctions.displayPostAndComments(ctx, loggedUser, page, ctx.params.db);
+                return RecipeFunctions.displayPostAndComments(ctx, loggedUser, page);
             }
         });
     }

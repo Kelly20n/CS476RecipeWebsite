@@ -8,19 +8,20 @@ const User = require('../model/user.js');
 const toBeApproved = require('../model/approval.js');
 
 
-function createComment(ctx, databaseUsed) {
-    console.log("Commment func" + databaseUsed);
+function createComment(ctx, username) {
+    //console.log("Commment func" + databaseUsed);
     var newComment = new Comment({
         postId: ctx.params.id,
+        user: username,
         commentBody: ctx.request.body.userComment,
-        postDB: databaseUsed,
+        postDB: ctx.params.db,
     });
     console.log(newComment);
     newComment.save();
     return;
 }
 
-async function displayPostAndComments(ctx, adminUser, page, databaseUsed) {
+async function displayPostAndComments(ctx, adminUser, page) {
     if(ctx.params.check == 1)
     {
         return toBeApproved.findById(ctx.params.id).then(async function(results){
@@ -30,39 +31,39 @@ async function displayPostAndComments(ctx, adminUser, page, databaseUsed) {
             });
         });
     }
-    else if(databaseUsed == "breakfast")
+    else if(ctx.params.db == "breakfast")
     {
         return Breakfast.findById(ctx.params.id).then(async function(results) {
-            var commentsOnPosts = await Comment.find({postId: ctx.params.id, postDB: databaseUsed});
+            var commentsOnPosts = await Comment.find({postId: ctx.params.id, postDB: ctx.params.db});
                 await ctx.render(page, {
                     post: results,
                     comments: commentsOnPosts,
                     admin: adminUser,
-                    databaseUsed: databaseUsed
+                    databaseUsed: ctx.params.db,
             });
         })
     }
-    else if(databaseUsed == "lunch")
+    else if(ctx.params.db == "lunch")
     {
         return Lunch.findById(ctx.params.id).then(async function(results) {
-            var commentsOnPosts = await Comment.find({postId: ctx.params.id, postDB: databaseUsed});
+            var commentsOnPosts = await Comment.find({postId: ctx.params.id, postDB: ctx.params.db});
                 await ctx.render(page, {
                     post: results,
                     comments: commentsOnPosts,
                     admin: adminUser,
-                    databaseUsed: databaseUsed
+                    databaseUsed: ctx.params.db
             });
         })
     }
-    else if (databaseUsed == "supper")
+    else if (ctx.params.db == "supper")
     {
         return Supper.findById(ctx.params.id).then(async function(results) {
-            var commentsOnPosts = await Comment.find({postId: ctx.params.id, postDB: databaseUsed});
+            var commentsOnPosts = await Comment.find({postId: ctx.params.id, postDB: ctx.params.db});
                 await ctx.render(page, {
                     post: results,
                     comments: commentsOnPosts,
                     admin: adminUser,
-                    databaseUsed: databaseUsed
+                    databaseUsed: ctx.params.db
             });
         })
     }
@@ -73,7 +74,7 @@ async function displayPostAndComments(ctx, adminUser, page, databaseUsed) {
                     post: results,
                     comments: commentsOnPosts,
                     admin: adminUser,
-                    databaseUsed: databaseUsed
+                    databaseUsed: "Recipe"
             });
         })
     }
