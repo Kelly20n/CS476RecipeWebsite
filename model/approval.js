@@ -1,7 +1,7 @@
 const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
 
-const breakfastSchema = new Schema({
+const toBeApprovedSchema = new Schema({
     title: String,
     ingredients: String,
     instructions: String,
@@ -9,6 +9,6 @@ const breakfastSchema = new Schema({
     checked: Number
 });
 
-const Breakfast = mongoose.model('breakfastposts', breakfastSchema);
+const toBeApproved = mongoose.model('tobeapproveds', toBeApprovedSchema);
 
-module.exports = Breakfast;
+module.exports = toBeApproved;

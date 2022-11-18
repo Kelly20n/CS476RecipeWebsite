@@ -4,11 +4,11 @@ const User = require('../model/user');
 const Banned = require('../model/banned');
 const Recipe = require('../model/recipe');
 const Router = require('koa-router');
+const toBeApproved = require('../model/approval');
+const hasBeenApproved = require('../model/approval');
 const GeneralFunctions = require('../functions/generalfunctions.js')
 const UserFunctions = require('../functions/userfunctions.js')
 const jwt = require('jsonwebtoken');
-const { redirect } = require('koa/lib/response');
-
 const route = Router();
 
 route.get('/admin', async (ctx, next) => {
@@ -98,10 +98,24 @@ route.post('/signup', async (ctx, next) => {
     });
 });
 
+// route.post('/approve/:id', async (ctx, next) => {
+//     const doc = await Recipe.findById(ctx.params.id);
+//     console.log('Document Approved');
+//     var newhasBeenApproved = new hasBeenApproved({
+//         title: ctx.request.body.recipeTitle,
+//         ingredients: ctx.request.body.recipeIngredients,
+//         instructions: ctx.request.body.recipeInstructions,
+//     });
+//     newhasBeenApproved.save();
+//     console.log(doc);
+//     await ctx.redirect('approval');
+// });
+
+
 route.get('/signout', async (ctx, next) => {
     ctx.cookies.set('token', null);
     await ctx.redirect('/');
-})
+});
 
 route.get('/login', async (ctx, next) => {
     const payload = GeneralFunctions.decodeUser(ctx);

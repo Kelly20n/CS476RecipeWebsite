@@ -4,8 +4,18 @@
 
     
 </div>
-{% for post in posts %}
+{% for post in posts1 %}
 <div class='post'>
-    <p><a href="/view/{{post.id}}/{{databaseUsed}}">{{post.title}}</a></p><br><Br>
+    <a href="/view/{{post.id}}/{{post.type}}"> <div>{{post.title}}</div></a><br><Br>
+</div>
+{% endfor %}
+{% for post in posts2 %}
+<div class='post'>
+    <a href="/view/{{post.id}}/{{post.type}}"> <div>{{post.title}}</div></a><br><Br>
+</div>
+{% endfor %}
+{% for post in posts3 %}
+<div class='post'>
+    <a href="/view/{{post.id}}/{{post.type}}"> <div>{{post.title}}</div></a><br><Br>
 </div>
 {% endfor %}

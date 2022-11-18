@@ -22,6 +22,11 @@
   text-align: center;
 }
 
+#approve{
+  visibility: hidden;
+  display: none;
+}
+
 .column {
   float: left;
   border: 2px solid #333;
@@ -116,6 +121,7 @@ body {
 
 <div class="topnav">
         <a class="active" href="/">Home</a>
+        <a id = "approve" href="/approval">Approval</a>
         <!--<a href="#news">News</a>
         <a href="#contact">Contact</a>
         <a href="#about">About</a>-->
@@ -160,9 +166,11 @@ body {
   function checkAdmin() {
     var x = document.getElementById("admin");
     var y = document.getElementById("signout");
+    var z = document.getElementById("approve");
     if({{admin.isAdmin}} === true) {
       x.style.visibility = "visible";
-      
+      z.style.visibility = "visible";
+      z.style.display = "block";
     }
     if({{admin != null}}) {
       y.style.visibility = "visible";

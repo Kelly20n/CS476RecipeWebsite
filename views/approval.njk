@@ -1,0 +1,31 @@
+{% include './includes/head.njk' %}
+
+
+{% for post in posts %}
+    <div class='post'>
+        <form action = "/remove/{{post.title}}" method ="POST">
+            <a href="/view/{{post.id}}/{{post.type}}/{{post.checked}}"> {{post.title}}</a>
+            <br></br>
+            <input type = "submit" value = "Remove"> </input>
+        </form>  
+        <form action = "/approval/{{post.id}}" method ="POST">
+            <input type = "submit" value = "Approve"> </input>
+        </form>  
+    </div>
+{% endfor %}
+
+
+
+{# {% for supper in supperposts %}
+    <div class='post'>
+        <form action = "/remove/{{post.id}}" method ="POST">
+            <a href="/view/{{post.id}}"> {{post.title}}</a>
+            <br></br>
+            <input type = "submit" value = "Remove"> </input>
+        </form>  
+        <form action = "/aprrove/:id" method ="POST">
+            <input type = "submit" value = "Approve"> </input>
+        </form>  
+    </div>
+{% endfor %} #}
+

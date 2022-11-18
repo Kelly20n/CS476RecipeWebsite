@@ -11,6 +11,8 @@ const Router = require('koa-router');
 const RecipeFunctions = require('../functions/recipefunctions.js')
 const GeneralFunctions = require('../functions/generalfunctions.js')
 const jwt = require('jsonwebtoken');
+const toBeApproved = require('../model/approval.js');
+
 
 
 const route = Router();
@@ -24,7 +26,7 @@ route.get('/', async (ctx, next) => {
     });
 });     
 
-route.get('/view/:id/:db', async (ctx, next) => {
+route.get('/view/:id/:db/:check', async (ctx, next) => {
     const payload = GeneralFunctions.decodeUser(ctx)
     return User.findOne({username: payload.userEmail}).then(async function(loggedUser) {
         const page = 'recipe';
@@ -33,7 +35,7 @@ route.get('/view/:id/:db', async (ctx, next) => {
     });
 });
 
-route.post('/view/:id/:db', async (ctx, next) => {
+route.post('/view/:id/:db/check', async (ctx, next) => {
     if(GeneralFunctions.verifyUser(ctx) === true)
     {
         const payload = GeneralFunctions.decodeUser(ctx)
@@ -64,17 +66,87 @@ route.get('/postPage', async (ctx, next) => {
 });
     
 route.post('/postPage', async (ctx, next) => {
-    
-    var newRecipe = new Recipe({
-        title: ctx.request.body.recipeTitle,
-        ingredients: ctx.request.body.recipeIngredients,
-        instructions: ctx.request.body.recipeInstructions,
-    });
-
-    newRecipe.save((err, res) => {
-        if(err) return handleError(err);
-        else return console.log("Result: ", res)
-    });
+    if(ctx.request.body.database == "breakfast")
+    {
+        var newBreakfast = new Breakfast({
+            title: ctx.request.body.recipeTitle,
+            ingredients: ctx.request.body.recipeIngredients,
+            instructions: ctx.request.body.recipeInstructions,
+            type: ctx.request.body.database,
+            checked: 0
+        });   
+        newBreakfast.save((err, res) => {
+            if(err) return handleError(err);
+            else return console.log("Result: ", res)
+        });
+        var newToBeApproved = new toBeApproved({
+            title: ctx.request.body.recipeTitle,
+            ingredients: ctx.request.body.recipeIngredients,
+            instructions: ctx.request.body.recipeInstructions,
+            type: ctx.request.body.database,
+            checked: 1
+        });   
+        newToBeApproved.save((err, res) => {
+            if(err) return handleError(err);
+            else return console.log("Result: ", res)
+        });
+        console.log('breakfast added');
+        await ctx.redirect('postPage');
+    }
+    else if(ctx.request.body.database == "lunch")
+    {
+        var newLunch = new Lunch({
+            title: ctx.request.body.recipeTitle,
+            ingredients: ctx.request.body.recipeIngredients,
+            instructions: ctx.request.body.recipeInstructions,
+            type: ctx.request.body.database,
+            checked: 0
+        }); 
+        newLunch.save((err, res) => {
+            if(err) return handleError(err);
+            else return console.log("Result: ", res)
+         });
+         var newToBeApproved = new toBeApproved({
+            title: ctx.request.body.recipeTitle,
+            ingredients: ctx.request.body.recipeIngredients,
+            instructions: ctx.request.body.recipeInstructions,
+            type: ctx.request.body.database,
+            checked: 1
+        });   
+        newToBeApproved.save((err, res) => {
+            if(err) return handleError(err);
+            else return console.log("Result: ", res)
+        });
+         console.log('lunch added');
+         await ctx.redirect('postPage');
+    }
+    else
+    {
+         var newSupper = new Supper({
+            title: ctx.request.body.recipeTitle,
+            ingredients: ctx.request.body.recipeIngredients,
+            instructions: ctx.request.body.recipeInstructions,
+            type: ctx.request.body.database,
+            checked: 0
+        });
+        newSupper.save((err, res) => {
+            if(err) return handleError(err);
+            else return console.log("Result: ", res)
+        });
+        var newToBeApproved = new toBeApproved({
+            title: ctx.request.body.recipeTitle,
+            ingredients: ctx.request.body.recipeIngredients,
+            instructions: ctx.request.body.recipeInstructions,
+            type: ctx.request.body.database,
+            checked: 1
+        });   
+        newToBeApproved.save((err, res) => {
+            if(err) return handleError(err);
+            else return console.log("Result: ", res)
+        });
+        console.log('supper added');
+        await ctx.redirect('postPage');
+    }
 
     const payload = GeneralFunctions.decodeUser(ctx);
     const page = 'postPage'
@@ -82,6 +154,49 @@ route.post('/postPage', async (ctx, next) => {
         return GeneralFunctions.displayNoDBinfo(ctx, loggedUser, page);
     })
 });
+
+//get and post for approval page
+route.get('/approval', async (ctx, next) => {
+    if(GeneralFunctions.verifyUser(ctx) === true){
+        const payload = GeneralFunctions.decodeUser(ctx);
+        return User.findOne({username: payload.userEmail}).then(async function(loggedUser){
+            return toBeApproved.find({}).then(async function(results) {
+                await ctx.render('approval',{
+                    posts: results,
+                    admin: loggedUser
+                });    
+            });
+        });
+    }
+    else return;    
+});
+
+//post for delete
+route.post('/remove/:id', async (ctx, next) => {
+    const doc = await toBeApproved.findOneAndRemove({title: ctx.params.id});
+    if(doc.type == "breakfast")
+    {
+        await Breakfast.findOneAndRemove({title: ctx.params.id});
+    }
+    else if(doc.type == "lunch")
+    {
+        await Lunch.findOneAndRemove({title: ctx.params.id});
+    }
+    else
+    {
+        await Supper.findOneAndRemove({title: ctx.params.id});
+    }
+    console.log('Removed Document');
+    await ctx.redirect('/approval');
+});
+
+route.post('/approval/:id', async (ctx, next) => {
+    await toBeApproved.findByIdAndRemove(ctx.params.id);
+    console.log('Removed Document');
+    await ctx.redirect('/approval');
+});
+
+
 
 route.post('/search', async (ctx, next) => {
     /*return Recipe.find({title: ctx.request.body.searchTerm}).then(async function(results){*/
