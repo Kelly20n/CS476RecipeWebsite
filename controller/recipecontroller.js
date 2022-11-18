@@ -238,11 +238,18 @@ route.post('/search', async (ctx, next) => {
                     //var results;
                     
                     var isTitleInEntry = false;
+                    
+                    
                     for(var i = 0; i < results1.length; i++)
                     {
                         //console.log(results1[i]);
-                        //console.log(results1[i].title + " vs. " + ctx.request.body.searchTerms)
 
+                        if(results1[i].title == undefined)
+                        {
+                            results1.splice(i, 1);
+                            //i--;
+                            continue;
+                        }
                         if(results1[i].title.toLowerCase() == ctx.request.body.searchTerms.toLowerCase())
                         {
                             //console.log("Hit" + results1);
@@ -262,7 +269,13 @@ route.post('/search', async (ctx, next) => {
                     {
                         //console.log(results2[i]);
                         //console.log(results2[i].title + " vs. " + ctx.request.body.searchTerms)
-
+                        //console.log(results2[i].title.toLowerCase() + " vs. " + ctx.request.body.searchTerms.toLowerCase());
+                        if(results2[i].title == undefined)
+                        {
+                            results2.splice(i, 1);
+                            //i--;
+                            continue;
+                        }
                         if(results2[i].title.toLowerCase() == ctx.request.body.searchTerms.toLowerCase())
                         {
                             //console.log("Hit" + results1);
@@ -282,7 +295,13 @@ route.post('/search', async (ctx, next) => {
                     {
                         //console.log(results3[i]);
                         //console.log(results3[i].title + " vs. " + ctx.request.body.searchTerms)
-
+                        //console.log(results3[i].title.toLowerCase() + " vs. " + ctx.request.body.searchTerms.toLowerCase());
+                        if(results3[i].title == undefined)
+                        {
+                            results3.splice(i, 1);
+                            //i--;
+                            continue;
+                        }
                         if(results3[i].title.toLowerCase() == ctx.request.body.searchTerms.toLowerCase())
                         {
                             //console.log("Hit" + results1);
@@ -324,6 +343,11 @@ route.post('/search', async (ctx, next) => {
                     var isIngredient = false;
                     for(var i = 0; i < results1.length; i++)
                     {
+                        if(results1[i].ingredients == undefined)
+                        {
+                            results1.splice(i, 1);
+                            continue;
+                        }
                         var dbIngredients = results1[i].ingredients.split(/\s*,\s*/);
                         for(var j = 0; j < searchTerms.length; j++)
                         {
@@ -332,7 +356,6 @@ route.post('/search', async (ctx, next) => {
                                 //console.log(searchTerms[i].toLowerCase() + " vs. " + dbIngredients[k].toLowerCase());
                                 if(searchTerms[j].toLowerCase() == dbIngredients[k].toLowerCase())
                                 {
-                                    
                                     isIngredient = true;
                                 }
                             }
@@ -346,6 +369,11 @@ route.post('/search', async (ctx, next) => {
                     }
                     for(var i = 0; i < results2.length; i++)
                     {
+                        if(results2[i].ingredients == undefined)
+                        {
+                            results2.splice(i, 1);
+                            continue;
+                        }
                         var dbIngredients = results2[i].ingredients.split(/\s*,\s*/);
                         for(var j = 0; j < searchTerms.length; j++)
                         {
@@ -368,6 +396,11 @@ route.post('/search', async (ctx, next) => {
                     }
                     for(var i = 0; i < results3.length; i++)
                     {
+                        if(results3[i].ingredients == undefined)
+                        {
+                            results3.splice(i, 1);
+                            continue;
+                        }
                         var dbIngredients = results3[i].ingredients.split(/\s*,\s*/);
                         for(var j = 0; j < searchTerms.length; j++)
                         {
