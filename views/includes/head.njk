@@ -36,6 +36,16 @@
   text-align: center;
 }
 
+.content {
+  max-width: 1000px;
+  border: 2px solid #333;
+  border-radius: 12px;
+  width: 33%;
+  margin: auto;
+  padding: 10px;
+  text-align: center;
+}
+
 .row:after {
   content: "";
   display: table;
@@ -48,7 +58,6 @@ body {
 }
 
 .topnav {
-  
   background-color: #333;
 }
 
@@ -137,20 +146,20 @@ body {
             <button class="dropbtn">Search</button>
             <div class="dropdown-content">
               <form action="/search" method="POST">
-                <input type="radio" id="byTitle" value='title' name="searchAlgorithm">
+                <input type="radio" id="byTitle" value='title' name="searchAlgorithm" required>
                 <label for="byTitle">Title</label></input>
-                <input type="radio" id="byIngredient" value='ingredients' name="searchAlgorithm">
+                <input type="radio" id="byIngredient" value='ingredients' name="searchAlgorithm" required>
                 <label for="byIngredients">Ingredients</label></input>
                 <div>
-                <input type="radio" id="breakfastFood" value='breakfast' name="database">
+                <input type="radio" id="breakfastFood" value='breakfast' name="database"required>
                 <label for="breakfastFood">BreakFast</label></input>
-                <input type="radio" id="lunchFood" value='lunch' name="database">
+                <input type="radio" id="lunchFood" value='lunch' name="database" required>
                 <label for="lunchFood">Lunch</label></input>
-                <input type="radio" id="supperFood" value='supper' name="database">
+                <input type="radio" id="supperFood" value='supper' name="database" required>
                 <label for="supperFood">Supper</label></input>
                 </div>
 
-                <input type="text" placeholder="Search" name="searchTerms"/>
+                <input type="text" placeholder="Search" name="searchTerms" required/>
                 <input type="submit"/>
               </form>
             </div>

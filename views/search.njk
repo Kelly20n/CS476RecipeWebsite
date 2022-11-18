@@ -3,6 +3,6 @@
 {{searchTerm}}
 {% for post in posts %}
 <div class='post'>
-    <a href="/view/{{post.id}}/{{databaseUsed}}"> <div>{{post.title}}</div></a><br><Br>
+    <a href="/view/{{post.id}}/{{post.type}}/{{post.checked}}"> <div>{{post.title}}</div></a><br><Br>
 </div>
 {% endfor %}

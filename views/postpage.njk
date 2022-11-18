@@ -3,13 +3,13 @@
 <div class='postRecipe'>
     <h1><b><u>Post Recipe</u></b></h1>
 
-    <form name="myForm" action="/postPage" method="POST" onsubmit= "return validate()" >
+    <form name="myForm" action="/postPage" method="POST" onsubmit= "return validate()"  enctype="multipart/form-data">
         <div>
             <input placeholder="Recipe Title" name="recipeTitle" id="rt" required></input><br></br>
             <input placeholder="Recipe Ingredients" name="recipeIngredients" id="ring" required></input><br></br>
             <textarea placeholder="Recipe Instructions" name="recipeInstructions" id="rins" required></textarea><br></br>
             <h4><b><u>Upload Image</u></b></h4>
-            <input type="file" name="file" id="file" enctype="multipart/form-data">
+            <input type="file" name="file" id="file">
             <label for="file" class="custom-file-label"></label><br></br>
             <input type="radio" id="breakfastFood" value='breakfast' name="database" id="break" required>
             <label for="breakfastFood">BreakFast</label></input>
@@ -24,7 +24,7 @@
 
 <script>
 
-    function validate() {
-       alert("Recipe Posted");
-    }
+function validate() {
+    alert('Redirected to: Home page, your recipe was posted successfully! If redirected to login page, login to add recipes, otherwise your title is already used, try again with a different title!')
+}
 </script>
