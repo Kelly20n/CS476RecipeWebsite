@@ -1,6 +1,4 @@
 require('dotenv').config();
-
-//global variables
 const Upload = require('../gridfs/storage.js');
 const gfs = require('../gridfs/gfs.js');
 const {GridFsStorage} = require('multer-gridfs-storage');
@@ -17,6 +15,7 @@ const GeneralFunctions = require('../functions/generalfunctions.js')
 const toBeApproved = require('../model/approval.js');
 const mongoose = require('mongoose');
 const fs = require('fs');
+const { title } = require('process');
 
 const host = process.env.host;
 const conn = mongoose.createConnection(host);
@@ -120,41 +119,45 @@ route.post('/view/:id/:db/:check/:commentid', async (ctx, next) => {
     else return
 });
 
-route.post('/view/:id/:db/:check/:commentid', async (ctx, next) => {
+
+route.post('/view/:post_type/:post_Id', async (ctx, next) => {
     if(GeneralFunctions.verifyUser(ctx) === true)
     {
         const payload = GeneralFunctions.decodeUser(ctx)
         return User.findOne({username: payload.userEmail}).then(async function(loggedUser) {
             const page = 'recipe';
             console.log(page);
-             console.log(ctx.params.commentid);
-            await Comments.findByIdAndDelete({_id: ctx.params.commentid});
+            return Breakfast.find({}).then(async function(results1) {
+                return Lunch.find({}).then(async function(results2) {
+                    return Supper.find({}).then(async function(results3) {
+                        if(ctx.params.post_type == "breakfast")
+                        {
+                            console.log('Breakfast post removed');
+                            const doc1 = await Breakfast.findOneAndRemove({title: ctx.params.post_Id});
+                            await Comment.deleteMany({postId: doc1._id})
+                        }
+                        if(ctx.params.post_type  == "lunch")
+                        {
+                            console.log('Lunch post removed');
+                            const doc2 = await Lunch.findOneAndRemove({title: ctx.params.post_Id});
+                            await Comment.deleteMany({postId: doc2._id})
+                        }
+                        if(ctx.params.post_type  == "supper")
+                        {
+                            console.log('Supper post removed');
+                            const doc3 = await Supper.findOneAndRemove({title: ctx.params.post_Id});
+                            await Comment.deleteMany({postId: doc3._id})
+                        }
+                        ctx.redirect('/');
+                    });
+                });
+            });
            
-            return RecipeFunctions.displayPostAndComments(ctx, loggedUser, page);
         });
+        
     }
-    else return
+    else return 
 });
-
-// route.post('/view/:id/:db/:check/:postId', async (ctx, next) => {
-//     if(GeneralFunctions.verifyUser(ctx) === true)
-//     {
-//         const payload = GeneralFunctions.decodeUser(ctx)
-//         return User.findOne({username: payload.userEmail}).then(async function(loggedUser) {
-//             const page = 'recipe';
-//             console.log(page);
-//             if(ctx.request.body.database == "breakfast")
-//             {
-//                 const doc1 = await Breakfast.findOneAndRemove({title: ctx.params.id});
-//                 await Comment.deleteMany({postId: doc1._id})
-//             }
-
-           
-//             return RecipeFunctions.displayPostAndComments(ctx, loggedUser, page);
-//         });
-//     }
-//     else return
-// });
 
 //route get for post page
 route.get('/postPage', async (ctx, next) => {
@@ -529,7 +532,6 @@ route.get('/image/:filename', async (ctx, next) => {
 
     // let file = await bucket.find({filename: ctx.params.filename}).toArray();
     const file = await bucket.find({filename: ctx.params.filename}).toArray();
-    ctx.body = file[0].contentType;
     console.log("Check it " + file)
 
     if(!file[0] || file[0].length === 0) {
@@ -538,7 +540,7 @@ route.get('/image/:filename', async (ctx, next) => {
 
     // stream = bucket.openDownloadStreamByName(ctx.params.filename);
     // ctx.body = stream.on();
-    if(file[0].contentType === 'image/jpeg' || file[0].contentType === 'img/png') {
+    if(file[0].contentType === 'image/jpeg' || file[0].contentType === 'image/png') {
         ctx.body = bucket.openDownloadStreamByName(ctx.params.filename);
         
     }
