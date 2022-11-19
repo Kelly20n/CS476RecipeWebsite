@@ -135,10 +135,6 @@ function returnPostsAllDatabases(ctx){
     });
 }
 
-async function sleep() {
-    await new Promise(r => setTimeout(r, 1000));
-    return;
-}
 function decodeUser(ctx) {
     if(ctx.cookies.get("token") != null) {
         const decoded = jwt.decode(ctx.cookies.get("token"), {complete: true});

@@ -1,10 +1,25 @@
 {% include './includes/head.njk' %}
 
-<div class="left">
-    <div class='recipe'>
-        <div>{{post.title}}</div><br><Br>
-        <div>Ingredients:<br><Br>{{post.ingredients}}</div>
-        <div>Instructions:<br><Br>{{post.instructions}}</div>
+<div class='left'>
+    <img src="../../../image/{{post.image}}" alt="" style="width:300px;height:400px;">
+    <div>{{post.title}}</div><br><Br>
+    <div>Ingredients:<br><Br>{{post.ingredients}}</div><br><Br>
+    <div>Instructions:<br><Br>{{post.instructions}}</div><br><Br>
+</div>
+
+<div class='comment'>
+    <div>Comments</div>
+    <form action="/view/{{post.id}}/{{post.type}}/{{post.checked}}" onsubmit="return loginValidate()" method="POST">
+        <div>
+            <textarea placeholder="Add a Comment" name="userComment"></textarea>
+            <input type="submit"/>
+        </div>
+    </form>
+    
+    {% for comment in comments %}
+    <div class='comment'>
+        <!-- Add for discrete Admin buttons Figure out functionality later <div id="adminButtons"> <input type="button" value="Sus"> </div>-->
+        <div> {{comment.commentBody}} </div> <div>Commented By: {{comment.user}}</div><br><Br>
     </div>
 </div>
 <div class="right">

@@ -1,15 +1,22 @@
 {% include './includes/head.njk' %}
 
-
+<style>
+    form { display: inline; }
+    a {
+        font-size: 25px;
+    }
+</style>
+   
+    <div class='content'>
+    <h1><b><u>Posts</b></u></h1>
 {% for post in posts %}
-    <div class='post'>
+    
         <form action = "/remove/{{post.title}}" method ="POST">
-            <a href="/view/{{post.id}}/{{post.type}}/{{post.checked}}"> {{post.title}}</a>
-            <br></br>
+            <a href="/approvalview/{{post.id}}/{{post.type}}/{{post.checked}}"> {{post.title}}</a>
             <input type = "submit" value = "Remove"> </input>
         </form>  
         <form action = "/approval/{{post.id}}" method ="POST">
             <input type = "submit" value = "Approve"> </input>
         </form>  
-    </div>
+        <br></br>
 {% endfor %}
