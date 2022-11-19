@@ -1,8 +1,17 @@
 {% include './includes/head.njk' %}
 
-<div class='recipe'>
-    <img src="../../../image/{{post.image}}" alt="" style="width:300px;height:400px;">
-    <div>{{post.title}}</div><br><Br>
-    <div>Ingredients:<br><Br>{{post.ingredients}}</div><br><Br>
-    <div>Instructions:<br><Br>{{post.instructions}}</div><br><Br>
+<br><br>
+<center>
+<div class='postRecipeDiv'>
+    <div class='postRecipe'>
+        <center>
+        <img src="../../../../image/{{post.image}}" alt="" style="text-align:center;width:300px;height:200px;">
+        </center>
+        <div><h2 style="text-align:center;" class="fw-bold mb-2 text-uppercase">{{post.title}}</h2></div><Br>
+        <div><h4 class="mb-0 text-uppercase">Ingredients:</h4><br>{{post.ingredients}}</div><Br><Br>
+        <div><h4 class="mb-0 text-uppercase">Instructions:</h4><br>{{post.instructions}}</div>
+    </div>
 </div>
+
+</center>
+

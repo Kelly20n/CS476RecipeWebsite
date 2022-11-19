@@ -1,20 +1,48 @@
 {% include './includes/head.njk' %}
 
-  <div class='left'>
-    <img src="../../../../image/{{post.image}}" alt="" style="width:300px;height:400px;">
-    <div>{{post.title}}</div><br><Br>
-    <div>Ingredients:<br><Br>{{post.ingredients}}</div><br><Br>
-    <div>Instructions:<br><Br>{{post.instructions}}</div><br><Br>
+{# <div class='left'> #}
+<br><br>
+<center>
+<div class='postRecipeDiv'>
+    <div class='postRecipe'>
+        <center>
+        <img src="../../../../image/{{post.image}}" alt="" style="text-align:center;width:300px;height:200px;">
+        </center>
+        <div><h2 style="text-align:center;" class="fw-bold mb-2 text-uppercase">{{post.title}}</h2></div><Br>
+        <div><h4 class="mb-0 text-uppercase">Ingredients:</h4><br>{{post.ingredients}}</div><Br><Br>
+        <div><h4 class="mb-0 text-uppercase">Instructions:</h4><br>{{post.instructions}}</div>
+    </div>
 </div>
 
+</center>
+<br>
+<div class="card bg-dark text-white" style="border-radius: 1rem;">
+<div class="card-body p-5 text-center">
+<div style="text-align: center;">
+    <div style="display: inline-block; text-align: left;">
+        <div class="fw-bold mb-2 text-uppercase">Comments</div>
+            <form action="/view/{{post.id}}/{{post.type}}/{{post.checked}}" onsubmit="return loginValidate()" method="POST">
+                <div class="form-outline form-white mb-4">
+                    <textarea placeholder="Add a Comment" name="userComment" rows="4" cols="58" class="form-control form-control-lg"></textarea><br>
+                    <input type="submit"/>
+                </div>
+            </form>
+            
+            {% for comment in comments %}
+                <div class='comment'>
+                    <u>{{comment.user}}</u> 
+                    <p class="comment">{{comment.commentBody}}</p>
+                    <p class="deleteComment">
+                        <form  action="/view/{{post.id}}/{{post.type}}/{{post.checked}}/{{comment.id}}"  method="POST" >
+                            <input type="submit" value ="Delete Comment" ></input>
+                        </form>
+                    </p>
+                </div>
+            {% endfor %}
 
-<div class="right">
-    <div class='comment'>
-        <div>Comments</div>
-        <form action="/view/{{post.id}}/{{post.type}}/{{post.checked}}" onsubmit="return loginValidate()" method="POST">
-            <div>
-                <textarea placeholder="Add a Comment" name="userComment"></textarea><br>
-                <input type="submit"/>
+            {# <form id="deletePost" action="/view/{{post.id}}/{{post.type}}/{{post.checked}}/{{post.postId}}"  method="POST">
+                <input type="submit" value ="Delete Post"></input>
+            </form> #}
             </div>
         </form>
         
@@ -36,6 +64,8 @@
         </div>
 
     </div>
+</div>
+</div>
 </div>
 
 <script>

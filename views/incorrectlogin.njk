@@ -52,17 +52,33 @@ body {
 
 
 <div class="topnav">
-        <a class="active" href="/">Home</a>
-        <a href="#news">News</a>
-        <a href="#contact">Contact</a>
-        <a href="#about">About</a>
-        <div class="right">
-            <a id="admin" href="/admin">Admin
-            <a href="/postPage">Add Recipe</a>
-            <a href="/login">Login</a>
-            <a id="signout" href="/signout" onclick="alert('Signout Successful')">Signout</a>
-            <a href="/signup">Signup</a>
-        </div>
+  <a class="active" href="/">Home</a>
+  <a id="breakfast" href="/views/breakfast">Breakfast</a>
+  <a id="lunch" href="/views/lunch">Lunch</a>
+  <a id="supper" href="/views/supper">Supper</a>
+  <a id = "approve" href="/approval">Approval</a>
+  <div class="topnavRight">
+    <a id="admin" href="/admin">Admin</a>
+    <a href="/postPage">Add Recipe</a>
+    <a href="/login">Login</a>
+    <a id="signout" href="/signout" onclick="alert('Signout Successful')">Signout</a>
+    <a href="/signup">Signup</a>
+  </div>
+  <center>
+    <div class="dropdown">
+      <div class="dropdown-content"></div>
+      <div class="center">
+        <form action="/search" method="POST">
+          <input type="radio" id="byTitle" value='title' name="searchAlgorithm">
+          <label for="byTitle">Title</label></input>
+          <input type="radio" id="byIngredient" value='ingredients' name="searchAlgorithm">
+          <label for="byIngredients">Ingredients</label></input>
+          <input type="text" placeholder="Search" name="searchTerms"/>
+          <input type="submit"/>
+        </form>
+      </div>
+    </div>
+  <center>
 </div>
 
 <body onload="incorrect()">

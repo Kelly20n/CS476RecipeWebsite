@@ -5,10 +5,10 @@
         display: inline-block;
     }
 </style>
-
+<br>
 <div class="row">
     <div class="column">
-        <h1><b><u>Users</b></u></h1>
+        <h2 class="fw-bold mb-2 text-uppercase">Users</h2>
         {% for user in users %}
         <div class="entry">
             <form action="/mod/{{user.id}}" method="post">
@@ -18,12 +18,12 @@
             <form action="/ban/{{user.id}}" method="post">
                 <input type="submit" value="Ban">
             </form>
-            <br><br>
         </div>
+        <br>
         {% endfor %}
     </div>
     <div class="column">
-        <h1><b><u>Admin Users</b></u></h1>
+        <h2 class="fw-bold mb-2 text-uppercase">Admin Users</h2>
         {% for adminuser in adminusers%}
         <div class="entry">
             <form action="/unmod/{{adminuser.id}}" method="post">
@@ -33,20 +33,20 @@
             <form action="/ban/{{adminuser.id}}" method="post">
                 <input type="submit" value="Ban">
             </form>
-            <br><br>
         </div>
+        <br>
         {% endfor %}
     </div>
     <div class="column">
-        <h1><b><u>Banned Users</b></u></h1>
+        <h2 class="fw-bold mb-2 text-uppercase">Banned Users</h2>
         {% for banneduser in bannedusers%}
             <div class="entry">
             <form action="/unban/{{banneduser.id}}" method="post">
                 {{banneduser.username}}
                 <input type="submit" value="Unban">
             </form>
-            <br><br>
         </div>
+        <br>
         {% endfor %}
     </div>
 </div>
