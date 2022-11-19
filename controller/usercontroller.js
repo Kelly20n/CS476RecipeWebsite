@@ -78,6 +78,8 @@ route.post('/signup', async (ctx, next) => {
                     username: ctx.request.body.userEmail,
                     password: ctx.request.body.userPass,
                     isAdmin: false,
+                    securityQ: ctx.request.body.securityQ,
+                    securityA: ctx.request.body.securityA
                 });
 
                 newUser.save((err, res) => {
@@ -122,9 +124,9 @@ route.get('/signup', async (ctx, next) => {
 });
 
 //route get for getting forgetpassword page
-route.get('/forgotpassword', async (ctx, next) => {
+route.get('/forgotpasswordportal', async (ctx, next) => {
     const payload = GeneralFunctions.decodeUser(ctx);
-    const page = 'forgotpassword'
+    const page = 'forgotpasswordportal'
     return User.findOne({username: payload.userEmail}).then(async function(loggedUser) {
         return GeneralFunctions.displayNoDBinfo(ctx, loggedUser, page);
     })
@@ -188,5 +190,44 @@ route.post('/unban/:id', async (ctx, next) => {
         await ctx.redirect('/admin');
     }
 });
+
+route.post('/forgotpasswordportal', async(ctx, next) => { 
+    return User.findOne({username: ctx.request.body.userEmail}).then(async function(results) {
+        console.log(results);
+        if(results == null) {
+            ctx.redirect('/forgotpasswordportal');
+        }
+        else {
+            return await ctx.render('forgotpassword', {
+                user: results
+            });
+    }
+    });
+});
+
+route.post('/resetpassword/:id', async(ctx, next) => {
+    return User.findById(ctx.params.id).then(async function(results) {
+        if(results.securityA == ctx.request.body.securityA) {
+            return await ctx.render('resetpassword', {
+                user: results
+            });
+        }
+        else {
+            return await ctx.render('forgotpassword', {
+                user: results
+            });
+        }
+    })
+    
+});
+
+route.post('/passwordisreset/:id', async(ctx, next) => {
+    await User.findByIdAndUpdate(ctx.params.id, { password: ctx.request.body.userPass})
+    ctx.redirect('/login');
+})
+
+route.get('/khanhiscute', async(ctx, next) => {
+    ctx.status = 418;
+})
 
 module.exports = route;

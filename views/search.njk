@@ -1,18 +1,20 @@
 {% include './includes/head.njk' %}
 
 {{searchTerm}}
+
 {% for post in posts1 %}
-<div class='post'>
-    <a href="/view/{{post.id}}/{{post.type}}/{{post.checked}}"> <div>{{post.title}}</div></a><br><Br>
+
+<div>
+    <a href="/view/{{post.id}}/{{post.type}}/{{post.checked}}"> {{post.title}} </a> Hits: {{hits1[loop.index0]}}<br><Br>
 </div>
 {% endfor %}
 {% for post in posts2 %}
-<div class='post'>
-    <a href="/view/{{post.id}}/{{post.type}}/{{post.checked}}"> <div>{{post.title}}</div></a><br><Br>
+<div>
+    <a href="/view/{{post.id}}/{{post.type}}/{{post.checked}}"> {{post.title}}</a> Hits: {{hits2[loop.index0]}}<br><Br>
 </div>
 {% endfor %}
 {% for post in posts3 %}
-<div class='post'>
-    <a href="/view/{{post.id}}/{{post.type}}/{{post.checked}}"> <div>{{post.title}}</div></a><br><Br>
+<div>
+    <a href="/view/{{post.id}}/{{post.type}}/{{post.checked}}"> {{post.title}}</a> Hits: {{hits3[loop.index0]}}<br><Br>
 </div>
 {% endfor %}
