@@ -16,12 +16,7 @@
 
 #approve{
   visibility: hidden;
-  display: none;
-}
 
-p.deleteComment{
-  visibility: hidden;
-  display: none;
 }
 
 .vr
@@ -97,6 +92,7 @@ p.deleteComment{
   padding: 10px;
   text-align: center;
 }
+
 
 .postcolumn {
   float: left;
@@ -245,15 +241,12 @@ body {
     var x = document.getElementById("admin");
     var y = document.getElementById("signout");
     var z = document.getElementById("approve");
-    //var b = document.getElementById("deletePost");
     if({{admin.isAdmin}} === true) {
       x.style.visibility = "visible";
       z.style.visibility = "visible";
-      z.style.display = "block";
-     // b.style.visibility = "visible";
-      //b.style.display = "block";
     }
-    if({{admin != null}}) {
+    if({{admin != null}})
+    {
       y.style.visibility = "visible";
       y.style.display = "block";
     }
@@ -261,4 +254,6 @@ body {
       alert('Invalid file format, must be JPEG or PNG!')
     }
   }
+  
+  
 </script>

@@ -1,6 +1,4 @@
 require('dotenv').config();
-
-//global variables
 const Upload = require('../gridfs/storage.js');
 const gfs = require('../gridfs/gfs.js');
 const {GridFsStorage} = require('multer-gridfs-storage');
@@ -17,6 +15,7 @@ const GeneralFunctions = require('../functions/generalfunctions.js')
 const toBeApproved = require('../model/approval.js');
 const mongoose = require('mongoose');
 const fs = require('fs');
+const { title } = require('process');
 
 const host = process.env.host;
 const conn = mongoose.createConnection(host);
@@ -101,19 +100,30 @@ route.get('/approvalview/:id/:db/:check', async (ctx, next) => {
     });
 });
 
+//
+route.get('/approvalposts/:id/:db/:check', async (ctx, next) => {
+    const payload = GeneralFunctions.decodeUser(ctx)
+    return User.findOne({username: payload.userEmail}).then(async function(loggedUser) {
+        const page = 'approvalposts';
+        console.log("db: " + ctx.params.db);
+        return RecipeFunctions.displayPostAndComments(ctx, loggedUser, page, ctx.params.db);
+    });
+});
+
+
 //route post to delete a comment
-route.post('/view/:id/:db/:check/:commentid', async (ctx, next) => {
+route.post('/approvalposts/:id/:db/:check/:commentid', async (ctx, next) => {
     if(GeneralFunctions.verifyUser(ctx) === true)
     {
         const payload = GeneralFunctions.decodeUser(ctx)
         return User.findOne({username: payload.userEmail}).then(async function(loggedUser) {
             if(loggedUser.isAdmin === true) {
-                const page = 'recipe';
-                console.log(page);
-                console.log(ctx.params.commentid);
-                await Comments.findByIdAndDelete({_id: ctx.params.commentid});
-            
-                return RecipeFunctions.displayPostAndComments(ctx, loggedUser, page);
+            const page = 'approvalposts';
+            console.log(page);
+            console.log(ctx.params.commentid);
+            await Comments.findByIdAndDelete({_id: ctx.params.commentid});
+           
+            return RecipeFunctions.displayPostAndComments(ctx, loggedUser, page);
             }
             else {
                 return await ctx.redirect("/");
@@ -123,20 +133,48 @@ route.post('/view/:id/:db/:check/:commentid', async (ctx, next) => {
     else return
 });
 
-route.post('/view/:id/:db/:check/:commentid', async (ctx, next) => {
+
+route.post('/approvalposts/:post_type/:post_Id', async (ctx, next) => {
     if(GeneralFunctions.verifyUser(ctx) === true)
     {
         const payload = GeneralFunctions.decodeUser(ctx)
         return User.findOne({username: payload.userEmail}).then(async function(loggedUser) {
-            const page = 'recipe';
-            console.log(page);
-             console.log(ctx.params.commentid);
-            await Comments.findByIdAndDelete({_id: ctx.params.commentid});
-           
-            return RecipeFunctions.displayPostAndComments(ctx, loggedUser, page);
+            if(loggedUser.isAdmin === true) {
+                const page = 'approvalposts';
+                console.log(page);
+                return Breakfast.find({}).then(async function(results1) {
+                    return Lunch.find({}).then(async function(results2) {
+                        return Supper.find({}).then(async function(results3) {
+                            if(ctx.params.post_type == "breakfast")
+                            {
+                                console.log('Breakfast post removed');
+                                const doc1 = await Breakfast.findOneAndRemove({title: ctx.params.post_Id});
+                                await Comment.deleteMany({postId: doc1._id})
+                            }
+                            if(ctx.params.post_type  == "lunch")
+                            {
+                                console.log('Lunch post removed');
+                                const doc2 = await Lunch.findOneAndRemove({title: ctx.params.post_Id});
+                                await Comment.deleteMany({postId: doc2._id})
+                            }
+                            if(ctx.params.post_type  == "supper")
+                            {
+                                console.log('Supper post removed');
+                                const doc3 = await Supper.findOneAndRemove({title: ctx.params.post_Id});
+                                await Comment.deleteMany({postId: doc3._id})
+                            }
+                            ctx.redirect('approval');
+                        });
+                    });
+                });
+            }
+            else {
+                return await ctx.redirect("/");
+            }
         });
+        
     }
-    else return
+    else return 
 });
 
 //route get for post page
@@ -295,15 +333,25 @@ route.get('/approval', async (ctx, next) => {
         return User.findOne({username: payload.userEmail}).then(async function(loggedUser){
             if(loggedUser.isAdmin === true) {
                 return toBeApproved.find({}).then(async function(results) {
-                    await ctx.render('approval', {
-                        posts: results,
-                        admin: loggedUser
+                    return Breakfast.find({}).then(async function(results1){
+                        return Lunch.find({}).then(async function(results2){
+                            return Supper.find({}).then(async function(results3){
+                                await ctx.render('approval', {
+                                    posts: results,
+                                    posts1: results1,
+                                    posts2: results2,
+                                    posts3: results3,
+                                    admin: loggedUser
+                                });
+                            });
+                        });
                     });
                 });
             }
             else {
                 return await ctx.redirect("/");
             }
+            
         });
     }
     else return;
