@@ -1,7 +1,7 @@
 {% include './includes/head.njk' %}
 
   <div class='left'>
-    <img src="../../../image/{{post.image}}" alt="" style="width:300px;height:400px;">
+    <img src="../../../../image/{{post.image}}" alt="" style="width:300px;height:400px;">
     <div>{{post.title}}</div><br><Br>
     <div>Ingredients:<br><Br>{{post.ingredients}}</div><br><Br>
     <div>Instructions:<br><Br>{{post.instructions}}</div><br><Br>
@@ -39,7 +39,7 @@
 
 <script>
     function loginValidate() {
-        if(admin == '') {
+        if({{admin}} == null) {
             alert('Sign in to access this feature!')
             return false;
         }
