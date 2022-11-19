@@ -39,6 +39,15 @@ route.get('/view/:id/:db/:check', async (ctx, next) => {
     });
 });
 
+route.get('/approvalview/:id/:db/:check', async (ctx, next) => {
+    const payload = GeneralFunctions.decodeUser(ctx)
+    return User.findOne({username: payload.userEmail}).then(async function(loggedUser) {
+        const page = 'approvalview';
+        console.log("db: " + ctx.params.db);
+        return RecipeFunctions.displayPostAndComments(ctx, loggedUser, page, ctx.params.db);
+    });
+});
+
 route.post('/view/:id/:db/:check', async (ctx, next) => {
     if(GeneralFunctions.verifyUser(ctx) === true)
     {
@@ -71,122 +80,128 @@ route.get('/postPage', async (ctx, next) => {
 });
 
 route.post('/postPage', Upload.single('file'), async (ctx, next) => {
-    // console.log(ctx.request.file);
-
-    // gfs.files.find().toArray((err, files) => {
-    //     if(!files || files.length === 0) {
-    //         return ctx.response.status(404);
-    //     }
-    //     console.log(ctx.file);
-
-// });
-
     if(GeneralFunctions.verifyUser(ctx) === true)
     {
         const payload = GeneralFunctions.decodeUser(ctx);
+        console.log("right here:" + ctx.file.contentType);
         return User.findOne({username: payload.userEmail}).then(async function(loggedUser) {
-            var key = false;
-            await Breakfast.findOne({title: ctx.request.body.recipeTitle}).then(async function(results) {
-                return Lunch.findOne({title: ctx.request.body.recipeTitle}).then(async function(results1) {
-                    return Supper.findOne({title: ctx.request.body.recipeTitle}).then(async function(results2) {
-                        console.log(results)
-                        console.log(results1)
-                        console.log(results2)
-                        if(results != null || results1 != null || results2 != null) {
-                            key = true;
-                            return await ctx.render('postpage', {
-                                admin: loggedUser,
-                                key: key
-                            })
-                        }
+            if(ctx.file.contentType === 'image/jpeg' || ctx.file.contentType === 'image/png') {
+                var key = false;
+                await Breakfast.findOne({title: ctx.request.body.recipeTitle}).then(async function(results) {
+                    return Lunch.findOne({title: ctx.request.body.recipeTitle}).then(async function(results1) {
+                        return Supper.findOne({title: ctx.request.body.recipeTitle}).then(async function(results2) {
+                            console.log(results)
+                            console.log(results1)
+                            console.log(results2)
+                            if(results != null || results1 != null || results2 != null) {
+                                key = true;
+                                return await ctx.render('postpage', {
+                                    admin: loggedUser,
+                                    key: key
+                                })
+                            }
+                        });
                     });
                 });
-            });
-            if(key != true)
-            {
-                if(ctx.request.body.database == "breakfast")
+                if(key != true)
                 {
-                    var newBreakfast = new Breakfast({
-                        title: ctx.request.body.recipeTitle,
-                        ingredients: ctx.request.body.recipeIngredients,
-                        instructions: ctx.request.body.recipeInstructions,
-                        type: ctx.request.body.database,
-                        checked: 0
-                    });
-                    newBreakfast.save((err, res) => {
-                        if(err) return handleError(err);
-                        else return
-                    });
-                    var newToBeApproved = new toBeApproved({
-                        title: ctx.request.body.recipeTitle,
-                        ingredients: ctx.request.body.recipeIngredients,
-                        instructions: ctx.request.body.recipeInstructions,
-                        type: ctx.request.body.database,
-                        checked: 1
-                    });
-                    newToBeApproved.save((err, res) => {
-                        if(err) return handleError(err);
-                        else return
-                    });
-                    console.log('breakfast added');
-                    await ctx.redirect('/');
+                    if(ctx.request.body.database == "breakfast")
+                    {
+                        var newBreakfast = new Breakfast({
+                            title: ctx.request.body.recipeTitle,
+                            ingredients: ctx.request.body.recipeIngredients,
+                            instructions: ctx.request.body.recipeInstructions,
+                            type: ctx.request.body.database,
+                            checked: 0,
+                            image: ctx.file.filename
+                        });
+                        newBreakfast.save((err, res) => {
+                            if(err) return handleError(err);
+                            else return
+                        });
+                        console.log(ctx.file.filename);
+                        var newToBeApproved = new toBeApproved({
+                            title: ctx.request.body.recipeTitle,
+                            ingredients: ctx.request.body.recipeIngredients,
+                            instructions: ctx.request.body.recipeInstructions,
+                            type: ctx.request.body.database,
+                            checked: 1,
+                            image: ctx.file.filename,
+                        });
+                        newToBeApproved.save((err, res) => {
+                            if(err) return handleError(err);
+                            else return
+                        });
+                        console.log('breakfast added');
+                        await ctx.redirect('/');
+                    }
+                    else if(ctx.request.body.database == "lunch")
+                    {
+                        var newLunch = new Lunch({
+                            title: ctx.request.body.recipeTitle,
+                            ingredients: ctx.request.body.recipeIngredients,
+                            instructions: ctx.request.body.recipeInstructions,
+                            type: ctx.request.body.database,
+                            checked: 0,
+                            image: ctx.file.filename
+                        });
+                        newLunch.save((err, res) => {
+                            if(err) return handleError(err);
+                            else return
+                        });
+                        var newToBeApproved = new toBeApproved({
+                            title: ctx.request.body.recipeTitle,
+                            ingredients: ctx.request.body.recipeIngredients,
+                            instructions: ctx.request.body.recipeInstructions,
+                            type: ctx.request.body.database,
+                            checked: 1,
+                            image: ctx.file.filename
+                        });
+                        newToBeApproved.save((err, res) => {
+                            if(err) return handleError(err);
+                            else return
+                        });
+                        console.log('lunch added');
+                        await ctx.redirect('/');
+                    }
+                    else
+                    {
+                        var newSupper = new Supper({
+                            title: ctx.request.body.recipeTitle,
+                            ingredients: ctx.request.body.recipeIngredients,
+                            instructions: ctx.request.body.recipeInstructions,
+                            type: ctx.request.body.database,
+                            checked: 0,
+                            image: ctx.file.filename
+                        });
+                        newSupper.save((err, res) => {
+                            if(err) return handleError(err);
+                            else return
+                        });
+                        var newToBeApproved = new toBeApproved({
+                            title: ctx.request.body.recipeTitle,
+                            ingredients: ctx.request.body.recipeIngredients,
+                            instructions: ctx.request.body.recipeInstructions,
+                            type: ctx.request.body.database,
+                            checked: 1,
+                            image: ctx.file.filename
+                        });
+                        newToBeApproved.save((err, res) => {
+                            if(err) return handleError(err);
+                            else return
+                        });
+                        console.log('supper added');
+                        await ctx.redirect('/');
+                    }
                 }
-                else if(ctx.request.body.database == "lunch")
-                {
-                    var newLunch = new Lunch({
-                        title: ctx.request.body.recipeTitle,
-                        ingredients: ctx.request.body.recipeIngredients,
-                        instructions: ctx.request.body.recipeInstructions,
-                        type: ctx.request.body.database,
-                        checked: 0
-                    });
-                    newLunch.save((err, res) => {
-                        if(err) return handleError(err);
-                        else return
-                    });
-                    var newToBeApproved = new toBeApproved({
-                        title: ctx.request.body.recipeTitle,
-                        ingredients: ctx.request.body.recipeIngredients,
-                        instructions: ctx.request.body.recipeInstructions,
-                        type: ctx.request.body.database,
-                        checked: 1
-                    });
-                    newToBeApproved.save((err, res) => {
-                        if(err) return handleError(err);
-                        else return
-                    });
-                    console.log('lunch added');
-                    await ctx.redirect('/');
-                }
-                else
-                {
-                    var newSupper = new Supper({
-                        title: ctx.request.body.recipeTitle,
-                        ingredients: ctx.request.body.recipeIngredients,
-                        instructions: ctx.request.body.recipeInstructions,
-                        type: ctx.request.body.database,
-                        checked: 0
-                    });
-                    newSupper.save((err, res) => {
-                        if(err) return handleError(err);
-                        else return
-                    });
-                    var newToBeApproved = new toBeApproved({
-                        title: ctx.request.body.recipeTitle,
-                        ingredients: ctx.request.body.recipeIngredients,
-                        instructions: ctx.request.body.recipeInstructions,
-                        type: ctx.request.body.database,
-                        checked: 1
-                    });
-                    newToBeApproved.save((err, res) => {
-                        if(err) return handleError(err);
-                        else return
-                    });
-                    console.log('supper added');
-                    await ctx.redirect('/');
-                }
+                else return
             }
-            else return
+            else {
+                return await ctx.render('postpage', {
+                    admin: loggedUser,
+                    file: false
+                })
+            }
         });
     }
     else return
@@ -260,32 +275,6 @@ route.post('/search', async (ctx, next) => {
             return GeneralFunctions.searchSingleDataBase(ctx, supperResults, "Supper");
         });
     }
-});
-
-route.post('/upload', Upload.single('file'), (ctx, next) => {
-    // console.log(ctx.request.file);
-    // console.log(ctx.file);
-    ctx.redirect('/uploadtest');
-})
-
-route.get('/uploadtest', async (ctx, next) => {
-    // const getFileService = async(filename) => {
-        const bucket = new mongoose.mongo.GridFSBucket(conn.db, {
-            bucketName: 'fs'
-        })
-
-        let file = await bucket.find().toArray();
-        console.log("Check it " + file)
-
-        if(!file || file.length === 0) {
-            return ctx.status = 400;
-        }
-        else {
-            console.log(file);
-        }
-        ctx.body = file;
-    // }
-    // await ctx.render('uploadtest')
 });
 
 route.get('/image/:filename', async (ctx, next) => {
