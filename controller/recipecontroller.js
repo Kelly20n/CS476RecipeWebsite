@@ -529,7 +529,6 @@ route.get('/image/:filename', async (ctx, next) => {
 
     // let file = await bucket.find({filename: ctx.params.filename}).toArray();
     const file = await bucket.find({filename: ctx.params.filename}).toArray();
-    ctx.body = file[0].contentType;
     console.log("Check it " + file)
 
     if(!file[0] || file[0].length === 0) {
@@ -538,7 +537,7 @@ route.get('/image/:filename', async (ctx, next) => {
 
     // stream = bucket.openDownloadStreamByName(ctx.params.filename);
     // ctx.body = stream.on();
-    if(file[0].contentType === 'image/jpeg' || file[0].contentType === 'img/png') {
+    if(file[0].contentType === 'image/jpeg' || file[0].contentType === 'image/png') {
         ctx.body = bucket.openDownloadStreamByName(ctx.params.filename);
         
     }
