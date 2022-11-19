@@ -2,19 +2,23 @@
 
 <style>
     form { display: inline; }
+    a {
+        font-size: 25px;
+    }
 </style>
-<center><h1><b><u>Needs to be Approved or Rejected</b></u></h1></center>
+   
+    <div class='content'>
+    <h1><b><u>Posts</b></u></h1>
 {% for post in posts %}
     
-    <center><div class='post'>
+        <form action = "/remove/{{post.title}}" method ="POST">
+            <a href="/approvalview/{{post.id}}/{{post.type}}/{{post.checked}}"> {{post.title}}</a>
+            <input type = "submit" value = "Remove"> </input>
+        </form>  
         <form action = "/approval/{{post.id}}" method ="POST">
             <a href="/view/{{post.id}}/{{post.type}}/{{post.checked}}"> {{post.title}}</a>
             <input type = "submit" value = "Approve"> </input>
-        </form> 
-        <form action = "/remove/{{post.title}}" method ="POST">
-            <input type = "submit" value = "Remove"> </input>
-        </form> 
-        <br></br>   
-    </div></center>
+        </form>  
+        <br></br>
 {% endfor %}
 

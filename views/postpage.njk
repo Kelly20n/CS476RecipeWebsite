@@ -3,7 +3,7 @@
 <div class='postRecipe'>
     <h1><b><u>Post Recipe</u></b></h1>
 
-    <form name="myForm" action="/postPage" method="POST" onsubmit= "return validate()" >
+    <form name="myForm" action="/postPage" method="POST" onsubmit= "return validate()"  enctype="multipart/form-data">
         <div>
             <input placeholder="Recipe Title" name="recipeTitle" id="rt" required></input><br></br>
             <input placeholder="Recipe Ingredients" name="recipeIngredients" id="ring" required></input><br></br>
@@ -24,7 +24,7 @@
 
 <script>
 
-    function validate() {
-       alert("Recipe Posted");
-    }
+function validate() {
+    alert('Redirected to: Home page, your recipe was posted successfully! If redirected to login page, login to add recipes, otherwise your title is already used, try again with a different title!')
+}
 </script>

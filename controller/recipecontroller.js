@@ -2,26 +2,37 @@ require('dotenv').config();
 
 //global variables
 const Upload = require('../gridfs/storage.js');
+const gfs = require('../gridfs/gfs.js');
+const {GridFsStorage} = require('multer-gridfs-storage');
 const Breakfast = require('../model/breakfast.js');
 const Lunch = require('../model/lunch.js');
 const Supper = require('../model/supper.js');
+const Comment = require('../model/comments.js')
+const Recipe = require('../model/recipe.js');
 const User = require('../model/user.js');
 const Router = require('koa-router');
 const Comments = require('../model/comments.js')
 const RecipeFunctions = require('../functions/recipefunctions.js')
 const GeneralFunctions = require('../functions/generalfunctions.js')
 const toBeApproved = require('../model/approval.js');
+const mongoose = require('mongoose');
+const fs = require('fs');
+
+const host = process.env.host;
+const conn = mongoose.createConnection(host);
+
 const route = Router();
 
 //route get for main/home page
 route.get('/', async (ctx, next) => {
     const payload = GeneralFunctions.decodeUser(ctx)
+    console.log(payload);
     return User.findOne({username: payload.userEmail}).then(async function(loggedUser) {
         console.log(loggedUser);
         const page = 'index';
         return RecipeFunctions.displayPostTitles(ctx, loggedUser, page);
     });
-});     
+});
 
 //route get for getting
 route.get('/views/breakfast', async (ctx, next) => {
@@ -67,7 +78,6 @@ route.post('/view/:id/:db/:check', async (ctx, next) => {
         return User.findOne({username: payload.userEmail}).then(async function(loggedUser) {
             const page = 'recipe';
             console.log(page);
-            //console.log("db: " + ctx.params.db);
             if(ctx.request.body.userComment === '') {
                 console.log(loggedUser);
                 return RecipeFunctions.displayPostAndComments(ctx, loggedUser, page);
@@ -81,6 +91,16 @@ route.post('/view/:id/:db/:check', async (ctx, next) => {
     }
     else return
 });
+
+route.get('/approvalview/:id/:db/:check', async (ctx, next) => {
+    const payload = GeneralFunctions.decodeUser(ctx)
+    return User.findOne({username: payload.userEmail}).then(async function(loggedUser) {
+        const page = 'approvalview';
+        console.log("db: " + ctx.params.db);
+        return RecipeFunctions.displayPostAndComments(ctx, loggedUser, page, ctx.params.db);
+    });
+});
+
 
 
 //route post to delete a comment
@@ -144,99 +164,133 @@ route.get('/postPage', async (ctx, next) => {
         return GeneralFunctions.displayNoDBinfo(ctx, loggedUser, page);
     })
 });
-    
-//route post page to post to database when recipe is posted
-route.post('/postPage', async (ctx, next) => {
-    //adds to breakfast database and toBeApproved for admin duties
-    if(ctx.request.body.database == "breakfast")
-    {
-        var newBreakfast = new Breakfast({
-            title: ctx.request.body.recipeTitle,
-            ingredients: ctx.request.body.recipeIngredients,
-            instructions: ctx.request.body.recipeInstructions,
-            type: ctx.request.body.database,
-            checked: 0
-        });   
-        newBreakfast.save((err, res) => {
-            if(err) return handleError(err);
-            else return console.log("Result: ", res)
-        });
-        var newToBeApproved = new toBeApproved({
-            title: ctx.request.body.recipeTitle,
-            ingredients: ctx.request.body.recipeIngredients,
-            instructions: ctx.request.body.recipeInstructions,
-            type: ctx.request.body.database,
-            checked: 1
-        });   
-        newToBeApproved.save((err, res) => {
-            if(err) return handleError(err);
-            else return console.log("Result: ", res)
-        });
-        console.log('breakfast added');
-        await ctx.redirect('postPage');
-    }
-    //adds to lunch database and toBeApproved for admin duties
-    else if(ctx.request.body.database == "lunch")
-    {
-        var newLunch = new Lunch({
-            title: ctx.request.body.recipeTitle,
-            ingredients: ctx.request.body.recipeIngredients,
-            instructions: ctx.request.body.recipeInstructions,
-            type: ctx.request.body.database,
-            checked: 0
-        }); 
-        newLunch.save((err, res) => {
-            if(err) return handleError(err);
-            else return console.log("Result: ", res)
-         });
-         var newToBeApproved = new toBeApproved({
-            title: ctx.request.body.recipeTitle,
-            ingredients: ctx.request.body.recipeIngredients,
-            instructions: ctx.request.body.recipeInstructions,
-            type: ctx.request.body.database,
-            checked: 1
-        });   
-        newToBeApproved.save((err, res) => {
-            if(err) return handleError(err);
-            else return console.log("Result: ", res)
-        });
-         console.log('lunch added');
-         await ctx.redirect('postPage');
-    }
-    //adds to supper database and toBeApproved for admin duties
-    else
-    {
-         var newSupper = new Supper({
-            title: ctx.request.body.recipeTitle,
-            ingredients: ctx.request.body.recipeIngredients,
-            instructions: ctx.request.body.recipeInstructions,
-            type: ctx.request.body.database,
-            checked: 0
-        });
-        newSupper.save((err, res) => {
-            if(err) return handleError(err);
-            else return console.log("Result: ", res)
-        });
-        var newToBeApproved = new toBeApproved({
-            title: ctx.request.body.recipeTitle,
-            ingredients: ctx.request.body.recipeIngredients,
-            instructions: ctx.request.body.recipeInstructions,
-            type: ctx.request.body.database,
-            checked: 1
-        });   
-        newToBeApproved.save((err, res) => {
-            if(err) return handleError(err);
-            else return console.log("Result: ", res)
-        });
-        console.log('supper added');
-        await ctx.redirect('postPage');
-    }
 
-    const payload = GeneralFunctions.decodeUser(ctx);
-    const page = 'postPage'
-    return User.findOne({username: payload.userEmail}).then(async function(loggedUser) {
-        return GeneralFunctions.displayNoDBinfo(ctx, loggedUser, page);
-    })
+route.post('/postPage', Upload.single('file'), async (ctx, next) => {
+    if(GeneralFunctions.verifyUser(ctx) === true)
+    {
+        const payload = GeneralFunctions.decodeUser(ctx);
+        console.log("right here:" + ctx.file.contentType);
+        return User.findOne({username: payload.userEmail}).then(async function(loggedUser) {
+            if(ctx.file.contentType === 'image/jpeg' || ctx.file.contentType === 'image/png') {
+                var key = false;
+                await Breakfast.findOne({title: ctx.request.body.recipeTitle}).then(async function(results) {
+                    return Lunch.findOne({title: ctx.request.body.recipeTitle}).then(async function(results1) {
+                        return Supper.findOne({title: ctx.request.body.recipeTitle}).then(async function(results2) {
+                            console.log(results)
+                            console.log(results1)
+                            console.log(results2)
+                            if(results != null || results1 != null || results2 != null) {
+                                key = true;
+                                return await ctx.render('postpage', {
+                                    admin: loggedUser,
+                                    key: key
+                                })
+                            }
+                        });
+                    });
+                });
+                if(key != true)
+                {
+                    if(ctx.request.body.database == "breakfast")
+                    {
+                        var newBreakfast = new Breakfast({
+                            title: ctx.request.body.recipeTitle,
+                            ingredients: ctx.request.body.recipeIngredients,
+                            instructions: ctx.request.body.recipeInstructions,
+                            type: ctx.request.body.database,
+                            checked: 0,
+                            image: ctx.file.filename
+                        });
+                        newBreakfast.save((err, res) => {
+                            if(err) return handleError(err);
+                            else return
+                        });
+                        console.log(ctx.file.filename);
+                        var newToBeApproved = new toBeApproved({
+                            title: ctx.request.body.recipeTitle,
+                            ingredients: ctx.request.body.recipeIngredients,
+                            instructions: ctx.request.body.recipeInstructions,
+                            type: ctx.request.body.database,
+                            checked: 1,
+                            image: ctx.file.filename,
+                        });
+                        newToBeApproved.save((err, res) => {
+                            if(err) return handleError(err);
+                            else return
+                        });
+                        console.log('breakfast added');
+                        await ctx.redirect('/');
+                    }
+                    else if(ctx.request.body.database == "lunch")
+                    {
+                        var newLunch = new Lunch({
+                            title: ctx.request.body.recipeTitle,
+                            ingredients: ctx.request.body.recipeIngredients,
+                            instructions: ctx.request.body.recipeInstructions,
+                            type: ctx.request.body.database,
+                            checked: 0,
+                            image: ctx.file.filename
+                        });
+                        newLunch.save((err, res) => {
+                            if(err) return handleError(err);
+                            else return
+                        });
+                        var newToBeApproved = new toBeApproved({
+                            title: ctx.request.body.recipeTitle,
+                            ingredients: ctx.request.body.recipeIngredients,
+                            instructions: ctx.request.body.recipeInstructions,
+                            type: ctx.request.body.database,
+                            checked: 1,
+                            image: ctx.file.filename
+                        });
+                        newToBeApproved.save((err, res) => {
+                            if(err) return handleError(err);
+                            else return
+                        });
+                        console.log('lunch added');
+                        await ctx.redirect('/');
+                    }
+                    else
+                    {
+                        var newSupper = new Supper({
+                            title: ctx.request.body.recipeTitle,
+                            ingredients: ctx.request.body.recipeIngredients,
+                            instructions: ctx.request.body.recipeInstructions,
+                            type: ctx.request.body.database,
+                            checked: 0,
+                            image: ctx.file.filename
+                        });
+                        newSupper.save((err, res) => {
+                            if(err) return handleError(err);
+                            else return
+                        });
+                        var newToBeApproved = new toBeApproved({
+                            title: ctx.request.body.recipeTitle,
+                            ingredients: ctx.request.body.recipeIngredients,
+                            instructions: ctx.request.body.recipeInstructions,
+                            type: ctx.request.body.database,
+                            checked: 1,
+                            image: ctx.file.filename
+                        });
+                        newToBeApproved.save((err, res) => {
+                            if(err) return handleError(err);
+                            else return
+                        });
+                        console.log('supper added');
+                        await ctx.redirect('/');
+                    }
+                }
+                else return
+            }
+            else {
+                return await ctx.render('postpage', {
+                    admin: loggedUser,
+                    file: false
+                })
+            }
+        });
+    }
+    else return
 });
 
 //route get to get all recipes that need to be approved or rejected
@@ -245,14 +299,14 @@ route.get('/approval', async (ctx, next) => {
         const payload = GeneralFunctions.decodeUser(ctx);
         return User.findOne({username: payload.userEmail}).then(async function(loggedUser){
             return toBeApproved.find({}).then(async function(results) {
-                await ctx.render('approval',{
+                await ctx.render('approval', {
                     posts: results,
                     admin: loggedUser
-                });    
+                });
             });
         });
     }
-    else return;    
+    else return;
 });
 
 //route post for removal of posts based on databased
@@ -261,17 +315,20 @@ route.post('/remove/:id', async (ctx, next) => {
     //remove post if recipe belongs to breakfast
     if(doc.type == "breakfast")
     {
-        await Breakfast.findOneAndRemove({title: ctx.params.id});
+        const doc1 = await Breakfast.findOneAndRemove({title: ctx.params.id});
+        await Comment.deleteMany({postId: doc1._id})
     }
     //remove post if recipe belongs to lunch
     else if(doc.type == "lunch")
     {
-        await Lunch.findOneAndRemove({title: ctx.params.id});
+        const doc2 = await Lunch.findOneAndRemove({title: ctx.params.id});
+        await Comment.deleteMany({postId: doc2._id});
     }
      //remove post if recipe belongs to lunch
     else
     {
-        await Supper.findOneAndRemove({title: ctx.params.id});
+        const doc3 = await Supper.findOneAndRemove({title: ctx.params.id});
+        await Comment.deleteMany({postId: doc3._id});
     }
     console.log('Removed Document');
     await ctx.redirect('/approval');
@@ -296,71 +353,62 @@ route.post('/search', async (ctx, next) => {
             return Lunch.find({}).then(async function(results2) {
                 return Supper.find({}).then(async function(results3) {
                     
-                    var results;
-                    
                     var isTitleInEntry = false;
+                    
                     for(var i = 0; i < results1.length; i++)
                     {
-                        //console.log(results1[i]);
-                        //console.log(results1[i].title + " vs. " + ctx.request.body.searchTerms)
-
-                        if(results1[i].title == ctx.request.body.searchTerms)
+                        if(results1[i].title == undefined)
                         {
-                            console.log("Hit" + results1);
+                            results1.splice(i, 1);
+                            continue;
+                        }
+                        if(results1[i].title.toLowerCase() == ctx.request.body.searchTerms.toLowerCase())
+                        {
                             isTitleInEntry = true;
                         }
                         if(!isTitleInEntry)
                         {
-                            //console.log("Removed " + searchTerm_Array + " wasn't found: " + results1[i]);
-                            //listOfIngredientsToRemove += i;
                             results1.splice(i, 1);
                             i--;
-                            // Removes item from results and decrements i to make algorithm look at index i again (new value now in the place)
                         }
                         isTitleInEntry = false;
                     }
                     for(var i = 0; i < results2.length; i++)
                     {
-                        //console.log(results2[i]);
-                        //console.log(results2[i].title + " vs. " + ctx.request.body.searchTerms)
-
-                        if(results2[i].title == ctx.request.body.searchTerms)
+                        if(results2[i].title == undefined)
                         {
-                            console.log("Hit" + results1);
+                            results2.splice(i, 1);
+                            continue;
+                        }
+                        if(results2[i].title.toLowerCase() == ctx.request.body.searchTerms.toLowerCase())
+                        {
                             isTitleInEntry = true;
                         }
                         if(!isTitleInEntry)
                         {
-                            //console.log("Removed " + searchTerm_Array + " wasn't found: " + results1[i]);
-                            //listOfIngredientsToRemove += i;
                             results2.splice(i, 1);
                             i--;
-                            // Removes item from results and decrements i to make algorithm look at index i again (new value now in the place)
                         }
                         isTitleInEntry = false;
                     }
                     for(var i = 0; i < results3.length; i++)
                     {
-                        //console.log(results3[i]);
-                        //console.log(results3[i].title + " vs. " + ctx.request.body.searchTerms)
-
-                        if(results3[i].title == ctx.request.body.searchTerms)
+                        if(results3[i].title == undefined)
                         {
-                            console.log("Hit" + results1);
+                            results3.splice(i, 1);
+                            continue;
+                        }
+                        if(results3[i].title.toLowerCase() == ctx.request.body.searchTerms.toLowerCase())
+                        {
                             isTitleInEntry = true;
                         }
                         if(!isTitleInEntry)
                         {
-                            //console.log("Removed " + searchTerm_Array + " wasn't found: " + results1[i]);
-                            //listOfIngredientsToRemove += i;
                             results3.splice(i, 1);
                             i--;
-                            // Removes item from results and decrements i to make algorithm look at index i again (new value now in the place)
                         }
                         isTitleInEntry = false;
                     }
-                    results = results1 + results2 + results3;
-                    console.log(results);
                     return await ctx.render('search', {
                         searchTerm: ctx.request.body.searchTerms,
                         posts1: results1,
@@ -373,28 +421,92 @@ route.post('/search', async (ctx, next) => {
         });
     }
     else{
-        return Breakfast.find({ingredients: ctx.request.body.searchTerms}).then(async function(results1) {
-            return Lunch.find({ingredients: ctx.request.body.searchTerms}).then(async function(results2) {
-                return Supper.find({ingredients: ctx.request.body.searchTerms}).then(async function(results3) {
-                    
-                    var results = results1 + results2 + results3;
-                    console.log(results);
+        
+        return Breakfast.find({}).then(async function(results1) {
+            return Lunch.find({}).then(async function(results2) {
+                return Supper.find({}).then(async function(results3) {
+                    console.log("Ingredients!");
 
                     var searchTerms = ctx.request.body.searchTerms.split(/\s*,\s*/);
+                    var isIngredient = false;
                     for(var i = 0; i < results1.length; i++)
                     {
-                        for(var j = 0; j < searchTerms; j++)
+                        if(results1[i].ingredients == undefined)
                         {
-
+                            results1.splice(i, 1);
+                            continue;
                         }
+                        var dbIngredients = results1[i].ingredients.split(/\s*,\s*/);
+                        for(var j = 0; j < searchTerms.length; j++)
+                        {
+                            for(var k = 0; k < dbIngredients.length; k++)
+                            {
+                                //console.log(searchTerms[i].toLowerCase() + " vs. " + dbIngredients[k].toLowerCase());
+                                if(searchTerms[j].toLowerCase() == dbIngredients[k].toLowerCase())
+                                {
+                                    isIngredient = true;
+                                }
+                            }
+                        }
+                        if(!isIngredient)
+                        {
+                            results1.splice(i, 1);
+                            i--;
+                        }
+                        isIngredient = false;
                     }
                     for(var i = 0; i < results2.length; i++)
                     {
-
+                        if(results2[i].ingredients == undefined)
+                        {
+                            results2.splice(i, 1);
+                            continue;
+                        }
+                        var dbIngredients = results2[i].ingredients.split(/\s*,\s*/);
+                        for(var j = 0; j < searchTerms.length; j++)
+                        {
+                            for(var k = 0; k < dbIngredients.length; k++)
+                            {
+                                //console.log(searchTerms[i].toLowerCase() + " vs. " + dbIngredients[k].toLowerCase());
+                                if(searchTerms[j].toLowerCase() == dbIngredients[k].toLowerCase())
+                                {
+                                    isIngredient = true;
+                                }
+                            }
+                        }
+                        if(!isIngredient)
+                        {
+                            results2.splice(i, 1);
+                            i--;
+                        }
+                        isIngredient = false;
                     }
                     for(var i = 0; i < results3.length; i++)
                     {
-
+                        if(results3[i].ingredients == undefined)
+                        {
+                            results3.splice(i, 1);
+                            continue;
+                        }
+                        var dbIngredients = results3[i].ingredients.split(/\s*,\s*/);
+                        for(var j = 0; j < searchTerms.length; j++)
+                        {
+                            for(var k = 0; k < dbIngredients.length; k++)
+                            {
+                                //console.log(searchTerms[i].toLowerCase() + " vs. " + dbIngredients[k].toLowerCase());
+                                if(searchTerms[j].toLowerCase() == dbIngredients[k].toLowerCase())
+                                {
+                                    
+                                    isIngredient = true;
+                                }
+                            }
+                        }
+                        if(!isIngredient)
+                        {
+                            results3.splice(i, 1);
+                            i--;
+                        }
+                        isIngredient = false;
                     }
 
                     return await ctx.render('search', {
@@ -408,43 +520,31 @@ route.post('/search', async (ctx, next) => {
             });
         });
     }
-    
-    //console.log("Results: " + results);
-    
-    /*
-    if(ctx.request.body.database == "breakfast")
-    {
-        console.log('Breakfast');
-        return Breakfast.find({}).then(async function(breakfastResults){
-            return GeneralFunctions.searchSingleDataBase(ctx, breakfastResults, "Breakfast");    
-        });
-    }
-    //search in lunch database
-    else if(ctx.request.body.database == "lunch")
-    {
-        console.log('Lunch');
-        return Lunch.find({}).then(async function(lunchResults){    
-            return GeneralFunctions.searchSingleDataBase(ctx, lunchResults, "Lunch");
-        });
-    }
-    //search in lunch database
-    else{
-        console.log('Supper');
-        return Supper.find({}).then(async function(supperResults){    
-            return GeneralFunctions.searchSingleDataBase(ctx, supperResults, "Supper");
-        });
-    }
-    */
 });
 
-//route post for upload picture files
-route.post('/upload', Upload.single('file'), (ctx, next) => {
-    console.log(ctx.request.file);
-    console.log(ctx.file);
+route.get('/image/:filename', async (ctx, next) => {
+    const bucket = new mongoose.mongo.GridFSBucket(conn.db, {
+        bucketName: 'fs'
+    })
+
+    // let file = await bucket.find({filename: ctx.params.filename}).toArray();
+    const file = await bucket.find({filename: ctx.params.filename}).toArray();
+    ctx.body = file[0].contentType;
+    console.log("Check it " + file)
+
+    if(!file[0] || file[0].length === 0) {
+        return ctx.status = 400;
+    }
+
+    // stream = bucket.openDownloadStreamByName(ctx.params.filename);
+    // ctx.body = stream.on();
+    if(file[0].contentType === 'image/jpeg' || file[0].contentType === 'img/png') {
+        ctx.body = bucket.openDownloadStreamByName(ctx.params.filename);
+        
+    }
+    else {
+        return ctx.status = 404;
+    }
 })
-
-route.get('/uploadtest', async (ctx, next) => {
-    await ctx.render('uploadtest')
-});
 
 module.exports = route;

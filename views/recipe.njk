@@ -1,15 +1,13 @@
 {% include './includes/head.njk' %}
 
-
-{# <body onload="checkButtons()"> #}
-
-<div class="left">
-    <div class='recipe'>
-        <div>{{post.title}}</div><br><Br>
-        <div>Ingredients:<br><Br>{{post.ingredients}}</div>
-        <div>Instructions:<br><Br>{{post.instructions}}</div>
-    </div>
+  <div class='left'>
+    <img src="../../../image/{{post.image}}" alt="" style="width:300px;height:400px;">
+    <div>{{post.title}}</div><br><Br>
+    <div>Ingredients:<br><Br>{{post.ingredients}}</div><br><Br>
+    <div>Instructions:<br><Br>{{post.instructions}}</div><br><Br>
 </div>
+
+
 <div class="right">
     <div class='comment'>
         <div>Comments</div>
