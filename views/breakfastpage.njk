@@ -2,7 +2,9 @@
 
 
 {% for post in posts %}
-<div class='post'>
-    <a href="/view/{{post.id}}/{{post.type}}/{{post.checked}}"> <div>{{post.title}}</div></a><br><Br>
+<div class='postcolumn'>
+    <p><a href="/view/{{post.id}}/{{post.type}}/{{post.checked}}">
+    <img src="../../../image/{{post.image}}" alt="" style="width:300px;height:200px; object-fit: fill;">
+    <p>{{post.title}}</p></a></p><br><Br>
 </div>
 {% endfor %}
