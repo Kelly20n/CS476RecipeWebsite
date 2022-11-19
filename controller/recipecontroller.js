@@ -101,8 +101,6 @@ route.get('/approvalview/:id/:db/:check', async (ctx, next) => {
     });
 });
 
-
-
 //route post to delete a comment
 route.post('/view/:id/:db/:check/:commentid', async (ctx, next) => {
     if(GeneralFunctions.verifyUser(ctx) === true)
@@ -354,66 +352,87 @@ route.post('/search', async (ctx, next) => {
                 return Supper.find({}).then(async function(results3) {
                     
                     var isTitleInEntry = false;
-                    
+                    var hitsOnSearch1 = [];
                     for(var i = 0; i < results1.length; i++)
                     {
+                        hitsOnSearch1[i] = 0;
                         if(results1[i].title == undefined)
                         {
                             results1.splice(i, 1);
+                            hitsOnSearch1.splice(i, 1);
                             continue;
                         }
                         if(results1[i].title.toLowerCase() == ctx.request.body.searchTerms.toLowerCase())
                         {
                             isTitleInEntry = true;
+                            hitsOnSearch1[i]++;
+                            console.log(results1[i].title + " has " + hitsOnSearch1[i] + " hits!");
                         }
                         if(!isTitleInEntry)
                         {
                             results1.splice(i, 1);
+                            hitsOnSearch1.splice(i, 1);
                             i--;
                         }
                         isTitleInEntry = false;
                     }
+                    var hitsOnSearch2 = [];
                     for(var i = 0; i < results2.length; i++)
                     {
+                        hitsOnSearch2[i] = 0;
                         if(results2[i].title == undefined)
                         {
                             results2.splice(i, 1);
+                            hitsOnSearch2.splice(i, 1);
                             continue;
                         }
                         if(results2[i].title.toLowerCase() == ctx.request.body.searchTerms.toLowerCase())
                         {
                             isTitleInEntry = true;
+                            hitsOnSearch2[i]++;
+                            console.log(results2[i].title + " has " + hitsOnSearch2[i] + " hits!");
                         }
                         if(!isTitleInEntry)
                         {
                             results2.splice(i, 1);
+                            hitsOnSearch2.splice(i, 1);
                             i--;
                         }
                         isTitleInEntry = false;
                     }
+                    var hitsOnSearch3 = [];
                     for(var i = 0; i < results3.length; i++)
                     {
+                        hitsOnSearch3[i] = 0;
                         if(results3[i].title == undefined)
                         {
                             results3.splice(i, 1);
+                            hitsOnSearch3.splice(i, 1);
                             continue;
                         }
                         if(results3[i].title.toLowerCase() == ctx.request.body.searchTerms.toLowerCase())
                         {
                             isTitleInEntry = true;
+                            hitsOnSearch3[i]++;
+                            console.log(results3[i].title + " has " + hitsOnSearch3[i] + " hits!");
                         }
                         if(!isTitleInEntry)
                         {
                             results3.splice(i, 1);
+                            hitsOnSearch3.splice(i, 1);
                             i--;
                         }
                         isTitleInEntry = false;
                     }
+                    console.log("Search1: " + hitsOnSearch1 + "\nSearch2: " + hitsOnSearch2 + "\nSearch3: " + hitsOnSearch3);
                     return await ctx.render('search', {
                         searchTerm: ctx.request.body.searchTerms,
                         posts1: results1,
                         posts2: results2,
                         posts3: results3,
+                        hits1: hitsOnSearch1,
+                        hits2: hitsOnSearch2,
+                        hits3: hitsOnSearch3,
                     });
 
                 });
@@ -429,11 +448,14 @@ route.post('/search', async (ctx, next) => {
 
                     var searchTerms = ctx.request.body.searchTerms.split(/\s*,\s*/);
                     var isIngredient = false;
+                    var hitsOnSearch1 = [];
                     for(var i = 0; i < results1.length; i++)
                     {
+                        hitsOnSearch1[i] = 0;
                         if(results1[i].ingredients == undefined)
                         {
                             results1.splice(i, 1);
+                            hitsOnSearch1.splice(i, 1);
                             continue;
                         }
                         var dbIngredients = results1[i].ingredients.split(/\s*,\s*/);
@@ -441,9 +463,27 @@ route.post('/search', async (ctx, next) => {
                         {
                             for(var k = 0; k < dbIngredients.length; k++)
                             {
-                                //console.log(searchTerms[i].toLowerCase() + " vs. " + dbIngredients[k].toLowerCase());
-                                if(searchTerms[j].toLowerCase() == dbIngredients[k].toLowerCase())
+                                var numBlanks = 0;
+                                var startingIndex = -1;
+                                for(var l = 0; l < dbIngredients[k].length; l++)
                                 {
+                                    //console.log(dbIngredients);
+                                    if(dbIngredients[k].charAt(l) == " ")
+                                    {
+                                        //console.log("Hit");
+                                        numBlanks++;
+                                    }
+                                    if(numBlanks == 2)
+                                    {
+                                        startingIndex = l;
+                                        break;
+                                    }
+                                }
+                                //console.log(searchTerms[i].toLowerCase() + " vs. " + dbIngredients[k].toLowerCase());
+                                if(searchTerms[j].toLowerCase() == dbIngredients[k].substring(startingIndex+1, dbIngredients[k].length).toLowerCase())
+                                {
+                                    hitsOnSearch1[i]++;
+                                    console.log(searchTerms[j].toLowerCase() + " vs. " + dbIngredients[k].substring(startingIndex+1, dbIngredients[k].length).toLowerCase());
                                     isIngredient = true;
                                 }
                             }
@@ -451,15 +491,19 @@ route.post('/search', async (ctx, next) => {
                         if(!isIngredient)
                         {
                             results1.splice(i, 1);
+                            hitsOnSearch1.splice(i, 1);
                             i--;
                         }
                         isIngredient = false;
                     }
+                    var hitsOnSearch2 = [];
                     for(var i = 0; i < results2.length; i++)
                     {
+                        hitsOnSearch2[i] = 0;
                         if(results2[i].ingredients == undefined)
                         {
                             results2.splice(i, 1);
+                            hitsOnSearch2.splice(i, 1);
                             continue;
                         }
                         var dbIngredients = results2[i].ingredients.split(/\s*,\s*/);
@@ -467,9 +511,28 @@ route.post('/search', async (ctx, next) => {
                         {
                             for(var k = 0; k < dbIngredients.length; k++)
                             {
-                                //console.log(searchTerms[i].toLowerCase() + " vs. " + dbIngredients[k].toLowerCase());
-                                if(searchTerms[j].toLowerCase() == dbIngredients[k].toLowerCase())
+
+                                var numBlanks = 0;
+                                var startingIndex = -1;
+                                for(var l = 0; l < dbIngredients[k].length; l++)
                                 {
+                                    //console.log(dbIngredients);
+                                    if(dbIngredients[k].charAt(l) == " ")
+                                    {
+                                        //console.log("Hit");
+                                        numBlanks++;
+                                    }
+                                    if(numBlanks == 2)
+                                    {
+                                        startingIndex = l;
+                                        break;
+                                    }
+                                }
+                                //console.log(searchTerms[i].toLowerCase() + " vs. " + dbIngredients[k].toLowerCase());
+                                if(searchTerms[j].toLowerCase() == dbIngredients[k].substring(startingIndex+1, dbIngredients[k].length).toLowerCase())
+                                {
+                                    hitsOnSearch2[i]++;
+                                    console.log(searchTerms[j].toLowerCase() + " vs. " + dbIngredients[k].substring(startingIndex+1, dbIngredients[k].length).toLowerCase());
                                     isIngredient = true;
                                 }
                             }
@@ -477,12 +540,15 @@ route.post('/search', async (ctx, next) => {
                         if(!isIngredient)
                         {
                             results2.splice(i, 1);
+                            hitsOnSearch2.splice(i, 1);
                             i--;
                         }
                         isIngredient = false;
                     }
+                    var hitsOnSearch3 = [];
                     for(var i = 0; i < results3.length; i++)
                     {
+                        hitsOnSearch3[i] = 0;
                         if(results3[i].ingredients == undefined)
                         {
                             results3.splice(i, 1);
@@ -493,10 +559,31 @@ route.post('/search', async (ctx, next) => {
                         {
                             for(var k = 0; k < dbIngredients.length; k++)
                             {
+                                //console.log(dbIngredients[k]);
                                 //console.log(searchTerms[i].toLowerCase() + " vs. " + dbIngredients[k].toLowerCase());
-                                if(searchTerms[j].toLowerCase() == dbIngredients[k].toLowerCase())
+                                var numBlanks = 0;
+                                var startingIndex = -1;
+                                for(var l = 0; l < dbIngredients[k].length; l++)
                                 {
-                                    
+                                    //console.log(dbIngredients);
+                                    if(dbIngredients[k].charAt(l) == " ")
+                                    {
+                                        //console.log("Hit");
+                                        numBlanks++;
+                                    }
+                                    if(numBlanks == 2)
+                                    {
+                                        startingIndex = l;
+                                        break;
+                                    }
+                                }
+                                
+
+                                //console.log(dbIngredients[k].substring(startingIndex+1, dbIngredients[k].length).toLowerCase());
+                                if(searchTerms[j].toLowerCase() == dbIngredients[k].substring(startingIndex+1, dbIngredients[k].length).toLowerCase())
+                                {
+                                    hitsOnSearch3[i]++;
+                                    console.log(searchTerms[j].toLowerCase() + " vs. " + dbIngredients[k].substring(startingIndex+1, dbIngredients[k].length).toLowerCase());
                                     isIngredient = true;
                                 }
                             }
@@ -504,6 +591,7 @@ route.post('/search', async (ctx, next) => {
                         if(!isIngredient)
                         {
                             results3.splice(i, 1);
+                            hitsOnSearch3.splice(i, 1);
                             i--;
                         }
                         isIngredient = false;
@@ -514,6 +602,9 @@ route.post('/search', async (ctx, next) => {
                         posts1: results1,
                         posts2: results2,
                         posts3: results3,
+                        hits1: hitsOnSearch1,
+                        hits2: hitsOnSearch2,
+                        hits3: hitsOnSearch3,
                     });
 
                 });
@@ -529,7 +620,7 @@ route.get('/image/:filename', async (ctx, next) => {
 
     // let file = await bucket.find({filename: ctx.params.filename}).toArray();
     const file = await bucket.find({filename: ctx.params.filename}).toArray();
-    ctx.body = file[0].contentType;
+    
     console.log("Check it " + file)
 
     if(!file[0] || file[0].length === 0) {
@@ -538,7 +629,7 @@ route.get('/image/:filename', async (ctx, next) => {
 
     // stream = bucket.openDownloadStreamByName(ctx.params.filename);
     // ctx.body = stream.on();
-    if(file[0].contentType === 'image/jpeg' || file[0].contentType === 'img/png') {
+    if(file[0].contentType === 'image/jpeg' || file[0].contentType === 'image/png') {
         ctx.body = bucket.openDownloadStreamByName(ctx.params.filename);
         
     }
