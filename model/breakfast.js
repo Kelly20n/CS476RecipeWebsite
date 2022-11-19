@@ -7,7 +7,9 @@ const breakfastSchema = new Schema({
     instructions: String,
     type: String,
     checked: Number,
-    image: String
+    image: String,
+    date: Date,
+    user: String
 });
 
 const Breakfast = mongoose.model('breakfastposts', breakfastSchema);

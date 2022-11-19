@@ -111,9 +111,9 @@ async function displaySupperPostTitles(ctx, adminUser, page) {
 }
 
 async function displayPostTitles(ctx, adminUser, page) {
-    return Breakfast.find({}).then(async function(results1) {
-        return Lunch.find({}).then(async function(results2) {
-            return Supper.find({}).then(async function(results3) {
+    return Breakfast.find({}).sort({'date': -1}).limit(5).then(async function(results1) {
+        return Lunch.find({}).sort({'date': -1}).limit(5).then(async function(results2) {
+            return Supper.find({}).sort({'date': -1}).limit(5).then(async function(results3) {
                 await ctx.render(page, {
                     posts1: results1,
                     posts2: results2,

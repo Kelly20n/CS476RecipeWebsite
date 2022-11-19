@@ -1,7 +1,6 @@
 {% include './includes/head.njk' %}
-<br>
-{# <div class = 'form-floating mb-3'>
-</div> #}
+<p class="text-white-50">Showing 15 most recent posts:</p>
+
 {% for post in posts1 %}
 <div class='postcolumn'>
     <p><a href="/view/{{post.id}}/{{post.type}}/{{post.checked}}">

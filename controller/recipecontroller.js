@@ -107,12 +107,17 @@ route.post('/view/:id/:db/:check/:commentid', async (ctx, next) => {
     {
         const payload = GeneralFunctions.decodeUser(ctx)
         return User.findOne({username: payload.userEmail}).then(async function(loggedUser) {
-            const page = 'recipe';
-            console.log(page);
-             console.log(ctx.params.commentid);
-            await Comments.findByIdAndDelete({_id: ctx.params.commentid});
-           
-            return RecipeFunctions.displayPostAndComments(ctx, loggedUser, page);
+            if(loggedUser.isAdmin === true) {
+                const page = 'recipe';
+                console.log(page);
+                console.log(ctx.params.commentid);
+                await Comments.findByIdAndDelete({_id: ctx.params.commentid});
+            
+                return RecipeFunctions.displayPostAndComments(ctx, loggedUser, page);
+            }
+            else {
+                return await ctx.redirect("/");
+            }
         });
     }
     else return
@@ -133,26 +138,6 @@ route.post('/view/:id/:db/:check/:commentid', async (ctx, next) => {
     }
     else return
 });
-
-// route.post('/view/:id/:db/:check/:postId', async (ctx, next) => {
-//     if(GeneralFunctions.verifyUser(ctx) === true)
-//     {
-//         const payload = GeneralFunctions.decodeUser(ctx)
-//         return User.findOne({username: payload.userEmail}).then(async function(loggedUser) {
-//             const page = 'recipe';
-//             console.log(page);
-//             if(ctx.request.body.database == "breakfast")
-//             {
-//                 const doc1 = await Breakfast.findOneAndRemove({title: ctx.params.id});
-//                 await Comment.deleteMany({postId: doc1._id})
-//             }
-
-           
-//             return RecipeFunctions.displayPostAndComments(ctx, loggedUser, page);
-//         });
-//     }
-//     else return
-// });
 
 //route get for post page
 route.get('/postPage', async (ctx, next) => {
@@ -197,7 +182,9 @@ route.post('/postPage', Upload.single('file'), async (ctx, next) => {
                             instructions: ctx.request.body.recipeInstructions,
                             type: ctx.request.body.database,
                             checked: 0,
-                            image: ctx.file.filename
+                            image: ctx.file.filename,
+                            date: new Date(),
+                            user: loggedUser.name
                         });
                         newBreakfast.save((err, res) => {
                             if(err) return handleError(err);
@@ -211,6 +198,8 @@ route.post('/postPage', Upload.single('file'), async (ctx, next) => {
                             type: ctx.request.body.database,
                             checked: 1,
                             image: ctx.file.filename,
+                            date: new Date(),
+                            user: loggedUser.name
                         });
                         newToBeApproved.save((err, res) => {
                             if(err) return handleError(err);
@@ -227,7 +216,9 @@ route.post('/postPage', Upload.single('file'), async (ctx, next) => {
                             instructions: ctx.request.body.recipeInstructions,
                             type: ctx.request.body.database,
                             checked: 0,
-                            image: ctx.file.filename
+                            image: ctx.file.filename,
+                            date: new Date(),
+                            user: loggedUser.name
                         });
                         newLunch.save((err, res) => {
                             if(err) return handleError(err);
@@ -239,7 +230,9 @@ route.post('/postPage', Upload.single('file'), async (ctx, next) => {
                             instructions: ctx.request.body.recipeInstructions,
                             type: ctx.request.body.database,
                             checked: 1,
-                            image: ctx.file.filename
+                            image: ctx.file.filename,
+                            date: new Date(),
+                            user: loggedUser.name
                         });
                         newToBeApproved.save((err, res) => {
                             if(err) return handleError(err);
@@ -256,7 +249,9 @@ route.post('/postPage', Upload.single('file'), async (ctx, next) => {
                             instructions: ctx.request.body.recipeInstructions,
                             type: ctx.request.body.database,
                             checked: 0,
-                            image: ctx.file.filename
+                            image: ctx.file.filename,
+                            date: new Date(),
+                            user: loggedUser.name
                         });
                         newSupper.save((err, res) => {
                             if(err) return handleError(err);
@@ -268,7 +263,9 @@ route.post('/postPage', Upload.single('file'), async (ctx, next) => {
                             instructions: ctx.request.body.recipeInstructions,
                             type: ctx.request.body.database,
                             checked: 1,
-                            image: ctx.file.filename
+                            image: ctx.file.filename,
+                            date: new Date(),
+                            user: loggedUser.name
                         });
                         newToBeApproved.save((err, res) => {
                             if(err) return handleError(err);
@@ -296,12 +293,17 @@ route.get('/approval', async (ctx, next) => {
     if(GeneralFunctions.verifyUser(ctx) === true){
         const payload = GeneralFunctions.decodeUser(ctx);
         return User.findOne({username: payload.userEmail}).then(async function(loggedUser){
-            return toBeApproved.find({}).then(async function(results) {
-                await ctx.render('approval', {
-                    posts: results,
-                    admin: loggedUser
+            if(loggedUser.isAdmin === true) {
+                return toBeApproved.find({}).then(async function(results) {
+                    await ctx.render('approval', {
+                        posts: results,
+                        admin: loggedUser
+                    });
                 });
-            });
+            }
+            else {
+                return await ctx.redirect("/");
+            }
         });
     }
     else return;

@@ -7,7 +7,9 @@ const toBeApprovedSchema = new Schema({
     instructions: String,
     type: String,
     checked: Number,
-    image: String
+    image: String,
+    date: Date,
+    user: String
 });
 
 const toBeApproved = mongoose.model('tobeapproveds', toBeApprovedSchema);

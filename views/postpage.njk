@@ -1,42 +1,63 @@
 {% include './includes/head.njk' %}
 
+<br>
 <center>
-<div class="container py-5 h-100">
-    <div class="row d-flex justify-content-center align-items-center h-100">
-<div class='postRecipePage'>
-    <h2 style="text-align:center;" class="fw-bold mb-2 text-uppercase">ADD RECIPE</h2><br>
+<section>
+<div class="postRecipeDiv">
+    <div class='postRecipePage'>
+        <h2 style="text-align:center;" class="fw-bold mb-2 text-uppercase">ADD RECIPE</h2><br>
 
-    <form name="myForm" action="/postPage" method="POST" onsubmit= "return validate()"  enctype="multipart/form-data">
-        <div>
-            <div class="form-outline form-white mb-4">
-                <input placeholder="Recipe Title" name="recipeTitle" id="rt" class="form-control form-control-lg" required></input>
+        <form name="myForm" action="/postPage" method="POST" onsubmit= "validate()"  enctype="multipart/form-data">
+            <div>
+                
+                <div class="form-outline form-white mb-4">
+                    <h5 class="fw-bold mb-2 text-uppercase">Recipe title</h5>
+                    <input placeholder="Recipe Title" name="recipeTitle" id="rt" class="form-control form-control-lg" required></input>
+                </div>
+                <div class="form-outline form-white mb-4">
+                    <h5 class="fw-bold mb-2 text-uppercase">Recipe ingredients</h5>
+                    <textarea placeholder="e.g. 1 Cup White Sugar" name="recipeIngredients" id="ring" class="form-control form-control-lg" required></textarea>
+                </div>
+                <div class="form-outline form-white mb-4">
+                    <h5 class="fw-bold mb-2 text-uppercase">Recipe instructions</h5>
+                    <textarea placeholder="Recipe Instructions" name="recipeInstructions" id="rins" class="form-control form-control-lg" required></textarea>
+                </div>
+                <h5 class="fw-bold mb-2 text-uppercase">UPLOAD IMAGE</h5>
+                <input type="file" name="file" id="file"  required>
+                <label for="file" class="custom-file-label"></label></input><br></br>
+                <input type="radio" id="breakfastFood" value='breakfast' name="database" id="break" required>
+                <label for="breakfastFood">BreakFast</label></input>
+                <input type="radio" id="lunchFood" value='lunch' name="database" id="lunch" required>
+                <label for="lunchFood">Lunch</label></input>
+                <input type="radio" id="supperFood" value='supper' name="database" id="supper" required>
+                <label for="supperFood">Supper</label></input><br></br>
+                <input type="submit">
             </div>
-            <div class="form-outline form-white mb-4">
-                <textarea placeholder="Recipe Ingredients" name="recipeIngredients" id="ring" class="form-control form-control-lg" required></textarea>
-            </div>
-            <div class="form-outline form-white mb-4">
-                <textarea placeholder="Recipe Instructions" name="recipeInstructions" id="rins" class="form-control form-control-lg" required></textarea>
-            </div>
-            <h5 class="fw-bold mb-2 text-uppercase">UPLOAD IMAGE</h5>
-            <input type="file" name="file" id="file"  required>
-            <label for="file" class="custom-file-label"></label><br></br>
-            <input type="radio" id="breakfastFood" value='breakfast' name="database" id="break" required>
-            <label for="breakfastFood">BreakFast</label></input>
-            <input type="radio" id="lunchFood" value='lunch' name="database" id="lunch" required>
-            <label for="lunchFood">Lunch</label></input>
-            <input type="radio" id="supperFood" value='supper' name="database" id="supper" required>
-            <label for="supperFood">Supper</label></input><br></br>
-            <input type="submit">
-        </div>
-    </form>
-</div>
-</div>
-</div>
+        </form>
+    </div>
+    <div class="vr"></div>
+    <div class="vr"></div>
+    <div class="vr"></div>
+    <div class="postRecipePage">
+        <h2 style="text-align:center;" class="fw-bold mb-2 text-uppercase">Add Recipe Instructions</h2><br>
+        <p>When adding ingredients make sure to first specify the amount then the measurement. Make sure the 
+            measurement doesn't include spaces (floz) then the ingredient. In situations
+            where you would use the whole ingredient, for example an egg use the "whole" measurement, e.g.
+            1 whole egg. Each ingedient needs to be followed by a comma until the last ingedient. 
+        </p>
+    </div> 
+</div> 
+    
+    
+</section>
 </center>
+
+
+
 
 <script>
 
 function validate() {
-    alert('Redirected to: Home page, your recipe was posted successfully! If redirected to login page, login to add recipes, otherwise your title is already used, try again with a different title!')
+    alert('If redirected to home page, your recipe was posted successfully! If redirected to login page, login to add recipes, otherwise your title is already used, try again with a different title!')
 }
 </script>

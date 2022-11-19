@@ -7,7 +7,9 @@ const supperSchema = new Schema({
     instructions: String,
     type: String,
     checked: Number,
-    image: String
+    image: String,
+    date: Date,
+    user: String
 });
 
 const Supper = mongoose.model('supperposts', supperSchema);
