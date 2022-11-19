@@ -16,16 +16,15 @@
 
 #approve{
   visibility: hidden;
-  display: none;
-}
 
-.deleteComment{
-    visibility: hidden;
 }
 
 #deletePost{
-    visibility: hidden;
-    display: none;
+  visibility: hidden;
+}
+
+.deleteComment{
+  visibility: hidden;
 }
 
 .comment {
@@ -198,21 +197,18 @@ body {
     var x = document.getElementById("admin");
     var y = document.getElementById("signout");
     var z = document.getElementById("approve");
-    //var b = document.getElementById("deletePost");
+    var a = document.getElementById("deletePost");
+    var b = document.getElementsByClassName("deleteComment");
     if({{admin.isAdmin}} === true) {
       x.style.visibility = "visible";
       z.style.visibility = "visible";
-      z.style.display = "block";
-     // b.style.visibility = "visible";
-      //b.style.display = "block";
-    }
-    if({{admin != null}}) {
-      y.style.visibility = "visible";
-      y.style.display = "block";
+      a.style.visibility = "visible";
+      b.style.visibility = "visible";
     }
     if({{file === false}}) {
       alert('Invalid file format, must be JPEG or PNG!')
     }
   }
+  
   
 </script>
