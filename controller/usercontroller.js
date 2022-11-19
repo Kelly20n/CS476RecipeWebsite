@@ -61,12 +61,7 @@ route.post('/signup', async (ctx, next) => {
             {
                 await ctx.redirect('/signup');
             }
-            // console.log(err + "\n")
-            // console.log(ctx.request.body.userEmail)
-            //Checks if password is equal
-            //Checks if there isnt another account with same email
-            //if all checks pass then successful signup
-            // Add logic to update mongoose of account
+
 
             if (ctx.request.body.userPass == ctx.request.body.userPassConfirm && err == null)
             {
@@ -95,20 +90,6 @@ route.post('/signup', async (ctx, next) => {
         });
     });
 });
-
-// route.post('/approve/:id', async (ctx, next) => {
-//     const doc = await Recipe.findById(ctx.params.id);
-//     console.log('Document Approved');
-//     var newhasBeenApproved = new hasBeenApproved({
-//         title: ctx.request.body.recipeTitle,
-//         ingredients: ctx.request.body.recipeIngredients,
-//         instructions: ctx.request.body.recipeInstructions,
-//     });
-//     newhasBeenApproved.save();
-//     console.log(doc);
-//     await ctx.redirect('approval');
-// });
-
 
 route.get('/signout', async (ctx, next) => {
     ctx.cookies.set('token', null);
