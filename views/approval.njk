@@ -1,7 +1,9 @@
 {% include './includes/head.njk' %}
 
 <style>
-    form { display: inline; }
+    form { 
+        display: inline-block; 
+        }
     a {
         font-size: 25px;
     }
@@ -16,7 +18,6 @@
             <input type = "submit" value = "Remove"> </input>
         </form>  
         <form action = "/approval/{{post.id}}" method ="POST">
-            <a href="/view/{{post.id}}/{{post.type}}/{{post.checked}}"> {{post.title}}</a>
             <input type = "submit" value = "Approve"> </input>
         </form>  
         <br></br>
