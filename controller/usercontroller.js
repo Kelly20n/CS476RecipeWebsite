@@ -31,7 +31,6 @@ route.get('/admin', async (ctx, next) => {
     else return
 });
         
-
 route.post('/login', async (ctx, next) => {
     return User.findOne({username: ctx.request.body.userEmail}).then(async function(results) {
         if(results === null)
@@ -61,12 +60,6 @@ route.post('/signup', async (ctx, next) => {
             {
                 await ctx.redirect('/signup');
             }
-            // console.log(err + "\n")
-            // console.log(ctx.request.body.userEmail)
-            //Checks if password is equal
-            //Checks if there isnt another account with same email
-            //if all checks pass then successful signup
-            // Add logic to update mongoose of account
 
             if (ctx.request.body.userPass == ctx.request.body.userPassConfirm && err == null)
             {
@@ -77,6 +70,8 @@ route.post('/signup', async (ctx, next) => {
                     username: ctx.request.body.userEmail,
                     password: ctx.request.body.userPass,
                     isAdmin: false,
+                    securityQ: ctx.request.body.securityQ,
+                    securityA: ctx.request.body.securityA
                 });
 
                 newUser.save((err, res) => {
@@ -95,20 +90,6 @@ route.post('/signup', async (ctx, next) => {
         });
     });
 });
-
-// route.post('/approve/:id', async (ctx, next) => {
-//     const doc = await Recipe.findById(ctx.params.id);
-//     console.log('Document Approved');
-//     var newhasBeenApproved = new hasBeenApproved({
-//         title: ctx.request.body.recipeTitle,
-//         ingredients: ctx.request.body.recipeIngredients,
-//         instructions: ctx.request.body.recipeInstructions,
-//     });
-//     newhasBeenApproved.save();
-//     console.log(doc);
-//     await ctx.redirect('approval');
-// });
-
 
 route.get('/signout', async (ctx, next) => {
     ctx.cookies.set('token', null);
@@ -131,9 +112,9 @@ route.get('/signup', async (ctx, next) => {
     })
 });
 
-route.get('/forgotpassword', async (ctx, next) => {
+route.get('/forgotpasswordportal', async (ctx, next) => {
     const payload = GeneralFunctions.decodeUser(ctx);
-    const page = 'forgotpassword'
+    const page = 'forgotpasswordportal'
     return User.findOne({username: payload.userEmail}).then(async function(loggedUser) {
         return GeneralFunctions.displayNoDBinfo(ctx, loggedUser, page);
     })
@@ -193,5 +174,44 @@ route.post('/unban/:id', async (ctx, next) => {
         await ctx.redirect('/admin');
     }
 });
+
+route.post('/forgotpasswordportal', async(ctx, next) => { 
+    return User.findOne({username: ctx.request.body.userEmail}).then(async function(results) {
+        console.log(results);
+        if(results == null) {
+            ctx.redirect('/forgotpasswordportal');
+        }
+        else {
+            return await ctx.render('forgotpassword', {
+                user: results
+            });
+    }
+    });
+});
+
+route.post('/resetpassword/:id', async(ctx, next) => {
+    return User.findById(ctx.params.id).then(async function(results) {
+        if(results.securityA == ctx.request.body.securityA) {
+            return await ctx.render('resetpassword', {
+                user: results
+            });
+        }
+        else {
+            return await ctx.render('forgotpassword', {
+                user: results
+            });
+        }
+    })
+    
+});
+
+route.post('/passwordisreset/:id', async(ctx, next) => {
+    await User.findByIdAndUpdate(ctx.params.id, { password: ctx.request.body.userPass})
+    ctx.redirect('/login');
+})
+
+route.get('/khanhiscute', async(ctx, next) => {
+    ctx.status = 418;
+})
 
 module.exports = route;
