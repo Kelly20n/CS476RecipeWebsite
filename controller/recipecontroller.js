@@ -100,13 +100,24 @@ route.get('/approvalview/:id/:db/:check', async (ctx, next) => {
     });
 });
 
+//
+route.get('/approvalposts/:id/:db/:check', async (ctx, next) => {
+    const payload = GeneralFunctions.decodeUser(ctx)
+    return User.findOne({username: payload.userEmail}).then(async function(loggedUser) {
+        const page = 'approvalposts';
+        console.log("db: " + ctx.params.db);
+        return RecipeFunctions.displayPostAndComments(ctx, loggedUser, page, ctx.params.db);
+    });
+});
+
+
 //route post to delete a comment
-route.post('/view/:id/:db/:check/:commentid', async (ctx, next) => {
+route.post('/approvalposts/:id/:db/:check/:commentid', async (ctx, next) => {
     if(GeneralFunctions.verifyUser(ctx) === true)
     {
         const payload = GeneralFunctions.decodeUser(ctx)
         return User.findOne({username: payload.userEmail}).then(async function(loggedUser) {
-            const page = 'recipe';
+            const page = 'approvalposts';
             console.log(page);
              console.log(ctx.params.commentid);
             await Comments.findByIdAndDelete({_id: ctx.params.commentid});
@@ -118,12 +129,12 @@ route.post('/view/:id/:db/:check/:commentid', async (ctx, next) => {
 });
 
 
-route.post('/view/:post_type/:post_Id', async (ctx, next) => {
+route.post('/approvalposts/:post_type/:post_Id', async (ctx, next) => {
     if(GeneralFunctions.verifyUser(ctx) === true)
     {
         const payload = GeneralFunctions.decodeUser(ctx)
         return User.findOne({username: payload.userEmail}).then(async function(loggedUser) {
-            const page = 'recipe';
+            const page = 'approvalposts';
             console.log(page);
             return Breakfast.find({}).then(async function(results1) {
                 return Lunch.find({}).then(async function(results2) {
@@ -146,7 +157,7 @@ route.post('/view/:post_type/:post_Id', async (ctx, next) => {
                             const doc3 = await Supper.findOneAndRemove({title: ctx.params.post_Id});
                             await Comment.deleteMany({postId: doc3._id})
                         }
-                        ctx.redirect('/');
+                        ctx.redirect('approval');
                     });
                 });
             });
@@ -300,10 +311,20 @@ route.get('/approval', async (ctx, next) => {
         const payload = GeneralFunctions.decodeUser(ctx);
         return User.findOne({username: payload.userEmail}).then(async function(loggedUser){
             return toBeApproved.find({}).then(async function(results) {
-                await ctx.render('approval', {
-                    posts: results,
-                    admin: loggedUser
+                return Breakfast.find({}).then(async function(results1){
+                    return Lunch.find({}).then(async function(results2){
+                        return Supper.find({}).then(async function(results3){
+                            await ctx.render('approval', {
+                                posts: results,
+                                posts1: results1,
+                                posts2: results2,
+                                posts3: results3,
+                                admin: loggedUser
+                            });
+                        });
+                    });
                 });
+               
             });
         });
     }

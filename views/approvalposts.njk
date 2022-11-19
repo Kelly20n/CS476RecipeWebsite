@@ -1,0 +1,33 @@
+{% include './includes/head.njk' %}
+
+<br><br>
+<center>
+<div class='postRecipeDiv'>
+    <div class='postRecipe'>
+        <center>
+        <img src="../../../../image/{{post.image}}" alt="" style="text-align:center;width:300px;height:200px;">
+        </center>
+        <div><h2 style="text-align:center;" class="fw-bold mb-2 text-uppercase">{{post.title}}</h2></div><Br>
+        <div><h4 class="mb-0 text-uppercase">Ingredients:</h4><br>{{post.ingredients}}</div><Br><Br>
+        <div><h4 class="mb-0 text-uppercase">Instructions:</h4><br>{{post.instructions}}</div>
+        {% for comment in comments %}
+            <div class='comment'>
+                Commented By: <u>{{comment.user}}</u> 
+                <p class="commentBorder">{{comment.commentBody}}</p>
+            </div>
+            <div class="deleteComment">
+                    <form action="/approvalposts/{{post.id}}/{{post.type}}/{{post.checked}}/{{comment.id}}" method="POST" >
+                        <input type="submit" value ="Delete Comment" ></input>
+                    </form>
+            </div>
+        {% endfor %}
+        <div id="deletePost">
+            <form  action="/approvalposts/{{post.type}}/{{post.title}}" method="POST">
+                <input type="submit" value ="Delete Post"></input>
+            </form>
+        </div>
+
+    </div>
+</div>
+
+</center>
