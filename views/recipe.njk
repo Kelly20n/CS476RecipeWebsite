@@ -1,5 +1,8 @@
 {% include './includes/head.njk' %}
 
+
+{# <body onload="checkButtons()"> #}
+
 <div class="left">
     <div class='recipe'>
         <div>{{post.title}}</div><br><Br>
@@ -18,14 +21,24 @@
         </form>
         
         {% for comment in comments %}
-        <div class='comment'>
-            Commented By: <u>{{comment.user}}</u> 
-            <p class="commentBorder">{{comment.commentBody}}</p>
-        </div>
-
+            <div class='comment'>
+                Commented By: <u>{{comment.user}}</u> 
+                <p class="commentBorder">{{comment.commentBody}}</p>
+                <p class="deleteComment">
+                    <form  action="/view/{{post.id}}/{{post.type}}/{{post.checked}}/{{comment.id}}"  method="POST" >
+                        <input type="submit" value ="Delete Comment" ></input>
+                    </form>
+                </p>
+            </div>
         {% endfor %}
+
+        {# <form id="deletePost" action="/view/{{post.id}}/{{post.type}}/{{post.checked}}/{{post.postId}}"  method="POST">
+            <input type="submit" value ="Delete Post"></input>
+        </form> #}
+        </div>
     </div>
 </div>
+
 <script>
     function loginValidate() {
         if(admin == '') {

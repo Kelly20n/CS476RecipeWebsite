@@ -1,9 +1,10 @@
-//global variables
+const Koa = require('koa');
 const Recipe = require('../model/recipe.js');
 const Breakfast = require('../model/breakfast.js');
 const Lunch = require('../model/lunch.js');
 const Supper = require('../model/supper.js');
 const Comment = require('../model/comments.js');
+const User = require('../model/user.js');
 const toBeApproved = require('../model/approval.js');
 
 
@@ -86,7 +87,7 @@ async function displayBreakfastPostTitles(ctx, adminUser, page) {
                     posts: results,
                     admin: adminUser,
                 });
-            });
+    });
 }
 
 async function displayLunchPostTitles(ctx, adminUser, page) {
@@ -96,7 +97,7 @@ async function displayLunchPostTitles(ctx, adminUser, page) {
                     posts: results,
                     admin: adminUser,
                 });
-            });
+    });
 }
 
 async function displaySupperPostTitles(ctx, adminUser, page) {

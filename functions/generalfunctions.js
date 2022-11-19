@@ -110,22 +110,21 @@ async function searchSingleDataBase(ctx, results, database) {
             }
 }
 
-async function returnPostsAllDatabases(){
-    var allDataResults;
+//function return post from specified database
+function returnPostsAllDatabases(ctx){
+    return Breakfast.find({title: ctx.request.body.searchTerms}).then(async function(results1) {
+        return Lunch.find({title: ctx.request.body.searchTerms}).then(async function(results2) {
+            return Supper.find({title: ctx.request.body.searchTerms}).then(async function(results3) {
+                var results = results1 + results2 + results3;
+                console.log(results);
 
-    //Need to check if this runs as wanted
-    //Want to return allDataResults as a collection of all the posts in all data bases
-    allDataResults += await Breakfast.find({}).then(async function(results) {
-        allDataResults += results;
-        console.log("in function" + allDataResults);
-    });
-    allDataResults += await Lunch.find({}).then(async function(results) {
-        allDataResults += results;
-        console.log("in function" + allDataResults);
-    });
-    allDataResults += await Supper.find({}).then(async function(results) {
-        allDataResults += results;
-        console.log("in function" + allDataResults);
+                return await ctx.render('search', {
+                    searchTerm: ctx.request.body.searchTerms,
+                    posts: results,
+                });
+
+            });
+        });
     });
 }
 
@@ -153,10 +152,10 @@ async function sleep() {
     return await new Promise(r => setTimeout(r, 1000));
 }
 
+
 module.exports.createToken = createToken;
 module.exports.verifyUser = verifyUser;
 module.exports.sleep = sleep;
 module.exports.searchSingleDataBase = searchSingleDataBase;
-module.exports.returnPostsAllDatabases = returnPostsAllDatabases;
 module.exports.decodeUser = decodeUser;
 module.exports.displayNoDBinfo = displayNoDBinfo;

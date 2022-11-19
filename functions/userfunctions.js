@@ -1,6 +1,4 @@
-const Koa = require('koa');
-// const Recipe = require('../model/recipe.js');
-// const Comment = require('../model/comments.js');
+//global
 const User = require('../model/user.js');
 const Banned = require('../model/banned.js');
 const jwt = require('jsonwebtoken');

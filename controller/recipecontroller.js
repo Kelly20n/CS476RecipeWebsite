@@ -7,6 +7,7 @@ const Lunch = require('../model/lunch.js');
 const Supper = require('../model/supper.js');
 const User = require('../model/user.js');
 const Router = require('koa-router');
+const Comments = require('../model/comments.js')
 const RecipeFunctions = require('../functions/recipefunctions.js')
 const GeneralFunctions = require('../functions/generalfunctions.js')
 const toBeApproved = require('../model/approval.js');
@@ -80,7 +81,61 @@ route.post('/view/:id/:db/:check', async (ctx, next) => {
     }
     else return
 });
-        
+
+
+//route post to delete a comment
+route.post('/view/:id/:db/:check/:commentid', async (ctx, next) => {
+    if(GeneralFunctions.verifyUser(ctx) === true)
+    {
+        const payload = GeneralFunctions.decodeUser(ctx)
+        return User.findOne({username: payload.userEmail}).then(async function(loggedUser) {
+            const page = 'recipe';
+            console.log(page);
+             console.log(ctx.params.commentid);
+            await Comments.findByIdAndDelete({_id: ctx.params.commentid});
+           
+            return RecipeFunctions.displayPostAndComments(ctx, loggedUser, page);
+        });
+    }
+    else return
+});
+
+route.post('/view/:id/:db/:check/:commentid', async (ctx, next) => {
+    if(GeneralFunctions.verifyUser(ctx) === true)
+    {
+        const payload = GeneralFunctions.decodeUser(ctx)
+        return User.findOne({username: payload.userEmail}).then(async function(loggedUser) {
+            const page = 'recipe';
+            console.log(page);
+             console.log(ctx.params.commentid);
+            await Comments.findByIdAndDelete({_id: ctx.params.commentid});
+           
+            return RecipeFunctions.displayPostAndComments(ctx, loggedUser, page);
+        });
+    }
+    else return
+});
+
+// route.post('/view/:id/:db/:check/:postId', async (ctx, next) => {
+//     if(GeneralFunctions.verifyUser(ctx) === true)
+//     {
+//         const payload = GeneralFunctions.decodeUser(ctx)
+//         return User.findOne({username: payload.userEmail}).then(async function(loggedUser) {
+//             const page = 'recipe';
+//             console.log(page);
+//             if(ctx.request.body.database == "breakfast")
+//             {
+//                 const doc1 = await Breakfast.findOneAndRemove({title: ctx.params.id});
+//                 await Comment.deleteMany({postId: doc1._id})
+//             }
+
+           
+//             return RecipeFunctions.displayPostAndComments(ctx, loggedUser, page);
+//         });
+//     }
+//     else return
+// });
+
 //route get for post page
 route.get('/postPage', async (ctx, next) => {
     const payload = GeneralFunctions.decodeUser(ctx);
@@ -329,6 +384,9 @@ route.post('/search', async (ctx, next) => {
                     for(var i = 0; i < results1.length; i++)
                     {
                         for(var j = 0; j < searchTerms; j++)
+                        {
+
+                        }
                     }
                     for(var i = 0; i < results2.length; i++)
                     {
