@@ -66,15 +66,6 @@ route.get('/view/:id/:db/:check', async (ctx, next) => {
     });
 });
 
-route.get('/approvalview/:id/:db/:check', async (ctx, next) => {
-    const payload = GeneralFunctions.decodeUser(ctx)
-    return User.findOne({username: payload.userEmail}).then(async function(loggedUser) {
-        const page = 'approvalview';
-        console.log("db: " + ctx.params.db);
-        return RecipeFunctions.displayPostAndComments(ctx, loggedUser, page, ctx.params.db);
-    });
-});
-
 route.post('/view/:id/:db/:check', async (ctx, next) => {
     if(GeneralFunctions.verifyUser(ctx) === true)
     {
@@ -94,6 +85,15 @@ route.post('/view/:id/:db/:check', async (ctx, next) => {
         });
     }
     else return
+});
+
+route.get('/approvalview/:id/:db/:check', async (ctx, next) => {
+    const payload = GeneralFunctions.decodeUser(ctx)
+    return User.findOne({username: payload.userEmail}).then(async function(loggedUser) {
+        const page = 'approvalview';
+        console.log("db: " + ctx.params.db);
+        return RecipeFunctions.displayPostAndComments(ctx, loggedUser, page, ctx.params.db);
+    });
 });
 
 
