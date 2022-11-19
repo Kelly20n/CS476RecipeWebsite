@@ -68,7 +68,6 @@ route.post('/view/:id/:db/:check', async (ctx, next) => {
         return User.findOne({username: payload.userEmail}).then(async function(loggedUser) {
             const page = 'recipe';
             console.log(page);
-            //console.log("db: " + ctx.params.db);
             if(ctx.request.body.userComment === '') {
                 console.log(loggedUser);
                 return RecipeFunctions.displayPostAndComments(ctx, loggedUser, page);
@@ -226,99 +225,68 @@ route.post('/approval/:id', async (ctx, next) => {
 
 
 route.post('/search', async (ctx, next) => {
-    /*return Recipe.find({title: ctx.request.body.searchTerm}).then(async function(results){*/
-    //GeneralFunctions.returnPostsAllDatabases(ctx);
-    
     if(ctx.request.body.searchAlgorithm == "title")
     {
         return Breakfast.find({}).then(async function(results1) {
             return Lunch.find({}).then(async function(results2) {
                 return Supper.find({}).then(async function(results3) {
                     
-                    //var results;
-                    
                     var isTitleInEntry = false;
-                    
                     
                     for(var i = 0; i < results1.length; i++)
                     {
-                        //console.log(results1[i]);
-
                         if(results1[i].title == undefined)
                         {
                             results1.splice(i, 1);
-                            //i--;
                             continue;
                         }
                         if(results1[i].title.toLowerCase() == ctx.request.body.searchTerms.toLowerCase())
                         {
-                            //console.log("Hit" + results1);
                             isTitleInEntry = true;
                         }
                         if(!isTitleInEntry)
                         {
-                            //console.log("Removed " + searchTerm_Array + " wasn't found: " + results1[i]);
-                            //listOfIngredientsToRemove += i;
                             results1.splice(i, 1);
                             i--;
-                            // Removes item from results and decrements i to make algorithm look at index i again (new value now in the place)
                         }
                         isTitleInEntry = false;
                     }
                     for(var i = 0; i < results2.length; i++)
                     {
-                        //console.log(results2[i]);
-                        //console.log(results2[i].title + " vs. " + ctx.request.body.searchTerms)
-                        //console.log(results2[i].title.toLowerCase() + " vs. " + ctx.request.body.searchTerms.toLowerCase());
                         if(results2[i].title == undefined)
                         {
                             results2.splice(i, 1);
-                            //i--;
                             continue;
                         }
                         if(results2[i].title.toLowerCase() == ctx.request.body.searchTerms.toLowerCase())
                         {
-                            //console.log("Hit" + results1);
                             isTitleInEntry = true;
                         }
                         if(!isTitleInEntry)
                         {
-                            //console.log("Removed " + searchTerm_Array + " wasn't found: " + results1[i]);
-                            //listOfIngredientsToRemove += i;
                             results2.splice(i, 1);
                             i--;
-                            // Removes item from results and decrements i to make algorithm look at index i again (new value now in the place)
                         }
                         isTitleInEntry = false;
                     }
                     for(var i = 0; i < results3.length; i++)
                     {
-                        //console.log(results3[i]);
-                        //console.log(results3[i].title + " vs. " + ctx.request.body.searchTerms)
-                        //console.log(results3[i].title.toLowerCase() + " vs. " + ctx.request.body.searchTerms.toLowerCase());
                         if(results3[i].title == undefined)
                         {
                             results3.splice(i, 1);
-                            //i--;
                             continue;
                         }
                         if(results3[i].title.toLowerCase() == ctx.request.body.searchTerms.toLowerCase())
                         {
-                            //console.log("Hit" + results1);
                             isTitleInEntry = true;
                         }
                         if(!isTitleInEntry)
                         {
-                            //console.log("Removed " + searchTerm_Array + " wasn't found: " + results1[i]);
-                            //listOfIngredientsToRemove += i;
                             results3.splice(i, 1);
                             i--;
-                            // Removes item from results and decrements i to make algorithm look at index i again (new value now in the place)
                         }
                         isTitleInEntry = false;
                     }
-                    //results = results1 + results2 + results3;
-                    //console.log(results);
                     return await ctx.render('search', {
                         searchTerm: ctx.request.body.searchTerms,
                         posts1: results1,
@@ -336,8 +304,6 @@ route.post('/search', async (ctx, next) => {
             return Lunch.find({}).then(async function(results2) {
                 return Supper.find({}).then(async function(results3) {
                     console.log("Ingredients!");
-                    //var results = results1 + results2 + results3;
-                    //console.log(results);
 
                     var searchTerms = ctx.request.body.searchTerms.split(/\s*,\s*/);
                     var isIngredient = false;
@@ -432,31 +398,6 @@ route.post('/search', async (ctx, next) => {
             });
         });
     }
-    
-    //console.log("Results: " + results);
-    
-    /*
-    if(ctx.request.body.database == "breakfast")
-    {
-        console.log('Breakfast');
-        return Breakfast.find({}).then(async function(breakfastResults){
-            return GeneralFunctions.searchSingleDataBase(ctx, breakfastResults, "Breakfast");    
-        });
-    }
-    else if(ctx.request.body.database == "lunch")
-    {
-        console.log('Lunch');
-        return Lunch.find({}).then(async function(lunchResults){    
-            return GeneralFunctions.searchSingleDataBase(ctx, lunchResults, "Lunch");
-        });
-    }
-    else{
-        console.log('Supper');
-        return Supper.find({}).then(async function(supperResults){    
-            return GeneralFunctions.searchSingleDataBase(ctx, supperResults, "Supper");
-        });
-    }
-    */
 });
 
 route.post('/upload', Upload.single('file'), (ctx, next) => {
