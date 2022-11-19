@@ -1,10 +1,10 @@
 {% include './includes/head.njk' %}
 
-
+<br>
 {% for post in posts %}
 <div class='postcolumn'>
     <p><a href="/view/{{post.id}}/{{post.type}}/{{post.checked}}">
     <img src="../../../image/{{post.image}}" alt="" style="width:300px;height:200px; object-fit: cover;">
-    <p>{{post.title}}</p></a></p><br><Br>
+    <h4 class="text-white-50 mb-5">{{post.title}}</h4></a></p>
 </div>
 {% endfor %}
