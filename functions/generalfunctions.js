@@ -46,14 +46,10 @@ async function searchSingleDataBase(ctx, results, database) {
                 {
                     if(results[i].title == ctx.request.body.searchTerms)
                     {
-                        //console.log("Hit on: " + searchTerm_Array[j] + results[i])
                         isTitleInEntry = true;
-                        //break loop1;
                     }
                     if(!isTitleInEntry)
                     {
-                        //console.log("Removed " + searchTerm_Array + " wasn't found: " + results[i]);
-                        //listOfIngredientsToRemove += i;
                         results.splice(i, 1);
                         i--;
                         // Removes item from results and decrements i to make algorithm look at index i again (new value now in the place)
@@ -79,8 +75,6 @@ async function searchSingleDataBase(ctx, results, database) {
                 loop0:
                 for(var i = 0; i < results.length; i++)
                 {
-                    //console.log("Viewing: " + results[i].ingredients);
-                    //Turns ingredients in recipe tree into lists with each db entry
                     dbIngredients = results[i].ingredients.split(/\s*,\s*/);
 
                     // Iterate through each search term
@@ -92,17 +86,13 @@ async function searchSingleDataBase(ctx, results, database) {
                         {
                             if(searchTerm_Array[j] == dbIngredients[k])
                             {
-                                //console.log("Hit on: " + searchTerm_Array[j] + results[i]);
                                 isIngredientInEntry = true;
-                                //break loop1;
                             }
                         }
 
                     }
                     if(!isIngredientInEntry)
                     {
-                        //console.log("Removed " + searchTerm_Array + " wasn't found: " + results[i]);
-                        //listOfIngredientsToRemove += i;
                         results.splice(i, 1);
                         i--;
                         // Removes item from results and decrements i to make algorithm look at index i again (new value now in the place)
@@ -129,7 +119,6 @@ function returnPostsAllDatabases(ctx){
                     searchTerm: ctx.request.body.searchTerms,
                     posts: results,
                 });
-
             });
         });
     });
