@@ -199,19 +199,15 @@ body {
     var x = document.getElementById("admin");
     var y = document.getElementById("signout");
     var z = document.getElementById("approve");
-    var a = document.getElementByClassName("deleteComment");
     //var b = document.getElementById("deletePost");
     if({{admin.isAdmin}} === true) {
       x.style.visibility = "visible";
       z.style.visibility = "visible";
       z.style.display = "block";
-      a.style.visibility = "visible";
-      a.style.display = "block";
      // b.style.visibility = "visible";
       //b.style.display = "block";
     }
     if({{admin != null}}) {
-      a.style.visibility = "hidden"
       y.style.visibility = "visible";
       y.style.display = "block";
     }
