@@ -29,17 +29,32 @@ p.deleteComment{
   display: none;
 } #}
 
-.comment {
-  width: 100%
+.postRecipeDiv {
+  text-align: center;
 }
 
+.postRecipe {
+  text-align: left;
+  display: inline-block;
+  border: 5px solid #333;
+  border-radius: 12px;
+  padding: 10px;
+  background-color: #505050;
+  {# background-image: linear-gradient(#585858, #484848); #}
+  width: 33%;
+}
+
+{# .comment {
+  text-align: left;
+} #}
+
 .commentBorder{
-  border: 2px solid #333;
+  border: 2px solid white;
   width: fit-content;
 }
 
 .entry {
-  border: 2px solid #333;
+  border: 5px solid #333;
   border-radius: 12px;
   padding: 10px;
   width: 300px
@@ -48,7 +63,7 @@ p.deleteComment{
 
 .column {
   float: left;
-  border: 2px solid #333;
+  border: 5px solid #333;
   border-radius: 12px;
   width: 33%;
   padding: 10px;
@@ -57,7 +72,7 @@ p.deleteComment{
 
 .postcolumn {
   float: left;
-  border: 2px solid #333;
+  border: 5px solid #333;
   border-radius: 12px;
   width: 33%;
   padding: 20px;
@@ -66,7 +81,7 @@ p.deleteComment{
 
 .content {
   max-width: 1000px;
-  border: 2px solid #333;
+  border: 5px solid #333;
   border-radius: 12px;
   width: 33%;
   margin: auto;
@@ -170,6 +185,11 @@ body {
 </style>
 
 <body onload="checkAdmin()">
+</body>
+
+
+
+
 
 <div class="topnav">
   <a class="active" href="/">Home</a>

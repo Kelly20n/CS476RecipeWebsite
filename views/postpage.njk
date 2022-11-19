@@ -1,5 +1,6 @@
 {% include './includes/head.njk' %}
 
+<center>
 <div class='postRecipe'>
     <h1><b><u>Post Recipe</u></b></h1>
 
@@ -9,7 +10,7 @@
             <input placeholder="Recipe Ingredients" name="recipeIngredients" id="ring" required></input><br></br>
             <textarea placeholder="Recipe Instructions" name="recipeInstructions" id="rins" required></textarea><br></br>
             <h4><b><u>Upload Image</u></b></h4>
-            <input type="file" name="file" id="file">
+            <input type="file" name="file" id="file" required>
             <label for="file" class="custom-file-label"></label><br></br>
             <input type="radio" id="breakfastFood" value='breakfast' name="database" id="break" required>
             <label for="breakfastFood">BreakFast</label></input>
@@ -21,6 +22,7 @@
         </div>
     </form>
 </div>
+</center>
 
 <script>
 

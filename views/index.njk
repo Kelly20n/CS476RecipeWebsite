@@ -2,26 +2,25 @@
 <div class = 'form-floating mb-3'>
 </div>
 
-    
-</div>
+
 {% for post in posts1 %}
 <div class='postcolumn'>
     <p><a href="/view/{{post.id}}/{{post.type}}/{{post.checked}}">
-    <img src="../../../image/{{post.image}}" alt="" style="width:300px;height:200px; object-fit: fill;">
+    <img src="../../../image/{{post.image}}" alt="" style="width:300px;height:200px; object-fit: cover;">
     <p>{{post.title}}</p></a></p><br><Br>
 </div>
 {% endfor %}
 {% for post in posts2 %}
 <div class='postcolumn'>
     <p><a href="/view/{{post.id}}/{{post.type}}/{{post.checked}}">
-    <img src="../../../image/{{post.image}}" alt="" style="width:300px;height:200px; object-fit: fill;">
+    <img src="../../../image/{{post.image}}" alt="" style="width:300px;height:200px; object-fit: cover;">
     <p>{{post.title}}</p></a></p><br><Br>
 </div>
 {% endfor %}
 {% for post in posts3 %}
 <div class='postcolumn'>
     <p><a href="/view/{{post.id}}/{{post.type}}/{{post.checked}}"> 
-    <img src="../../../image/{{post.image}}" class="img-circle" alt="" style="width:300px;height:200px; object-fit: fill;">
+    <img src="../../../image/{{post.image}}" class="img-circle" alt="" style="width:300px;height:200px; object-fit: cover;">
     <p>{{post.title}}</p></a></p><br><Br>
 </div>
 {% endfor %}
