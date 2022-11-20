@@ -4,6 +4,7 @@
 <title>Recipe Website</title>
 <link rel="stylesheet" href="https://bootswatch.com/5/darkly/bootstrap.min.css">
 <style>
+
 #admin {
   visibility: hidden;
 }
@@ -13,13 +14,120 @@
   display: none;
 }
 
+#approve{
+  visibility: hidden;
+
+}
+
+img {
+  max-width: 100%;
+  height: auto;
+}
+
+.vr
+{
+  display:inline;
+  height:100%;
+  width:1px;
+  {# border:1px inset; #}
+  margin:5px
+}
+
+.recipeInstruction {
+  display: inline-block;
+  text-align: right;
+}
+
+.postRecipeDiv {
+  text-align: center;
+}
+
+.postRecipePage {
+  text-align: left;
+  display: inline-block;
+  border: 5px solid #333;
+  border-radius: 12px;
+  padding: 25px;
+  {# background-color: #505050; #}
+  background-color: #333;
+  width: 500;
+}
+
+.postRecipe {
+  text-align: left;
+  display: inline-block;
+  border: 5px solid #333;
+  border-radius: 12px;
+  padding: 10px;
+  background-color: #333;
+  {# background-image: linear-gradient(#585858, #484848); #}
+  width: 33%;
+}
+
+{# .comment {
+  max-width: 50%;
+} #}
+
+.commentBorder{
+  border: 2px solid white;
+  width: fit-content;
+}
+
+.entry {
+  border: 5px solid #333;
+  border-radius: 12px;
+  background-color: #333;
+  padding: 10px;
+  text-align: center;
+}
+
+.column {
+  float: left;
+  border: 5px solid #333;
+  background-color: #404040;
+  border-radius: 12px;
+  width: 33%;
+  padding: 10px;
+  text-align: center;
+}
+
+.columnApproval {
+  float: left;
+  border: 5px solid #333;
+  background-color: #404040;
+  border-radius: 12px;
+  width: 50%;
+  padding: 10px;
+  text-align: center;
+}
+
+
+.postcolumn {
+  float: left;
+  border: 5px solid #333;
+  background-color: #404040;
+  border-radius: 12px;
+  width: 33%;
+  padding: 20px;
+  text-align: center;
+}
+
+.row:after {
+  content: "";
+  display: table;
+  clear: both;
+}
+
+div {
+  font-size: 20px;
+}
+
 body {
   margin: 0;
   font-family: Arial, Helvetica, sans-serif;
 }
 
 .topnav {
-  overflow: hidden;
   background-color: #333;
 }
 
@@ -42,14 +150,62 @@ body {
   color: white;
 }
 
+.topnavRight{
+  float: right;
+}
+
+
 .right {
     float: right;
-    margin-right: 10px;
+    width: 40%;
 }
+.left {
+    float: left;
+    width:60%;
+    
+}
+.dropbtn {
+    background-color: #04AA6D;
+    color: white;
+    padding: 16px;
+    font-size: 16px;
+    border: none;
+  }
+  
+  .dropdown {
+    position: relative;
+    display: inline-block;
+  }
+  
+  .dropdown-content {
+    display: none;
+    position: absolute;
+    background-color: #000000;
+    min-width: 300px;
+    box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+    z-index: 1;
+  }
+  
+  .dropdown-content a {
+    color: black;
+    padding: 12px 16px;
+    text-decoration: none;
+    display: block;
+  }
+  
+  .dropdown-content a:hover {background-color: #ddd;}
+  
+  .dropdown:hover .dropdown-content {display: block;}
+  
+  .dropdown:hover .dropbtn {background-color: #3e8e41;}
+
+  .center {
+    text-align:center; 
+    top: 50%;
+    -ms-transform: translateY(+25%);
+    transform: translateY(+25%);
+  }
 </style>
-
-
-
 
 <div class="topnav">
   <a class="active" href="/">Home</a>
@@ -73,8 +229,8 @@ body {
           <label for="byTitle">Title</label></input>
           <input type="radio" id="byIngredient" value='ingredients' name="searchAlgorithm" required>
           <label for="byIngredients">Ingredients</label></input>
-          <input type="text" placeholder="Search" name="searchTerms"/>
-          <input type="submit"/>
+          <input type="text" placeholder="e.g. Egg, White Sugar" name="searchTerms" required/>
+          <input type="submit" value="Search"/>
         </form>
       </div>
     </div>
@@ -89,14 +245,12 @@ body {
       <div class="col-12 col-md-8 col-lg-6 col-xl-5">
         <div class="card bg-dark text-white" style="border-radius: 1rem;">
           <div class="card-body p-5 text-center">
-
             <div class="mb-md-5 mt-md-4 pb-5">
 
               <h2 class="fw-bold mb-2 text-uppercase">Login</h2>
               <p class="text-white-50 mb-5">Please enter your email and password!</p>
-
-              <body onload="incorect()">
-              </body>
+              {# <body onload="incorect()">
+              </body> #}
               <!-- Need to add functionality to check database-->
               <form action="/login" method="POST">
                 <div class="form-outline form-white mb-4">
