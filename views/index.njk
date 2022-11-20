@@ -1,7 +1,5 @@
 {% include './includes/head.njk' %}
-<br>
-{# <div class = 'form-floating mb-3'>
-</div> #}
+<h5 class="text-white-50 mb-5">Showing the 5 most recent recipes from each category: </h5>
 {% for post in posts1 %}
 <div class='postcolumn'>
     <p><a href="/view/{{post.id}}/{{post.type}}/{{post.checked}}">
