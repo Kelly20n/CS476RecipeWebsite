@@ -391,50 +391,77 @@ route.post('/approval/:id', async (ctx, next) => {
 
 //route post for searching recipe based on database
 route.post('/search', async (ctx, next) => {
+    ///////////////////////
+    // This search algorithm is to search through either the titles (every word individually) 
+    // of the database entries or the ingredients (every ingredient or word indivdually) 
+    ///////////////////////
     const payload = GeneralFunctions.decodeUser(ctx);
     return User.findOne({username: payload.userEmail}).then(async function(loggedUser){
+
+        // If the using is wanting to search by title then this algorithm is used
         if(ctx.request.body.searchAlgorithm == "title")
         {
+            // Queries for every entry in the three databases
             return Breakfast.find({}).then(async function(results1) {
                 return Lunch.find({}).then(async function(results2) {
                     return Supper.find({}).then(async function(results3) {
                         
+                        // Used to to control the loop of figuring out if a word in the title is in the entry
                         var isTitleInEntry = false;
+
+                        // Used in the njk to show how many times the instance of a word in the search string has been found
                         var hitsOnSearch1 = [];
+
+                        // Splits up the search terms into an array whenever there is a comma or a space
                         var searchTitle = ctx.request.body.searchTerms.split(/[, ]+/);
                         for(var i = 0; i < results1.length; i++)
                         {
                             hitsOnSearch1[i] = 0;
+
+                            ////////////
+                            //Detects if an entry is actually valid
+                            ////////////
                             if(results1[i] == undefined)
                             {
                                 results1.splice(i, 1);
                                 hitsOnSearch1.splice(i, 1);
                                 continue;
                             }
+
+                            // splits up the title stored in the query from the database into an array. Seperated by commas and spaces in the title
                             var wordsInResults1Title = results1[i].title.split(/[, ]+/);
+                            
+                            // Double for loop to iterate through the words in the search terms and through the array from the database query
                             for(var g = 0; g < searchTitle.length; g++)
                             {
                                 for(var h = 0; h < wordsInResults1Title.length; h++)
                                 {
+                                    // as long as the entries exist the test to see if they are equivalent takes place
+                                    // needed or else will crash the program
                                     if(searchTitle[g] != undefined && wordsInResults1Title[h] != undefined)
                                     {   
-                                        console.log(searchTitle[g].toLowerCase() + " vs. "+  wordsInResults1Title[h].toLowerCase());
+                                        // compares the entries, if equivalent then it sets isTitleInEntry to true
                                         if(searchTitle[g].toLowerCase() == wordsInResults1Title[h].toLowerCase())
                                         {
                                             isTitleInEntry = true;
+                                            // uses the same index as results1 to have the hitsonsearch data relate to the same index as results1
                                             hitsOnSearch1[i]++;
                                         }
                                     }
                                 }
                             }
+                            // if the title was not found then the entry is taken out of the array and then the for loop is set back to make up for the entry being taken out
+                            // the hits corresponding to this entry is also spliced out
                             if(!isTitleInEntry)
                             {
                                 results1.splice(i, 1);
                                 hitsOnSearch1.splice(i, 1);
                                 i--;
                             }
+                            // sets to false everytime i reaches the end
                             isTitleInEntry = false;
                         }
+                        // Used in the njk to show how many times the instance of a word in the search string has been found
                         var hitsOnSearch2 = [];
                         for(var i = 0; i < results2.length; i++)
                         {
@@ -445,68 +472,93 @@ route.post('/search', async (ctx, next) => {
                                 hitsOnSearch2.splice(i, 1);
                                 continue;
                             }
+                            // Splits up the search terms into an array whenever there is a comma or a space
                             var wordsInResults2Title = results2[i].title.split(/[, ]+/);
+
+                            // Double for loop to iterate through the words in the search terms and through the array from the database query
                             for(var g = 0; g < searchTitle.length; g++)
                             {
                                 for(var h = 0; h < wordsInResults2Title.length; h++)
                                 {
+                                    // as long as the entries exist the test to see if they are equivalent takes place
+                                    // needed or else will crash the program
                                     if(searchTitle[g] != undefined && wordsInResults2Title[h] != undefined)
                                     {   
-                                        console.log(searchTitle[g].toLowerCase() + " vs. "+  wordsInResults2Title[h].toLowerCase());
+                                        // compares the entries, if equivalent then it sets isTitleInEntry to true
                                         if(searchTitle[g].toLowerCase() == wordsInResults2Title[h].toLowerCase())
                                         {
                                             isTitleInEntry = true;
+                                            // uses the same index as results1 to have the hitsonsearch data relate to the same index as results2
                                             hitsOnSearch2[i]++;
                                         }
                                     }
                                 }
                             }
+                            // if the title was not found then the entry is taken out of the array and then the for loop is set back to make up for the entry being taken out
+                            // the hits corresponding to this entry is also spliced out
                             if(!isTitleInEntry)
                             {
                                 results2.splice(i, 1);
                                 hitsOnSearch2.splice(i, 1);
                                 i--;
                             }
+                            // sets to false everytime i reaches the end
                             isTitleInEntry = false;
                         }
+
+                        // Used in the njk to show how many times the instance of a word in the search string has been found
                         var hitsOnSearch3 = [];
                         for(var i = 0; i < results3.length; i++)
                         {
                             hitsOnSearch3[i] = 0;
+                            
+                            ////////////
+                            //Detects if an entry is actually valid
+                            ////////////
                             if(results3[i] == undefined)
                             {
                                 results3.splice(i, 1);
                                 hitsOnSearch1.splice(i, 1);
                                 continue;
                             }
+                            // Splits up the search terms into an array whenever there is a comma or a space
                             var wordsInResults3Title = results3[i].title.split(/[, ]+/);
+
+                            // Double for loop to iterate through the words in the search terms and through the array from the database query
                             for(var g = 0; g < searchTitle.length; g++)
                             {
                                 for(var h = 0; h < wordsInResults3Title.length; h++)
                                 {
+                                    // as long as the entries exist the test to see if they are equivalent takes place
+                                    // needed or else will crash the program
                                     if(searchTitle[g] != undefined && wordsInResults3Title[h] != undefined)
                                     {   
-                                        console.log(searchTitle[g].toLowerCase() + " vs. "+  wordsInResults3Title[h].toLowerCase());
+                                        // compares the entries, if equivalent then it sets isTitleInEntry to true
                                         if(searchTitle[g].toLowerCase() == wordsInResults3Title[h].toLowerCase())
                                         {
                                             isTitleInEntry = true;
+                                            // uses the same index as results1 to have the hitsonsearch data relate to the same index as results3
                                             hitsOnSearch3[i]++;
                                         }
                                     }
                                 }
                             }
+                            // if the title was not found then the entry is taken out of the array and then the for loop is set back to make up for the entry being taken out
+                            // the hits corresponding to this entry is also spliced out
                             if(!isTitleInEntry)
                             {
                                 results3.splice(i, 1);
                                 hitsOnSearch3.splice(i, 1);
                                 i--;
                             }
+                            // sets to false everytime i reaches the end
                             isTitleInEntry = false;
                         
                         }
                         console.log("Results1: " + results1 + "\nResults2: " + results2 + "\nResults3: " + results3);
                         console.log("Search1: " + hitsOnSearch1 + "\nSearch2: " + hitsOnSearch2 + "\nSearch3: " + hitsOnSearch3);
                         
+                        // if one or more entry has been found it renders the results screen else it renders a specific page for no results
                         if(results1 != "" || results2 != "" || results3 != "")
                         {
                             return await ctx.render('search', {
@@ -532,11 +584,14 @@ route.post('/search', async (ctx, next) => {
                 });
             });
         }
+        // If the user is wanting to search by ingredient then this algorithm is used
         else{
-            
+            // Queries for every entry in the three databases
             return Breakfast.find({}).then(async function(results1) {
                 return Lunch.find({}).then(async function(results2) {
                     return Supper.find({}).then(async function(results3) {
+                        
+                        // Splits up the search terms into an array whenever there is a comma or a space
                         var searchTerms = ctx.request.body.searchTerms.split(/[, ]+/);
                         var isIngredient = false;
                         var hitsOnSearch1 = [];
