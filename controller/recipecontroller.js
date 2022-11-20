@@ -531,19 +531,29 @@ route.post('/search', async (ctx, next) => {
                                 i--;
                             }
                             isTitleInEntry = false;
+                        
                         }
+                        console.log("Results1: " + results1 + "\nResults2: " + results2 + "\nResults3: " + results3);
                         console.log("Search1: " + hitsOnSearch1 + "\nSearch2: " + hitsOnSearch2 + "\nSearch3: " + hitsOnSearch3);
-                        return await ctx.render('search', {
-                            searchTerm: ctx.request.body.searchTerms,
-                            posts1: results1,
-                            posts2: results2,
-                            posts3: results3,
-                            hits1: hitsOnSearch1,
-                            hits2: hitsOnSearch2,
-                            hits3: hitsOnSearch3,
-                            amdin: loggedUser
-                        });
-
+                        
+                        if(results1 != "" || results2 != "" || results3 != "")
+                            {
+                                return await ctx.render('search', {
+                                    searchTerm: ctx.request.body.searchTerms,
+                                    posts1: results1,
+                                    posts2: results2,
+                                    posts3: results3,
+                                    hits1: hitsOnSearch1,
+                                    hits2: hitsOnSearch2,
+                                    hits3: hitsOnSearch3,
+                                    amdin: loggedUser
+                                });
+                            }   
+                            else
+                            {
+                                return await ctx.render('searchnone', {});
+                            }
+                        
                     });
                 });
             });
