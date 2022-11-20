@@ -4,9 +4,9 @@ form {
         display: inline-block; 
         }
 </style>
-<center>
 <br>
-<div>
+<center>
+    <div>
     <form action = "/remove/{{post.title}}" method ="POST">
         <input type = "submit" value = "Remove"> </input>
     </form>  
@@ -14,6 +14,8 @@ form {
         <input type = "submit" value = "Approve"> </input>
     </form>  
 </div>
+<h5 class="fw-bold mb-2">Recipe by: <u>{{post.user}}</u></h5>
+<p class="fw-bold mb-2 text-uppercase">{{post.type}}</p>
 
 <div class='postRecipeDiv'>
     <div class='postRecipe'>

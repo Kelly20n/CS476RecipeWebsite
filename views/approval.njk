@@ -14,20 +14,14 @@
         <h2 class="fw-bold mb-2 text-uppercase">Posts to be approved</h2>
         {% for post in posts %}
             <div class="entry">
-                <form action = "/remove/{{post.title}}" method ="POST">
-                    <a href="/approvalview/{{post.id}}/{{post.type}}/{{post.checked}}"> {{post.title}}</a>
-                    <input type = "submit" value = "Remove"> </input>
-                </form>  
-                <form action = "/approval/{{post.id}}" method ="POST">
-                    <input type = "submit" value = "Approve"> </input>
-                </form>  
+                <a href="/approvalview/{{post.id}}/{{post.type}}/{{post.checked}}"> {{post.title}}</a>
             </div>
             <br>
         {% endfor %}
     </div>
 
     <div class='columnApproval'>
-        <h2 class="fw-bold mb-2 text-uppercase">Posts</h2>
+        <h2 class="fw-bold mb-2 text-uppercase">All Posts</h2>
         {% for post in posts1 %}
             <div class="entry">
                 <a href="/approvalposts/{{post.id}}/{{post.type}}/{{post.checked}}">

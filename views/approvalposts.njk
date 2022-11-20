@@ -1,7 +1,19 @@
 {% include './includes/head.njk' %}
+<style>
+form { 
+        display: inline-block; 
+}
 
-<br><br>
+</style>
+<br>
 <center>
+<div id="deletePost">
+        <form  action="/approvalposts/{{post.type}}/{{post.title}}" method="POST">
+            <input type="submit" value ="Delete Post"></input>
+        </form>
+</div>
+<h5 class="fw-bold mb-2">Recipe by: <u>{{post.user}}</u></h5>
+<p class="fw-bold mb-2 text-uppercase">{{post.type}}</p>
 <div class='postRecipeDiv'>
     <div class='postRecipe'>
         <center>
@@ -10,24 +22,31 @@
         <div><h2 style="text-align:center;" class="fw-bold mb-2 text-uppercase">{{post.title}}</h2></div><Br>
         <div><h4 class="mb-0 text-uppercase">Ingredients:</h4><br>{{post.ingredients}}</div><Br><Br>
         <div><h4 class="mb-0 text-uppercase">Instructions:</h4><br>{{post.instructions}}</div>
-        {% for comment in comments %}
-            <div class='comment'>
-                Commented By: <u>{{comment.user}}</u> 
-                <p class="commentBorder">{{comment.commentBody}}</p>
-            </div>
-            <div class="deleteComment">
-                    <form action="/approvalposts/{{post.id}}/{{post.type}}/{{post.checked}}/{{comment.id}}" method="POST" >
-                        <input type="submit" value ="Delete Comment" ></input>
-                    </form>
-            </div>
-        {% endfor %}
-        <div id="deletePost">
-            <form  action="/approvalposts/{{post.type}}/{{post.title}}" method="POST">
-                <input type="submit" value ="Delete Post"></input>
-            </form>
-        </div>
-
     </div>
 </div>
 
 </center>
+
+<br>
+<div class="card bg-dark text-white" style="border-radius: 1rem;">
+<div class="card-body p-5 text-center">
+<div style="text-align: center;">
+    <div style="display: inline-block; text-align: left;">
+        <div class="fw-bold mb-2 text-uppercase">Comments</div>
+
+            {% for comment in comments %}
+            <div class='comment'>
+                <u>{{comment.user}}</u> 
+                <p class="comment">{{comment.commentBody}}</p>
+                <form action="/approvalposts/{{post.id}}/{{post.type}}/{{post.checked}}/{{comment.id}}" method="POST" >
+                    <input type="submit" value ="Delete Comment" ></input>
+                </form>
+            </div>
+                
+            {% endfor %}
+        </div>
+    </div>
+</div>
+</div>
+</div>
+

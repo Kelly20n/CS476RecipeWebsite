@@ -145,6 +145,7 @@ route.post('/approvalposts/:post_type/:post_Id', async (ctx, next) => {
                 return Breakfast.find({}).then(async function(results1) {
                     return Lunch.find({}).then(async function(results2) {
                         return Supper.find({}).then(async function(results3) {
+                            await toBeApproved.findOneAndRemove({title: ctx.params.post_Id})
                             if(ctx.params.post_type == "breakfast")
                             {
                                 console.log('Breakfast post removed');
@@ -163,7 +164,7 @@ route.post('/approvalposts/:post_type/:post_Id', async (ctx, next) => {
                                 const doc3 = await Supper.findOneAndRemove({title: ctx.params.post_Id});
                                 await Comment.deleteMany({postId: doc3._id})
                             }
-                            ctx.redirect('approval');
+                            ctx.redirect('/approval');
                         });
                     });
                 });
@@ -394,273 +395,277 @@ route.post('/search', async (ctx, next) => {
     //search in breakfast database
     /*return Recipe.find({title: ctx.request.body.searchTerm}).then(async function(results){*/
     //GeneralFunctions.returnPostsAllDatabases(ctx);
-    
-    if(ctx.request.body.searchAlgorithm == "title")
-    {
-        return Breakfast.find({}).then(async function(results1) {
-            return Lunch.find({}).then(async function(results2) {
-                return Supper.find({}).then(async function(results3) {
-                    
-                    var isTitleInEntry = false;
-                    var hitsOnSearch1 = [];
-                    for(var i = 0; i < results1.length; i++)
-                    {
-                        hitsOnSearch1[i] = 0;
-                        if(results1[i].title == undefined)
+    const payload = GeneralFunctions.decodeUser(ctx);
+    return User.findOne({username: payload.userEmail}).then(async function(loggedUser){
+        if(ctx.request.body.searchAlgorithm == "title")
+        {
+            return Breakfast.find({}).then(async function(results1) {
+                return Lunch.find({}).then(async function(results2) {
+                    return Supper.find({}).then(async function(results3) {
+                        
+                        var isTitleInEntry = false;
+                        var hitsOnSearch1 = [];
+                        for(var i = 0; i < results1.length; i++)
                         {
-                            results1.splice(i, 1);
-                            hitsOnSearch1.splice(i, 1);
-                            continue;
+                            hitsOnSearch1[i] = 0;
+                            if(results1[i].title == undefined)
+                            {
+                                results1.splice(i, 1);
+                                hitsOnSearch1.splice(i, 1);
+                                continue;
+                            }
+                            if(results1[i].title.toLowerCase() == ctx.request.body.searchTerms.toLowerCase())
+                            {
+                                isTitleInEntry = true;
+                                hitsOnSearch1[i]++;
+                                console.log(results1[i].title + " has " + hitsOnSearch1[i] + " hits!");
+                            }
+                            if(!isTitleInEntry)
+                            {
+                                results1.splice(i, 1);
+                                hitsOnSearch1.splice(i, 1);
+                                i--;
+                            }
+                            isTitleInEntry = false;
                         }
-                        if(results1[i].title.toLowerCase() == ctx.request.body.searchTerms.toLowerCase())
+                        var hitsOnSearch2 = [];
+                        for(var i = 0; i < results2.length; i++)
                         {
-                            isTitleInEntry = true;
-                            hitsOnSearch1[i]++;
-                            console.log(results1[i].title + " has " + hitsOnSearch1[i] + " hits!");
+                            hitsOnSearch2[i] = 0;
+                            if(results2[i].title == undefined)
+                            {
+                                results2.splice(i, 1);
+                                hitsOnSearch2.splice(i, 1);
+                                continue;
+                            }
+                            if(results2[i].title.toLowerCase() == ctx.request.body.searchTerms.toLowerCase())
+                            {
+                                isTitleInEntry = true;
+                                hitsOnSearch2[i]++;
+                                console.log(results2[i].title + " has " + hitsOnSearch2[i] + " hits!");
+                            }
+                            if(!isTitleInEntry)
+                            {
+                                results2.splice(i, 1);
+                                hitsOnSearch2.splice(i, 1);
+                                i--;
+                            }
+                            isTitleInEntry = false;
                         }
-                        if(!isTitleInEntry)
+                        var hitsOnSearch3 = [];
+                        for(var i = 0; i < results3.length; i++)
                         {
-                            results1.splice(i, 1);
-                            hitsOnSearch1.splice(i, 1);
-                            i--;
+                            hitsOnSearch3[i] = 0;
+                            if(results3[i].title == undefined)
+                            {
+                                results3.splice(i, 1);
+                                hitsOnSearch3.splice(i, 1);
+                                continue;
+                            }
+                            if(results3[i].title.toLowerCase() == ctx.request.body.searchTerms.toLowerCase())
+                            {
+                                isTitleInEntry = true;
+                                hitsOnSearch3[i]++;
+                                console.log(results3[i].title + " has " + hitsOnSearch3[i] + " hits!");
+                            }
+                            if(!isTitleInEntry)
+                            {
+                                results3.splice(i, 1);
+                                hitsOnSearch3.splice(i, 1);
+                                i--;
+                            }
+                            isTitleInEntry = false;
                         }
-                        isTitleInEntry = false;
-                    }
-                    var hitsOnSearch2 = [];
-                    for(var i = 0; i < results2.length; i++)
-                    {
-                        hitsOnSearch2[i] = 0;
-                        if(results2[i].title == undefined)
-                        {
-                            results2.splice(i, 1);
-                            hitsOnSearch2.splice(i, 1);
-                            continue;
-                        }
-                        if(results2[i].title.toLowerCase() == ctx.request.body.searchTerms.toLowerCase())
-                        {
-                            isTitleInEntry = true;
-                            hitsOnSearch2[i]++;
-                            console.log(results2[i].title + " has " + hitsOnSearch2[i] + " hits!");
-                        }
-                        if(!isTitleInEntry)
-                        {
-                            results2.splice(i, 1);
-                            hitsOnSearch2.splice(i, 1);
-                            i--;
-                        }
-                        isTitleInEntry = false;
-                    }
-                    var hitsOnSearch3 = [];
-                    for(var i = 0; i < results3.length; i++)
-                    {
-                        hitsOnSearch3[i] = 0;
-                        if(results3[i].title == undefined)
-                        {
-                            results3.splice(i, 1);
-                            hitsOnSearch3.splice(i, 1);
-                            continue;
-                        }
-                        if(results3[i].title.toLowerCase() == ctx.request.body.searchTerms.toLowerCase())
-                        {
-                            isTitleInEntry = true;
-                            hitsOnSearch3[i]++;
-                            console.log(results3[i].title + " has " + hitsOnSearch3[i] + " hits!");
-                        }
-                        if(!isTitleInEntry)
-                        {
-                            results3.splice(i, 1);
-                            hitsOnSearch3.splice(i, 1);
-                            i--;
-                        }
-                        isTitleInEntry = false;
-                    }
-                    console.log("Search1: " + hitsOnSearch1 + "\nSearch2: " + hitsOnSearch2 + "\nSearch3: " + hitsOnSearch3);
-                    return await ctx.render('search', {
-                        searchTerm: ctx.request.body.searchTerms,
-                        posts1: results1,
-                        posts2: results2,
-                        posts3: results3,
-                        hits1: hitsOnSearch1,
-                        hits2: hitsOnSearch2,
-                        hits3: hitsOnSearch3,
-                    });
+                        console.log("Search1: " + hitsOnSearch1 + "\nSearch2: " + hitsOnSearch2 + "\nSearch3: " + hitsOnSearch3);
+                        return await ctx.render('search', {
+                            searchTerm: ctx.request.body.searchTerms,
+                            posts1: results1,
+                            posts2: results2,
+                            posts3: results3,
+                            hits1: hitsOnSearch1,
+                            hits2: hitsOnSearch2,
+                            hits3: hitsOnSearch3,
+                            amdin: loggedUser
+                        });
 
+                    });
                 });
             });
-        });
-    }
-    else{
-        
-        return Breakfast.find({}).then(async function(results1) {
-            return Lunch.find({}).then(async function(results2) {
-                return Supper.find({}).then(async function(results3) {
-                    console.log("Ingredients!");
+        }
+        else{
+            
+            return Breakfast.find({}).then(async function(results1) {
+                return Lunch.find({}).then(async function(results2) {
+                    return Supper.find({}).then(async function(results3) {
+                        console.log("Ingredients!");
 
-                    var searchTerms = ctx.request.body.searchTerms.split(/\s*,\s*/);
-                    var isIngredient = false;
-                    var hitsOnSearch1 = [];
-                    for(var i = 0; i < results1.length; i++)
-                    {
-                        hitsOnSearch1[i] = 0;
-                        if(results1[i].ingredients == undefined)
+                        var searchTerms = ctx.request.body.searchTerms.split(/\s*,\s*/);
+                        var isIngredient = false;
+                        var hitsOnSearch1 = [];
+                        for(var i = 0; i < results1.length; i++)
                         {
-                            results1.splice(i, 1);
-                            hitsOnSearch1.splice(i, 1);
-                            continue;
-                        }
-                        var dbIngredients = results1[i].ingredients.split(/\s*,\s*/);
-                        for(var j = 0; j < searchTerms.length; j++)
-                        {
-                            for(var k = 0; k < dbIngredients.length; k++)
+                            hitsOnSearch1[i] = 0;
+                            if(results1[i].ingredients == undefined)
                             {
-                                var numBlanks = 0;
-                                var startingIndex = -1;
-                                for(var l = 0; l < dbIngredients[k].length; l++)
+                                results1.splice(i, 1);
+                                hitsOnSearch1.splice(i, 1);
+                                continue;
+                            }
+                            var dbIngredients = results1[i].ingredients.split(/\s*,\s*/);
+                            for(var j = 0; j < searchTerms.length; j++)
+                            {
+                                for(var k = 0; k < dbIngredients.length; k++)
                                 {
-                                    //console.log(dbIngredients);
-                                    if(dbIngredients[k].charAt(l) == " ")
+                                    var numBlanks = 0;
+                                    var startingIndex = -1;
+                                    for(var l = 0; l < dbIngredients[k].length; l++)
                                     {
-                                        //console.log("Hit");
-                                        numBlanks++;
+                                        //console.log(dbIngredients);
+                                        if(dbIngredients[k].charAt(l) == " ")
+                                        {
+                                            //console.log("Hit");
+                                            numBlanks++;
+                                        }
+                                        if(numBlanks == 2)
+                                        {
+                                            startingIndex = l;
+                                            break;
+                                        }
                                     }
-                                    if(numBlanks == 2)
+                                    //console.log(searchTerms[i].toLowerCase() + " vs. " + dbIngredients[k].toLowerCase());
+                                    if(searchTerms[j].toLowerCase() == dbIngredients[k].substring(startingIndex+1, dbIngredients[k].length).toLowerCase())
                                     {
-                                        startingIndex = l;
-                                        break;
+                                        hitsOnSearch1[i]++;
+                                        console.log(searchTerms[j].toLowerCase() + " vs. " + dbIngredients[k].substring(startingIndex+1, dbIngredients[k].length).toLowerCase());
+                                        isIngredient = true;
                                     }
-                                }
-                                //console.log(searchTerms[i].toLowerCase() + " vs. " + dbIngredients[k].toLowerCase());
-                                if(searchTerms[j].toLowerCase() == dbIngredients[k].substring(startingIndex+1, dbIngredients[k].length).toLowerCase())
-                                {
-                                    hitsOnSearch1[i]++;
-                                    console.log(searchTerms[j].toLowerCase() + " vs. " + dbIngredients[k].substring(startingIndex+1, dbIngredients[k].length).toLowerCase());
-                                    isIngredient = true;
                                 }
                             }
-                        }
-                        if(!isIngredient)
-                        {
-                            results1.splice(i, 1);
-                            hitsOnSearch1.splice(i, 1);
-                            i--;
-                        }
-                        isIngredient = false;
-                    }
-                    var hitsOnSearch2 = [];
-                    for(var i = 0; i < results2.length; i++)
-                    {
-                        hitsOnSearch2[i] = 0;
-                        if(results2[i].ingredients == undefined)
-                        {
-                            results2.splice(i, 1);
-                            hitsOnSearch2.splice(i, 1);
-                            continue;
-                        }
-                        var dbIngredients = results2[i].ingredients.split(/\s*,\s*/);
-                        for(var j = 0; j < searchTerms.length; j++)
-                        {
-                            for(var k = 0; k < dbIngredients.length; k++)
+                            if(!isIngredient)
                             {
+                                results1.splice(i, 1);
+                                hitsOnSearch1.splice(i, 1);
+                                i--;
+                            }
+                            isIngredient = false;
+                        }
+                        var hitsOnSearch2 = [];
+                        for(var i = 0; i < results2.length; i++)
+                        {
+                            hitsOnSearch2[i] = 0;
+                            if(results2[i].ingredients == undefined)
+                            {
+                                results2.splice(i, 1);
+                                hitsOnSearch2.splice(i, 1);
+                                continue;
+                            }
+                            var dbIngredients = results2[i].ingredients.split(/\s*,\s*/);
+                            for(var j = 0; j < searchTerms.length; j++)
+                            {
+                                for(var k = 0; k < dbIngredients.length; k++)
+                                {
 
-                                var numBlanks = 0;
-                                var startingIndex = -1;
-                                for(var l = 0; l < dbIngredients[k].length; l++)
-                                {
-                                    //console.log(dbIngredients);
-                                    if(dbIngredients[k].charAt(l) == " ")
+                                    var numBlanks = 0;
+                                    var startingIndex = -1;
+                                    for(var l = 0; l < dbIngredients[k].length; l++)
                                     {
-                                        //console.log("Hit");
-                                        numBlanks++;
+                                        //console.log(dbIngredients);
+                                        if(dbIngredients[k].charAt(l) == " ")
+                                        {
+                                            //console.log("Hit");
+                                            numBlanks++;
+                                        }
+                                        if(numBlanks == 2)
+                                        {
+                                            startingIndex = l;
+                                            break;
+                                        }
                                     }
-                                    if(numBlanks == 2)
+                                    //console.log(searchTerms[i].toLowerCase() + " vs. " + dbIngredients[k].toLowerCase());
+                                    if(searchTerms[j].toLowerCase() == dbIngredients[k].substring(startingIndex+1, dbIngredients[k].length).toLowerCase())
                                     {
-                                        startingIndex = l;
-                                        break;
+                                        hitsOnSearch2[i]++;
+                                        console.log(searchTerms[j].toLowerCase() + " vs. " + dbIngredients[k].substring(startingIndex+1, dbIngredients[k].length).toLowerCase());
+                                        isIngredient = true;
                                     }
-                                }
-                                //console.log(searchTerms[i].toLowerCase() + " vs. " + dbIngredients[k].toLowerCase());
-                                if(searchTerms[j].toLowerCase() == dbIngredients[k].substring(startingIndex+1, dbIngredients[k].length).toLowerCase())
-                                {
-                                    hitsOnSearch2[i]++;
-                                    console.log(searchTerms[j].toLowerCase() + " vs. " + dbIngredients[k].substring(startingIndex+1, dbIngredients[k].length).toLowerCase());
-                                    isIngredient = true;
                                 }
                             }
-                        }
-                        if(!isIngredient)
-                        {
-                            results2.splice(i, 1);
-                            hitsOnSearch2.splice(i, 1);
-                            i--;
-                        }
-                        isIngredient = false;
-                    }
-                    var hitsOnSearch3 = [];
-                    for(var i = 0; i < results3.length; i++)
-                    {
-                        hitsOnSearch3[i] = 0;
-                        if(results3[i].ingredients == undefined)
-                        {
-                            results3.splice(i, 1);
-                            continue;
-                        }
-                        var dbIngredients = results3[i].ingredients.split(/\s*,\s*/);
-                        for(var j = 0; j < searchTerms.length; j++)
-                        {
-                            for(var k = 0; k < dbIngredients.length; k++)
+                            if(!isIngredient)
                             {
-                                //console.log(dbIngredients[k]);
-                                //console.log(searchTerms[i].toLowerCase() + " vs. " + dbIngredients[k].toLowerCase());
-                                var numBlanks = 0;
-                                var startingIndex = -1;
-                                for(var l = 0; l < dbIngredients[k].length; l++)
+                                results2.splice(i, 1);
+                                hitsOnSearch2.splice(i, 1);
+                                i--;
+                            }
+                            isIngredient = false;
+                        }
+                        var hitsOnSearch3 = [];
+                        for(var i = 0; i < results3.length; i++)
+                        {
+                            hitsOnSearch3[i] = 0;
+                            if(results3[i].ingredients == undefined)
+                            {
+                                results3.splice(i, 1);
+                                continue;
+                            }
+                            var dbIngredients = results3[i].ingredients.split(/\s*,\s*/);
+                            for(var j = 0; j < searchTerms.length; j++)
+                            {
+                                for(var k = 0; k < dbIngredients.length; k++)
                                 {
-                                    //console.log(dbIngredients);
-                                    if(dbIngredients[k].charAt(l) == " ")
+                                    //console.log(dbIngredients[k]);
+                                    //console.log(searchTerms[i].toLowerCase() + " vs. " + dbIngredients[k].toLowerCase());
+                                    var numBlanks = 0;
+                                    var startingIndex = -1;
+                                    for(var l = 0; l < dbIngredients[k].length; l++)
                                     {
-                                        //console.log("Hit");
-                                        numBlanks++;
+                                        //console.log(dbIngredients);
+                                        if(dbIngredients[k].charAt(l) == " ")
+                                        {
+                                            //console.log("Hit");
+                                            numBlanks++;
+                                        }
+                                        if(numBlanks == 2)
+                                        {
+                                            startingIndex = l;
+                                            break;
+                                        }
                                     }
-                                    if(numBlanks == 2)
-                                    {
-                                        startingIndex = l;
-                                        break;
-                                    }
-                                }
-                                
+                                    
 
-                                //console.log(dbIngredients[k].substring(startingIndex+1, dbIngredients[k].length).toLowerCase());
-                                if(searchTerms[j].toLowerCase() == dbIngredients[k].substring(startingIndex+1, dbIngredients[k].length).toLowerCase())
-                                {
-                                    hitsOnSearch3[i]++;
-                                    console.log(searchTerms[j].toLowerCase() + " vs. " + dbIngredients[k].substring(startingIndex+1, dbIngredients[k].length).toLowerCase());
-                                    isIngredient = true;
+                                    //console.log(dbIngredients[k].substring(startingIndex+1, dbIngredients[k].length).toLowerCase());
+                                    if(searchTerms[j].toLowerCase() == dbIngredients[k].substring(startingIndex+1, dbIngredients[k].length).toLowerCase())
+                                    {
+                                        hitsOnSearch3[i]++;
+                                        console.log(searchTerms[j].toLowerCase() + " vs. " + dbIngredients[k].substring(startingIndex+1, dbIngredients[k].length).toLowerCase());
+                                        isIngredient = true;
+                                    }
                                 }
                             }
+                            if(!isIngredient)
+                            {
+                                results3.splice(i, 1);
+                                hitsOnSearch3.splice(i, 1);
+                                i--;
+                            }
+                            isIngredient = false;
                         }
-                        if(!isIngredient)
-                        {
-                            results3.splice(i, 1);
-                            hitsOnSearch3.splice(i, 1);
-                            i--;
-                        }
-                        isIngredient = false;
-                    }
 
-                    return await ctx.render('search', {
-                        searchTerm: ctx.request.body.searchTerms,
-                        posts1: results1,
-                        posts2: results2,
-                        posts3: results3,
-                        hits1: hitsOnSearch1,
-                        hits2: hitsOnSearch2,
-                        hits3: hitsOnSearch3,
+                        return await ctx.render('search', {
+                            searchTerm: ctx.request.body.searchTerms,
+                            posts1: results1,
+                            posts2: results2,
+                            posts3: results3,
+                            hits1: hitsOnSearch1,
+                            hits2: hitsOnSearch2,
+                            hits3: hitsOnSearch3,
+                            admin: loggedUser
+                        });
+
                     });
-
                 });
             });
-        });
-    }
+        }
+    });
 });
 
 route.get('/image/:filename', async (ctx, next) => {

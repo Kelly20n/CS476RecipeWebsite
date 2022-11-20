@@ -69,9 +69,9 @@ body {
       <div class="dropdown-content"></div>
       <div class="center">
         <form action="/search" method="POST">
-          <input type="radio" id="byTitle" value='title' name="searchAlgorithm">
+          <input type="radio" id="byTitle" value='title' name="searchAlgorithm" required>
           <label for="byTitle">Title</label></input>
-          <input type="radio" id="byIngredient" value='ingredients' name="searchAlgorithm">
+          <input type="radio" id="byIngredient" value='ingredients' name="searchAlgorithm" required>
           <label for="byIngredients">Ingredients</label></input>
           <input type="text" placeholder="Search" name="searchTerms"/>
           <input type="submit"/>

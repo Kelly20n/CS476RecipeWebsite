@@ -1,24 +1,25 @@
 {% include './includes/head.njk' %}
-<p class="text-white-50">Showing 15 most recent posts:</p>
-
+<br>
+{# <div class = 'form-floating mb-3'>
+</div> #}
 {% for post in posts1 %}
 <div class='postcolumn'>
     <p><a href="/view/{{post.id}}/{{post.type}}/{{post.checked}}">
     <img src="../../../image/{{post.image}}" alt="" style="width:300px;height:200px; object-fit: cover;">
-    <h4 class="text-white-50 mb-5">{{post.title}}</h4></a></p>
+    <h4 class="text-white-50 mb-5" style="overflow: hidden;">{{post.title}}</h4></a></p>
 </div>
 {% endfor %}
 {% for post in posts2 %}
 <div class='postcolumn'>
     <p><a href="/view/{{post.id}}/{{post.type}}/{{post.checked}}">
     <img src="../../../image/{{post.image}}" alt="" style="width:300px;height:200px; object-fit: cover;">
-    <h4 class="text-white-50 mb-5">{{post.title}}</h4></a></p>
+    <h4 class="text-white-50 mb-5" style="overflow: hidden;">{{post.title}}</h4></a></p>
 </div>
 {% endfor %}
 {% for post in posts3 %}
 <div class='postcolumn'>
     <p><a href="/view/{{post.id}}/{{post.type}}/{{post.checked}}"> 
     <img src="../../../image/{{post.image}}" class="img-circle" alt="" style="width:300px;height:200px; object-fit: cover;">
-    <h4 class="text-white-50 mb-5">{{post.title}}</h4></a></p>
+    <h4 class="text-white-50 mb-5" style="overflow: hidden;">{{post.title}}</h4></a></p>
 </div>
 {% endfor %}
