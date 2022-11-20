@@ -725,14 +725,14 @@ route.post('/search', async (ctx, next) => {
                                 hits1: hitsOnSearch1,
                                 hits2: hitsOnSearch2,
                                 hits3: hitsOnSearch3,
-                                amdin: loggedUser
+                                admin: loggedUser
                             });
                         }   
                         else
                         {
                             return await ctx.render('searchnone', {
                                 searchTerm: ctx.request.body.searchTerms,
-                                amdin: loggedUser
+                                admin: loggedUser
                             });
                         }
 
