@@ -8,14 +8,14 @@ const GeneralFunctions = require('../functions/generalfunctions.js')
 const UserFunctions = require('../functions/userfunctions.js')
 const route = Router();
 
-//route get for admin to check if user is logged into an account with admin priveleges and displays ti
+//route get for admin to check if user is logged into an account with admin priveleges and displays it
 route.get('/admin', async (ctx, next) => {
     if(GeneralFunctions.verifyUser(ctx) === true)
     {
         const payload = GeneralFunctions.decodeUser(ctx);
         const page = 'admin';
         return User.findOne({username: payload.userEmail}).then(async function(loggedUser) {
-            //check if user logged in
+            //if you ban yourself
             if(loggedUser == null) {
                 ctx.cookies.set('token', null);
                 return await ctx.redirect("/");
@@ -24,6 +24,7 @@ route.get('/admin', async (ctx, next) => {
             else if(loggedUser.isAdmin == true) {
                 return UserFunctions.displayUsers(ctx, loggedUser, page);
             }
+            //if you unmod yourself
             else {
                 ctx.cookies.set('token', null);
                 return await ctx.redirect("/");
@@ -39,7 +40,7 @@ route.post('/login', async (ctx, next) => {
         //check if input is empty
         if(results === null)
         {
-            console.log('Unsuccessful Login2');
+            console.log('Unsuccessful Login');
             return await ctx.render('incorrectlogin');
         }
         //checks if input matches existing account info
@@ -51,7 +52,7 @@ route.post('/login', async (ctx, next) => {
         //otherwise input is wrong
         else
         {
-            console.log('Unsuccessful Login3');
+            console.log('Unsuccessful Login');
             return await ctx.render('incorrectlogin');
         }
     });
@@ -62,7 +63,6 @@ route.post('/signup', async (ctx, next) => {
     //search through users and banned users database
     return User.findOne({username: ctx.request.body.userEmail}).then(async function(err, results) {
         return Banned.findOne({username: ctx.request.body.userEmail}).then(async function(check) {
-            console.log(check);
             //if signup not allowed/working redirect to signup
             if(check != null)
             {
@@ -72,7 +72,7 @@ route.post('/signup', async (ctx, next) => {
             if (ctx.request.body.userPass == ctx.request.body.userPassConfirm && err == null)
             {
                 console.log('Successful Sign Up');
-                
+                //create new user
                 var newUser = new User({
                     name: ctx.request.body.name,
                     username: ctx.request.body.userEmail,
@@ -101,6 +101,7 @@ route.post('/signup', async (ctx, next) => {
 
 //route get for sign out to sign a user out
 route.get('/signout', async (ctx, next) => {
+    //delete cookie
     ctx.cookies.set('token', null);
     await ctx.redirect('/');
 });
@@ -191,6 +192,7 @@ route.post('/unban/:id', async (ctx, next) => {
     }
 });
 
+//route for starting reset password process
 route.post('/forgotpasswordportal', async(ctx, next) => { 
     return User.findOne({username: ctx.request.body.userEmail}).then(async function(results) {
         console.log(results);
@@ -205,6 +207,7 @@ route.post('/forgotpasswordportal', async(ctx, next) => {
     });
 });
 
+//route to display the security question
 route.post('/resetpassword/:id', async(ctx, next) => {
     return User.findById(ctx.params.id).then(async function(results) {
         if(results.securityA == ctx.request.body.securityA) {
@@ -220,12 +223,13 @@ route.post('/resetpassword/:id', async(ctx, next) => {
     })
     
 });
-
+//route to submit new password
 route.post('/passwordisreset/:id', async(ctx, next) => {
     await User.findByIdAndUpdate(ctx.params.id, { password: ctx.request.body.userPass})
     ctx.redirect('/login');
 })
 
+//secret route
 route.get('/khanhiscute', async(ctx, next) => {
     ctx.status = 418;
 })
