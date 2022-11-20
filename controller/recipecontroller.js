@@ -697,8 +697,6 @@ route.post('/search', async (ctx, next) => {
                                             break;
                                         }
                                     }
-                                    
-
                                     //console.log(dbIngredients[k].substring(startingIndex+1, dbIngredients[k].length).toLowerCase());
                                     if(searchTerms[j].toLowerCase() == dbIngredients[k].substring(startingIndex+1, dbIngredients[k].length).toLowerCase())
                                     {
