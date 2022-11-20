@@ -11,6 +11,7 @@ const alert = require('alert');
 function createToken(ctx) {
     const secret = process.env.TOKEN_SECRET;
     const jwtToken = jwt.sign(ctx.request.body, secret, {expiresIn: 60 * 60})
+    //set token in cookies
     ctx.cookies.set('token', jwtToken)
     return;
 }
@@ -34,102 +35,83 @@ function verifyUser(ctx) {
 
 //function to search through a database
 async function searchSingleDataBase(ctx, results, database) {
-            console.log(database);
-            //if nothing found redirect to title
-            if(results === null)
+    console.log(database);
+    //if nothing found redirect to title
+    if(results === null)
+    {
+        return await ctx.redirect('/')
+    }
+    //searches for title
+    else if(ctx.request.body.searchAlgorithm == 'title')
+    {
+        // Iterate through items from db
+        console.log(ctx.request.body.searchTerms);
+        var isTitleInEntry = false;
+        for(var i = 0; i < results.length; i++)
+        {
+            if(results[i].title == ctx.request.body.searchTerms)
             {
-                return await ctx.redirect('/')
+                isTitleInEntry = true;
             }
-            //searches for title
-            else if(ctx.request.body.searchAlgorithm == 'title')
+            if(!isTitleInEntry)
             {
-                // Iterate through items from db
-                console.log(ctx.request.body.searchTerms);
-                var isTitleInEntry = false;
-                for(var i = 0; i < results.length; i++)
-                {
-                    if(results[i].title == ctx.request.body.searchTerms)
-                    {
-                        isTitleInEntry = true;
-                    }
-                    if(!isTitleInEntry)
-                    {
-                        results.splice(i, 1);
-                        i--;
-                    }
-                    isTitleInEntry = false;
-                }
-                console.log("Database: " + database);
-                return await ctx.render('search', {
-                    searchTerm: ctx.request.body.searchTerms,
-                    posts: results,
-                    databaseUsed: database
-                });
+                results.splice(i, 1);
+                i--;
             }
-            //searches for ingredients
-            else if (ctx.request.body.searchAlgorithm == 'ingredients')
-            {
-                var searchTerm_Array = ctx.request.body.searchTerms.split(/\s*,\s*/);
-                console.log("Search Terms: " + searchTerm_Array);
-                let isIngredientInEntry = false;
-                var dbIngredients;
-                var listOfIngredientsToRemove = [];
-                // Iterate through items from db
-                loop0:
-                for(var i = 0; i < results.length; i++)
-                {
-                    dbIngredients = results[i].ingredients.split(/\s*,\s*/);
-
-                    // Iterate through each search term
-                    loop1:
-                    for(var j = 0; j < searchTerm_Array.length; j++)
-                    {
-                        loop2:
-                        for(var k = 0; k < dbIngredients.length; k++)
-                        {
-                            if(searchTerm_Array[j] == dbIngredients[k])
-                            {
-                                isIngredientInEntry = true;
-                            }
-                        }
-                    }
-                    if(!isIngredientInEntry)
-                    {
-                        results.splice(i, 1);
-                        i--;
-                        // Removes item from results and decrements i to make algorithm look at index i again (new value now in the place)
-                    }
-                    isIngredientInEntry = false;
-                }
-                console.log("Database: " + database);
-                return await ctx.render('search', {
-                    searchTerm: ctx.request.body.searchTerm,
-                    posts: results,
-                    databaseUsed: database,
-                });
-            }
-}
-
-//function return post from specified database
-function returnPostsAllDatabases(ctx){
-    return Breakfast.find({title: ctx.request.body.searchTerms}).then(async function(results1) {
-        return Lunch.find({title: ctx.request.body.searchTerms}).then(async function(results2) {
-            return Supper.find({title: ctx.request.body.searchTerms}).then(async function(results3) {
-                var results = results1 + results2 + results3;
-                console.log(results);
-
-                return await ctx.render('search', {
-                    searchTerm: ctx.request.body.searchTerms,
-                    posts: results,
-                });
-            });
+            isTitleInEntry = false;
+        }
+        console.log("Database: " + database);
+        return await ctx.render('search', {
+            searchTerm: ctx.request.body.searchTerms,
+            posts: results,
+            databaseUsed: database
         });
-    });
+    }
+    //searches for ingredients
+    else if (ctx.request.body.searchAlgorithm == 'ingredients')
+    {
+        var searchTerm_Array = ctx.request.body.searchTerms.split(/\s*,\s*/);
+        console.log("Search Terms: " + searchTerm_Array);
+        let isIngredientInEntry = false;
+        var dbIngredients;
+        var listOfIngredientsToRemove = [];
+        // Iterate through items from db
+        loop0:
+        for(var i = 0; i < results.length; i++)
+        {
+            dbIngredients = results[i].ingredients.split(/\s*,\s*/);
+
+            // Iterate through each search term
+            loop1:
+            for(var j = 0; j < searchTerm_Array.length; j++)
+            {
+                loop2:
+                for(var k = 0; k < dbIngredients.length; k++)
+                {
+                    if(searchTerm_Array[j] == dbIngredients[k])
+                    {
+                        isIngredientInEntry = true;
+                    }
+                }
+            }
+            if(!isIngredientInEntry)
+            {
+                results.splice(i, 1);
+                i--;
+                // Removes item from results and decrements i to make algorithm look at index i again (new value now in the place)
+            }
+            isIngredientInEntry = false;
+        }
+        console.log("Database: " + database);
+        return await ctx.render('search', {
+            searchTerm: ctx.request.body.searchTerm,
+            posts: results,
+            databaseUsed: database,
+        });
+    }
 }
 
-
-
-//function to breaks down user to check for token and cookies
+//function to know what specific user is making requests
 function decodeUser(ctx) {
     if(ctx.cookies.get("token") != null) {
         const decoded = jwt.decode(ctx.cookies.get("token"), {complete: true});

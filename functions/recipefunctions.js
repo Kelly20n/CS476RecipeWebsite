@@ -1,13 +1,11 @@
-const Koa = require('koa');
 const Recipe = require('../model/recipe.js');
 const Breakfast = require('../model/breakfast.js');
 const Lunch = require('../model/lunch.js');
 const Supper = require('../model/supper.js');
 const Comment = require('../model/comments.js');
-const User = require('../model/user.js');
 const toBeApproved = require('../model/approval.js');
 
-
+//Function to create comment
 function createComment(ctx, username) {
     //console.log("Commment func" + databaseUsed);
     var newComment = new Comment({
@@ -21,9 +19,11 @@ function createComment(ctx, username) {
     return;
 }
 
+//display post and comments uses the db tag to find which database its from and then sends the info to the page
 async function displayPostAndComments(ctx, adminUser, page) {
     if(ctx.params.check == 1)
     {
+        //if check = 1 that means the post is in toBeApproved
         return toBeApproved.findById(ctx.params.id).then(async function(results){
             await ctx.render(page, {
                 post: results,
@@ -55,7 +55,7 @@ async function displayPostAndComments(ctx, adminUser, page) {
             });
         })
     }
-    else if (ctx.params.db == "supper")
+    else
     {
         return Supper.findById(ctx.params.id).then(async function(results) {
             var commentsOnPosts = await Comment.find({postId: ctx.params.id, postDB: ctx.params.db});
@@ -67,22 +67,11 @@ async function displayPostAndComments(ctx, adminUser, page) {
             });
         })
     }
-    else{
-        return Recipe.findById(ctx.params.id).then(async function(results) {
-            var commentsOnPosts = await Comment.find({postId: ctx.params.id, postDB: "Recipe"});
-                await ctx.render(page, {
-                    post: results,
-                    comments: commentsOnPosts,
-                    admin: adminUser,
-                    databaseUsed: "Recipe"
-            });
-        })
-    }
 }
 
+//function to display just the image and the title for breakfast posts in reverse order
 async function displayBreakfastPostTitles(ctx, adminUser, page) {
     return Breakfast.find({}).sort({'date': -1}).then(async function(results) {
-        
                 await ctx.render(page, {
                     posts: results,
                     admin: adminUser,
@@ -90,6 +79,7 @@ async function displayBreakfastPostTitles(ctx, adminUser, page) {
     });
 }
 
+//function to display just the image and the title for lunch posts in reverse order
 async function displayLunchPostTitles(ctx, adminUser, page) {
     return Lunch.find({}).sort({'date': -1}).then(async function(results) {
         
@@ -100,6 +90,7 @@ async function displayLunchPostTitles(ctx, adminUser, page) {
     });
 }
 
+//function to display just the image and the title for supper posts in reverse order
 async function displaySupperPostTitles(ctx, adminUser, page) {
     return Supper.find({}).sort({'date': -1}).then(async function(results) {
         
@@ -110,6 +101,7 @@ async function displaySupperPostTitles(ctx, adminUser, page) {
             });
 }
 
+//function to display index page, with 5 posts from all categories
 async function displayPostTitles(ctx, adminUser, page) {
     return Breakfast.find({}).sort({'date': -1}).limit(5).then(async function(results1) {
         return Lunch.find({}).sort({'date': -1}).limit(5).then(async function(results2) {
@@ -124,8 +116,6 @@ async function displayPostTitles(ctx, adminUser, page) {
         });
     });
 }
-
-
 
 module.exports.createComment = createComment;
 module.exports.displayPostAndComments = displayPostAndComments;
