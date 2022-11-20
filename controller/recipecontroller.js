@@ -1,12 +1,9 @@
 require('dotenv').config();
 const Upload = require('../gridfs/storage.js');
-const gfs = require('../gridfs/gfs.js');
-const {GridFsStorage} = require('multer-gridfs-storage');
 const Breakfast = require('../model/breakfast.js');
 const Lunch = require('../model/lunch.js');
 const Supper = require('../model/supper.js');
 const Comment = require('../model/comments.js')
-const Recipe = require('../model/recipe.js');
 const User = require('../model/user.js');
 const Router = require('koa-router');
 const Comments = require('../model/comments.js')
@@ -14,8 +11,6 @@ const RecipeFunctions = require('../functions/recipefunctions.js')
 const GeneralFunctions = require('../functions/generalfunctions.js')
 const toBeApproved = require('../model/approval.js');
 const mongoose = require('mongoose');
-const fs = require('fs');
-const { title } = require('process');
 
 const host = process.env.host;
 const conn = mongoose.createConnection(host);
@@ -25,58 +20,54 @@ const route = Router();
 //route get for main/home page
 route.get('/', async (ctx, next) => {
     const payload = GeneralFunctions.decodeUser(ctx)
-    console.log(payload);
     return User.findOne({username: payload.userEmail}).then(async function(loggedUser) {
-        console.log(loggedUser);
         const page = 'index';
         return RecipeFunctions.displayPostTitles(ctx, loggedUser, page);
     });
 });
 
-//route get for getting
+//route to get all breakfast recipes
 route.get('/views/breakfast', async (ctx, next) => {
     const payload = GeneralFunctions.decodeUser(ctx)
     return User.findOne({username: payload.userEmail}).then(async function(loggedUser) {
-        console.log(loggedUser);
         const page = 'breakfastpage';
         return RecipeFunctions.displayBreakfastPostTitles(ctx, loggedUser, page);
     });
 });    
 
+//route to get all lunch posts
 route.get('/views/lunch', async (ctx, next) => {
     const payload = GeneralFunctions.decodeUser(ctx)
     return User.findOne({username: payload.userEmail}).then(async function(loggedUser) {
-        console.log(loggedUser);
         const page = 'lunchpage';
         return RecipeFunctions.displayLunchPostTitles(ctx, loggedUser, page);
     });
 }); 
-
+//route to get all supper posts
 route.get('/views/supper', async (ctx, next) => {
     const payload = GeneralFunctions.decodeUser(ctx)
     return User.findOne({username: payload.userEmail}).then(async function(loggedUser) {
-        console.log(loggedUser);
         const page = 'supperpage';
         return RecipeFunctions.displaySupperPostTitles(ctx, loggedUser, page);
     });
 }); 
 
+//route to view a specific post with comments
 route.get('/view/:id/:db/:check', async (ctx, next) => {
     const payload = GeneralFunctions.decodeUser(ctx)
     return User.findOne({username: payload.userEmail}).then(async function(loggedUser) {
         const page = 'recipe';
-        console.log("db: " + ctx.params.db);
         return RecipeFunctions.displayPostAndComments(ctx, loggedUser, page, ctx.params.db);
     });
 });
 
+//route to post comment and update view of specific post
 route.post('/view/:id/:db/:check', async (ctx, next) => {
     if(GeneralFunctions.verifyUser(ctx) === true)
     {
         const payload = GeneralFunctions.decodeUser(ctx)
         return User.findOne({username: payload.userEmail}).then(async function(loggedUser) {
             const page = 'recipe';
-            console.log(page);
             if(ctx.request.body.userComment === '') {
                 console.log(loggedUser);
                 return RecipeFunctions.displayPostAndComments(ctx, loggedUser, page);
@@ -91,22 +82,32 @@ route.post('/view/:id/:db/:check', async (ctx, next) => {
     else return
 });
 
+//route to view posts to be approved only available to the admin
 route.get('/approvalview/:id/:db/:check', async (ctx, next) => {
     const payload = GeneralFunctions.decodeUser(ctx)
     return User.findOne({username: payload.userEmail}).then(async function(loggedUser) {
-        const page = 'approvalview';
-        console.log("db: " + ctx.params.db);
-        return RecipeFunctions.displayPostAndComments(ctx, loggedUser, page, ctx.params.db);
+        //Check if user is admin, on the off chance they are able to get the info to attempt to view this page
+        if(loggedUser.isAdmin == true) {
+            const page = 'approvalview';
+            return RecipeFunctions.displayPostAndComments(ctx, loggedUser, page, ctx.params.db);
+        }
+        else {
+            await ctx.redirect('/');
+        }
     });
 });
 
-//
+//route to view a specific post to potentially delete the post or delete the comments
 route.get('/approvalposts/:id/:db/:check', async (ctx, next) => {
     const payload = GeneralFunctions.decodeUser(ctx)
     return User.findOne({username: payload.userEmail}).then(async function(loggedUser) {
-        const page = 'approvalposts';
-        console.log("db: " + ctx.params.db);
-        return RecipeFunctions.displayPostAndComments(ctx, loggedUser, page, ctx.params.db);
+        if(loggedUser.isAdmin == true) {
+            const page = 'approvalposts';
+            return RecipeFunctions.displayPostAndComments(ctx, loggedUser, page, ctx.params.db);
+        }
+        else {
+            await ctx.redirect('/');
+        }
     });
 });
 
@@ -118,12 +119,10 @@ route.post('/approvalposts/:id/:db/:check/:commentid', async (ctx, next) => {
         const payload = GeneralFunctions.decodeUser(ctx)
         return User.findOne({username: payload.userEmail}).then(async function(loggedUser) {
             if(loggedUser.isAdmin === true) {
-            const page = 'approvalposts';
-            console.log(page);
-            console.log(ctx.params.commentid);
-            await Comments.findByIdAndDelete({_id: ctx.params.commentid});
-           
-            return RecipeFunctions.displayPostAndComments(ctx, loggedUser, page);
+                const page = 'approvalposts';
+                await Comments.findByIdAndDelete({_id: ctx.params.commentid});
+            
+                return RecipeFunctions.displayPostAndComments(ctx, loggedUser, page);
             }
             else {
                 return await ctx.redirect("/");
@@ -133,7 +132,7 @@ route.post('/approvalposts/:id/:db/:check/:commentid', async (ctx, next) => {
     else return
 });
 
-
+//route to delete a post
 route.post('/approvalposts/:post_type/:post_Id', async (ctx, next) => {
     if(GeneralFunctions.verifyUser(ctx) === true)
     {
@@ -141,11 +140,12 @@ route.post('/approvalposts/:post_type/:post_Id', async (ctx, next) => {
         return User.findOne({username: payload.userEmail}).then(async function(loggedUser) {
             if(loggedUser.isAdmin === true) {
                 const page = 'approvalposts';
-                console.log(page);
+                //find all posts by searching all collections
                 return Breakfast.find({}).then(async function(results1) {
                     return Lunch.find({}).then(async function(results2) {
                         return Supper.find({}).then(async function(results3) {
                             await toBeApproved.findOneAndRemove({title: ctx.params.post_Id})
+                            //if post is in the breakfast database delete it from there and all of it's comments
                             if(ctx.params.post_type == "breakfast")
                             {
                                 console.log('Breakfast post removed');
@@ -187,32 +187,32 @@ route.get('/postPage', async (ctx, next) => {
     })
 });
 
+//route to post a recipe
 route.post('/postPage', Upload.single('file'), async (ctx, next) => {
     if(GeneralFunctions.verifyUser(ctx) === true)
     {
         const payload = GeneralFunctions.decodeUser(ctx);
-        console.log("right here:" + ctx.file.contentType);
         return User.findOne({username: payload.userEmail}).then(async function(loggedUser) {
             if(ctx.file.contentType === 'image/jpeg' || ctx.file.contentType === 'image/png') {
                 var key = false;
+                //check if recipe title already exists in collections
                 await Breakfast.findOne({title: ctx.request.body.recipeTitle}).then(async function(results) {
                     return Lunch.findOne({title: ctx.request.body.recipeTitle}).then(async function(results1) {
                         return Supper.findOne({title: ctx.request.body.recipeTitle}).then(async function(results2) {
-                            console.log(results)
-                            console.log(results1)
-                            console.log(results2)
                             if(results != null || results1 != null || results2 != null) {
                                 key = true;
                                 return await ctx.render('postpage', {
                                     admin: loggedUser,
                                     key: key
-                                })
+                                });
                             }
                         });
                     });
                 });
+                //if recipe title doesn't already exist in database
                 if(key != true)
                 {
+                    //if statements are if the user chose the radio button corresponding to the type of recipe
                     if(ctx.request.body.database == "breakfast")
                     {
                         var newBreakfast = new Breakfast({
@@ -229,7 +229,6 @@ route.post('/postPage', Upload.single('file'), async (ctx, next) => {
                             if(err) return handleError(err);
                             else return
                         });
-                        console.log(ctx.file.filename);
                         var newToBeApproved = new toBeApproved({
                             title: ctx.request.body.recipeTitle,
                             ingredients: ctx.request.body.recipeIngredients,
@@ -327,7 +326,7 @@ route.post('/postPage', Upload.single('file'), async (ctx, next) => {
     else return
 });
 
-//route get to get all recipes that need to be approved or rejected
+//route get to get all recipes that need to be approved or rejected and all recipes
 route.get('/approval', async (ctx, next) => {
     if(GeneralFunctions.verifyUser(ctx) === true){
         const payload = GeneralFunctions.decodeUser(ctx);
@@ -392,9 +391,6 @@ route.post('/approval/:id', async (ctx, next) => {
 
 //route post for searching recipe based on database
 route.post('/search', async (ctx, next) => {
-    //search in breakfast database
-    /*return Recipe.find({title: ctx.request.body.searchTerm}).then(async function(results){*/
-    //GeneralFunctions.returnPostsAllDatabases(ctx);
     const payload = GeneralFunctions.decodeUser(ctx);
     return User.findOne({username: payload.userEmail}).then(async function(loggedUser){
         if(ctx.request.body.searchAlgorithm == "title")
@@ -406,15 +402,9 @@ route.post('/search', async (ctx, next) => {
                         var isTitleInEntry = false;
                         var hitsOnSearch1 = [];
                         var searchTitle = ctx.request.body.searchTerms.split(/[, ]+/);
-                        //console.log(searchTitle);
                         for(var i = 0; i < results1.length; i++)
                         {
                             hitsOnSearch1[i] = 0;
-                            // if(results1[i] != undefined)
-                            // {
-                            //     var wordsInResults1Title = results1[i].title.split(' ');
-                            // }
-                            //console.log(wordsInResults1Title);
                             if(results1[i] == undefined)
                             {
                                 results1.splice(i, 1);
@@ -422,8 +412,6 @@ route.post('/search', async (ctx, next) => {
                                 continue;
                             }
                             var wordsInResults1Title = results1[i].title.split(/[, ]+/);
-                            // console.log(searchTitle);
-                            // console.log(wordsInResults1Title);
                             for(var g = 0; g < searchTitle.length; g++)
                             {
                                 for(var h = 0; h < wordsInResults1Title.length; h++)
@@ -435,7 +423,6 @@ route.post('/search', async (ctx, next) => {
                                         {
                                             isTitleInEntry = true;
                                             hitsOnSearch1[i]++;
-                                            //console.log(results1[i].title + " has " + hitsOnSearch1[i] + " hits!");
                                         }
                                     }
                                 }
@@ -452,11 +439,6 @@ route.post('/search', async (ctx, next) => {
                         for(var i = 0; i < results2.length; i++)
                         {
                             hitsOnSearch2[i] = 0;
-                            // if(results1[i] != undefined)
-                            // {
-                            //     var wordsInResults1Title = results1[i].title.split(' ');
-                            // }
-                            //console.log(wordsInResults1Title);
                             if(results2[i] == undefined)
                             {
                                 results2.splice(i, 1);
@@ -464,8 +446,6 @@ route.post('/search', async (ctx, next) => {
                                 continue;
                             }
                             var wordsInResults2Title = results2[i].title.split(/[, ]+/);
-                            // console.log(searchTitle);
-                            // console.log(wordsInResults1Title);
                             for(var g = 0; g < searchTitle.length; g++)
                             {
                                 for(var h = 0; h < wordsInResults2Title.length; h++)
@@ -477,7 +457,6 @@ route.post('/search', async (ctx, next) => {
                                         {
                                             isTitleInEntry = true;
                                             hitsOnSearch2[i]++;
-                                            //console.log(results1[i].title + " has " + hitsOnSearch1[i] + " hits!");
                                         }
                                     }
                                 }
@@ -494,11 +473,6 @@ route.post('/search', async (ctx, next) => {
                         for(var i = 0; i < results3.length; i++)
                         {
                             hitsOnSearch3[i] = 0;
-                            // if(results1[i] != undefined)
-                            // {
-                            //     var wordsInResults1Title = results1[i].title.split(' ');
-                            // }
-                            //console.log(wordsInResults1Title);
                             if(results3[i] == undefined)
                             {
                                 results3.splice(i, 1);
@@ -506,8 +480,6 @@ route.post('/search', async (ctx, next) => {
                                 continue;
                             }
                             var wordsInResults3Title = results3[i].title.split(/[, ]+/);
-                            // console.log(searchTitle);
-                            // console.log(wordsInResults1Title);
                             for(var g = 0; g < searchTitle.length; g++)
                             {
                                 for(var h = 0; h < wordsInResults3Title.length; h++)
@@ -519,7 +491,6 @@ route.post('/search', async (ctx, next) => {
                                         {
                                             isTitleInEntry = true;
                                             hitsOnSearch3[i]++;
-                                            //console.log(results1[i].title + " has " + hitsOnSearch1[i] + " hits!");
                                         }
                                     }
                                 }
@@ -587,10 +558,8 @@ route.post('/search', async (ctx, next) => {
                                     var startingIndex = -1;
                                     for(var l = 0; l < dbIngredients[k].length; l++)
                                     {
-                                        //console.log(dbIngredients);
                                         if(dbIngredients[k].charAt(l) == " ")
                                         {
-                                            //console.log("Hit");
                                             numBlanks++;
                                         }
                                         if(numBlanks == 2)
@@ -599,7 +568,6 @@ route.post('/search', async (ctx, next) => {
                                             break;
                                         }
                                     }
-                                    //console.log(searchTerms[i].toLowerCase() + " vs. " + dbIngredients[k].toLowerCase());
                                     if(searchTerms[j].toLowerCase() == dbIngredients[k].substring(startingIndex+1, dbIngredients[k].length).toLowerCase())
                                     {
                                         hitsOnSearch1[i]++;
@@ -636,10 +604,8 @@ route.post('/search', async (ctx, next) => {
                                     var startingIndex = -1;
                                     for(var l = 0; l < dbIngredients[k].length; l++)
                                     {
-                                        //console.log(dbIngredients);
                                         if(dbIngredients[k].charAt(l) == " ")
                                         {
-                                            //console.log("Hit");
                                             numBlanks++;
                                         }
                                         if(numBlanks == 2)
@@ -648,7 +614,6 @@ route.post('/search', async (ctx, next) => {
                                             break;
                                         }
                                     }
-                                    //console.log(searchTerms[i].toLowerCase() + " vs. " + dbIngredients[k].toLowerCase());
                                     if(searchTerms[j].toLowerCase() == dbIngredients[k].substring(startingIndex+1, dbIngredients[k].length).toLowerCase())
                                     {
                                         hitsOnSearch2[i]++;
@@ -679,16 +644,12 @@ route.post('/search', async (ctx, next) => {
                             {
                                 for(var k = 0; k < dbIngredients.length; k++)
                                 {
-                                    //console.log(dbIngredients[k]);
-                                    //console.log(searchTerms[i].toLowerCase() + " vs. " + dbIngredients[k].toLowerCase());
                                     var numBlanks = 0;
                                     var startingIndex = -1;
                                     for(var l = 0; l < dbIngredients[k].length; l++)
                                     {
-                                        //console.log(dbIngredients);
                                         if(dbIngredients[k].charAt(l) == " ")
                                         {
-                                            //console.log("Hit");
                                             numBlanks++;
                                         }
                                         if(numBlanks == 2)
@@ -697,7 +658,6 @@ route.post('/search', async (ctx, next) => {
                                             break;
                                         }
                                     }
-                                    //console.log(dbIngredients[k].substring(startingIndex+1, dbIngredients[k].length).toLowerCase());
                                     if(searchTerms[j].toLowerCase() == dbIngredients[k].substring(startingIndex+1, dbIngredients[k].length).toLowerCase())
                                     {
                                         hitsOnSearch3[i]++;
@@ -735,7 +695,6 @@ route.post('/search', async (ctx, next) => {
                                 admin: loggedUser
                             });
                         }
-
                     });
                 });
             });
@@ -743,22 +702,18 @@ route.post('/search', async (ctx, next) => {
     });
 });
 
+//route to access photos
 route.get('/image/:filename', async (ctx, next) => {
     const bucket = new mongoose.mongo.GridFSBucket(conn.db, {
         bucketName: 'fs'
     })
 
-    // let file = await bucket.find({filename: ctx.params.filename}).toArray();
     const file = await bucket.find({filename: ctx.params.filename}).toArray();
-    
-    console.log("Check it " + file)
 
     if(!file[0] || file[0].length === 0) {
         return ctx.status = 400;
     }
 
-    // stream = bucket.openDownloadStreamByName(ctx.params.filename);
-    // ctx.body = stream.on();
     if(file[0].contentType === 'image/jpeg' || file[0].contentType === 'image/png') {
         ctx.body = bucket.openDownloadStreamByName(ctx.params.filename);
         
