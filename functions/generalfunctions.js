@@ -10,7 +10,7 @@ const alert = require('alert');
 //function to create a token/secret token
 function createToken(ctx) {
     const secret = process.env.TOKEN_SECRET;
-    const jwtToken = jwt.sign(ctx.request.body, secret, {expiresIn: 60 * 60})
+    const jwtToken = jwt.sign(ctx.request.body, secret, {expiresIn: '1h'})
     //set token in cookies
     ctx.cookies.set('token', jwtToken)
     return;
