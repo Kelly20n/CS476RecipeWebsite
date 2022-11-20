@@ -551,7 +551,10 @@ route.post('/search', async (ctx, next) => {
                             }   
                             else
                             {
-                                return await ctx.render('searchnone', {});
+                                return await ctx.render('searchnone', {
+                                    searchTerm: ctx.request.body.searchTerms,
+                                    amdin: loggedUser
+                                });
                             }
                         
                     });
