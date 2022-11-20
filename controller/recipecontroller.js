@@ -590,27 +590,39 @@ route.post('/search', async (ctx, next) => {
             return Breakfast.find({}).then(async function(results1) {
                 return Lunch.find({}).then(async function(results2) {
                     return Supper.find({}).then(async function(results3) {
-                        
+
                         // Splits up the search terms into an array whenever there is a comma or a space
                         var searchTerms = ctx.request.body.searchTerms.split(/[, ]+/);
                         var isIngredient = false;
                         var hitsOnSearch1 = [];
+
+                        
                         for(var i = 0; i < results1.length; i++)
                         {
                             hitsOnSearch1[i] = 0;
+                            ////////////
+                            //Detects if an entry is actually valid
+                            ////////////
                             if(results1[i].ingredients == undefined)
                             {
                                 results1.splice(i, 1);
                                 hitsOnSearch1.splice(i, 1);
                                 continue;
                             }
+
+                            // Splits up the search terms into an array whenever there is a comma or a space
                             var dbIngredients = results1[i].ingredients.split(/[, ]+/);
+
+                            // Double for loop to iterate through the words in the search terms and through the array from the database query
                             for(var j = 0; j < searchTerms.length; j++)
                             {
                                 for(var k = 0; k < dbIngredients.length; k++)
                                 {
                                     var numBlanks = 0;
+                                    // starts stating index at -1 to make +1 easy to use for detection
                                     var startingIndex = -1;
+                                    
+                                    // Attempts to detect the two words that are supposed to be the measurements for the recipe (looks for two space characters)
                                     for(var l = 0; l < dbIngredients[k].length; l++)
                                     {
                                         if(dbIngredients[k].charAt(l) == " ")
@@ -623,14 +635,16 @@ route.post('/search', async (ctx, next) => {
                                             break;
                                         }
                                     }
+
+                                    // checks the searchterms to the substring found without measurements
                                     if(searchTerms[j].toLowerCase() == dbIngredients[k].substring(startingIndex+1, dbIngredients[k].length).toLowerCase())
                                     {
                                         hitsOnSearch1[i]++;
-                                        console.log(searchTerms[j].toLowerCase() + " vs. " + dbIngredients[k].substring(startingIndex+1, dbIngredients[k].length).toLowerCase());
                                         isIngredient = true;
                                     }
                                 }
                             }
+                            // if ingredient isnt found splice out of array
                             if(!isIngredient)
                             {
                                 results1.splice(i, 1);
@@ -643,12 +657,17 @@ route.post('/search', async (ctx, next) => {
                         for(var i = 0; i < results2.length; i++)
                         {
                             hitsOnSearch2[i] = 0;
+
+                            ////////////
+                            //Detects if an entry is actually valid
+                            ////////////
                             if(results2[i].ingredients == undefined)
                             {
                                 results2.splice(i, 1);
                                 hitsOnSearch2.splice(i, 1);
                                 continue;
                             }
+                            // Splits up the ingredients into an array whenever there is a comma or a space
                             var dbIngredients = results2[i].ingredients.split(/[, ]+/);
                             for(var j = 0; j < searchTerms.length; j++)
                             {
@@ -656,7 +675,10 @@ route.post('/search', async (ctx, next) => {
                                 {
 
                                     var numBlanks = 0;
+                                    // starts stating index at -1 to make +1 easy to use for detection
                                     var startingIndex = -1;
+
+                                    // Attempts to detect the two words that are supposed to be the measurements for the recipe (looks for two space characters)
                                     for(var l = 0; l < dbIngredients[k].length; l++)
                                     {
                                         if(dbIngredients[k].charAt(l) == " ")
@@ -669,14 +691,16 @@ route.post('/search', async (ctx, next) => {
                                             break;
                                         }
                                     }
+
+                                    // checks the searchterms to the substring found without measurements
                                     if(searchTerms[j].toLowerCase() == dbIngredients[k].substring(startingIndex+1, dbIngredients[k].length).toLowerCase())
                                     {
                                         hitsOnSearch2[i]++;
-                                        console.log(searchTerms[j].toLowerCase() + " vs. " + dbIngredients[k].substring(startingIndex+1, dbIngredients[k].length).toLowerCase());
                                         isIngredient = true;
                                     }
                                 }
                             }
+                            // if ingredient isnt found splice out of array
                             if(!isIngredient)
                             {
                                 results2.splice(i, 1);
@@ -689,18 +713,26 @@ route.post('/search', async (ctx, next) => {
                         for(var i = 0; i < results3.length; i++)
                         {
                             hitsOnSearch3[i] = 0;
+                            ////////////
+                            //Detects if an entry is actually valid
+                            ////////////
                             if(results3[i].ingredients == undefined)
                             {
                                 results3.splice(i, 1);
                                 continue;
                             }
+
+                            // Splits up the search terms into an array whenever there is a comma or a space
                             var dbIngredients = results3[i].ingredients.split(/[, ]+/);
                             for(var j = 0; j < searchTerms.length; j++)
                             {
                                 for(var k = 0; k < dbIngredients.length; k++)
                                 {
                                     var numBlanks = 0;
+                                    // starts stating index at -1 to make +1 easy to use for detection
                                     var startingIndex = -1;
+
+                                    // Attempts to detect the two words that are supposed to be the measurements for the recipe (looks for two space characters)
                                     for(var l = 0; l < dbIngredients[k].length; l++)
                                     {
                                         if(dbIngredients[k].charAt(l) == " ")
@@ -713,6 +745,7 @@ route.post('/search', async (ctx, next) => {
                                             break;
                                         }
                                     }
+                                    // checks the searchterms to the substring found without measurements
                                     if(searchTerms[j].toLowerCase() == dbIngredients[k].substring(startingIndex+1, dbIngredients[k].length).toLowerCase())
                                     {
                                         hitsOnSearch3[i]++;
@@ -721,6 +754,7 @@ route.post('/search', async (ctx, next) => {
                                     }
                                 }
                             }
+                            // if ingredient isnt found splice out of array
                             if(!isIngredient)
                             {
                                 results3.splice(i, 1);
@@ -729,7 +763,7 @@ route.post('/search', async (ctx, next) => {
                             }
                             isIngredient = false;
                         }
-
+                        // if there is one or more posts found then it renders the search results page else a no searches found page is rendered
                         if(results1 != "" || results2 != "" || results3 != "")
                         {
                             return await ctx.render('search', {
