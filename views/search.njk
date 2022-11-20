@@ -5,7 +5,7 @@
     <p><a href="/view/{{post.id}}/{{post.type}}/{{post.checked}}">
     <img src="../../../image/{{post.image}}" alt="" style="width:300px;height:200px; object-fit: cover;">
     <h4 class="text-white-50 mb-5">{{post.title}}</h4></a></p>
-    {{hits1[loop.index0]}} of the ingredients you entered are in this recipe!<br><Br>
+    {{hits1[loop.index0]}} instance(s) of the search terms you entered are in this recipe!<br><Br>
 </div>
 {% endfor %}
 {% for post in posts2 %}
@@ -13,7 +13,7 @@
     <p><a href="/view/{{post.id}}/{{post.type}}/{{post.checked}}">
     <img src="../../../image/{{post.image}}" alt="" style="width:300px;height:200px; object-fit: cover;">
     <h4 class="text-white-50 mb-5">{{post.title}}</h4></a></p>
-    {{hits2[loop.index0]}} of the ingredients you entered is/are in this recipe!<br><Br>
+    {{hits2[loop.index0]}} instance(s) of the search terms you entered are in this recipe!<br><Br>
 </div>
 {% endfor %}
 {% for post in posts3 %}
@@ -21,6 +21,6 @@
     <p><a href="/view/{{post.id}}/{{post.type}}/{{post.checked}}">
     <img src="../../../image/{{post.image}}" alt="" style="width:300px;height:200px; object-fit: cover;">
     <h4 class="text-white-50 mb-5">{{post.title}}</h4></a></p>
-    {{hits3[loop.index0]}} of the ingredients you entered are in this recipe!<br><Br>
+    {{hits3[loop.index0]}} instance(s) of the search terms you entered are in this recipe!<br><Br>
 </div>
 {% endfor %}

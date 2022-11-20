@@ -405,20 +405,40 @@ route.post('/search', async (ctx, next) => {
                         
                         var isTitleInEntry = false;
                         var hitsOnSearch1 = [];
+                        var searchTitle = ctx.request.body.searchTerms.split(/[, ]+/);
+                        //console.log(searchTitle);
                         for(var i = 0; i < results1.length; i++)
                         {
                             hitsOnSearch1[i] = 0;
-                            if(results1[i].title == undefined)
+                            // if(results1[i] != undefined)
+                            // {
+                            //     var wordsInResults1Title = results1[i].title.split(' ');
+                            // }
+                            //console.log(wordsInResults1Title);
+                            if(results1[i] == undefined)
                             {
                                 results1.splice(i, 1);
                                 hitsOnSearch1.splice(i, 1);
                                 continue;
                             }
-                            if(results1[i].title.toLowerCase() == ctx.request.body.searchTerms.toLowerCase())
+                            var wordsInResults1Title = results1[i].title.split(/[, ]+/);
+                            // console.log(searchTitle);
+                            // console.log(wordsInResults1Title);
+                            for(var g = 0; g < searchTitle.length; g++)
                             {
-                                isTitleInEntry = true;
-                                hitsOnSearch1[i]++;
-                                console.log(results1[i].title + " has " + hitsOnSearch1[i] + " hits!");
+                                for(var h = 0; h < wordsInResults1Title.length; h++)
+                                {
+                                    if(searchTitle[g] != undefined && wordsInResults1Title[h] != undefined)
+                                    {   
+                                        console.log(searchTitle[g].toLowerCase() + " vs. "+  wordsInResults1Title[h].toLowerCase());
+                                        if(searchTitle[g].toLowerCase() == wordsInResults1Title[h].toLowerCase())
+                                        {
+                                            isTitleInEntry = true;
+                                            hitsOnSearch1[i]++;
+                                            //console.log(results1[i].title + " has " + hitsOnSearch1[i] + " hits!");
+                                        }
+                                    }
+                                }
                             }
                             if(!isTitleInEntry)
                             {
@@ -432,17 +452,35 @@ route.post('/search', async (ctx, next) => {
                         for(var i = 0; i < results2.length; i++)
                         {
                             hitsOnSearch2[i] = 0;
-                            if(results2[i].title == undefined)
+                            // if(results1[i] != undefined)
+                            // {
+                            //     var wordsInResults1Title = results1[i].title.split(' ');
+                            // }
+                            //console.log(wordsInResults1Title);
+                            if(results2[i] == undefined)
                             {
                                 results2.splice(i, 1);
                                 hitsOnSearch2.splice(i, 1);
                                 continue;
                             }
-                            if(results2[i].title.toLowerCase() == ctx.request.body.searchTerms.toLowerCase())
+                            var wordsInResults2Title = results2[i].title.split(/[, ]+/);
+                            // console.log(searchTitle);
+                            // console.log(wordsInResults1Title);
+                            for(var g = 0; g < searchTitle.length; g++)
                             {
-                                isTitleInEntry = true;
-                                hitsOnSearch2[i]++;
-                                console.log(results2[i].title + " has " + hitsOnSearch2[i] + " hits!");
+                                for(var h = 0; h < wordsInResults2Title.length; h++)
+                                {
+                                    if(searchTitle[g] != undefined && wordsInResults2Title[h] != undefined)
+                                    {   
+                                        console.log(searchTitle[g].toLowerCase() + " vs. "+  wordsInResults2Title[h].toLowerCase());
+                                        if(searchTitle[g].toLowerCase() == wordsInResults2Title[h].toLowerCase())
+                                        {
+                                            isTitleInEntry = true;
+                                            hitsOnSearch2[i]++;
+                                            //console.log(results1[i].title + " has " + hitsOnSearch1[i] + " hits!");
+                                        }
+                                    }
+                                }
                             }
                             if(!isTitleInEntry)
                             {
@@ -456,17 +494,35 @@ route.post('/search', async (ctx, next) => {
                         for(var i = 0; i < results3.length; i++)
                         {
                             hitsOnSearch3[i] = 0;
-                            if(results3[i].title == undefined)
+                            // if(results1[i] != undefined)
+                            // {
+                            //     var wordsInResults1Title = results1[i].title.split(' ');
+                            // }
+                            //console.log(wordsInResults1Title);
+                            if(results3[i] == undefined)
                             {
                                 results3.splice(i, 1);
-                                hitsOnSearch3.splice(i, 1);
+                                hitsOnSearch1.splice(i, 1);
                                 continue;
                             }
-                            if(results3[i].title.toLowerCase() == ctx.request.body.searchTerms.toLowerCase())
+                            var wordsInResults3Title = results3[i].title.split(/[, ]+/);
+                            // console.log(searchTitle);
+                            // console.log(wordsInResults1Title);
+                            for(var g = 0; g < searchTitle.length; g++)
                             {
-                                isTitleInEntry = true;
-                                hitsOnSearch3[i]++;
-                                console.log(results3[i].title + " has " + hitsOnSearch3[i] + " hits!");
+                                for(var h = 0; h < wordsInResults3Title.length; h++)
+                                {
+                                    if(searchTitle[g] != undefined && wordsInResults3Title[h] != undefined)
+                                    {   
+                                        console.log(searchTitle[g].toLowerCase() + " vs. "+  wordsInResults3Title[h].toLowerCase());
+                                        if(searchTitle[g].toLowerCase() == wordsInResults3Title[h].toLowerCase())
+                                        {
+                                            isTitleInEntry = true;
+                                            hitsOnSearch3[i]++;
+                                            //console.log(results1[i].title + " has " + hitsOnSearch1[i] + " hits!");
+                                        }
+                                    }
+                                }
                             }
                             if(!isTitleInEntry)
                             {
@@ -499,7 +555,7 @@ route.post('/search', async (ctx, next) => {
                     return Supper.find({}).then(async function(results3) {
                         console.log("Ingredients!");
 
-                        var searchTerms = ctx.request.body.searchTerms.split(/\s*,\s*/);
+                        var searchTerms = ctx.request.body.searchTerms.split(/[, ]+/);
                         var isIngredient = false;
                         var hitsOnSearch1 = [];
                         for(var i = 0; i < results1.length; i++)
@@ -511,7 +567,7 @@ route.post('/search', async (ctx, next) => {
                                 hitsOnSearch1.splice(i, 1);
                                 continue;
                             }
-                            var dbIngredients = results1[i].ingredients.split(/\s*,\s*/);
+                            var dbIngredients = results1[i].ingredients.split(/[, ]+/);
                             for(var j = 0; j < searchTerms.length; j++)
                             {
                                 for(var k = 0; k < dbIngredients.length; k++)
@@ -559,7 +615,7 @@ route.post('/search', async (ctx, next) => {
                                 hitsOnSearch2.splice(i, 1);
                                 continue;
                             }
-                            var dbIngredients = results2[i].ingredients.split(/\s*,\s*/);
+                            var dbIngredients = results2[i].ingredients.split(/[, ]+/);
                             for(var j = 0; j < searchTerms.length; j++)
                             {
                                 for(var k = 0; k < dbIngredients.length; k++)
@@ -607,7 +663,7 @@ route.post('/search', async (ctx, next) => {
                                 results3.splice(i, 1);
                                 continue;
                             }
-                            var dbIngredients = results3[i].ingredients.split(/\s*,\s*/);
+                            var dbIngredients = results3[i].ingredients.split(/[, ]+/);
                             for(var j = 0; j < searchTerms.length; j++)
                             {
                                 for(var k = 0; k < dbIngredients.length; k++)
