@@ -81,7 +81,7 @@ async function displayPostAndComments(ctx, adminUser, page) {
 }
 
 async function displayBreakfastPostTitles(ctx, adminUser, page) {
-    return Breakfast.find({}).then(async function(results) {
+    return Breakfast.find({}).sort({'date': -1}).then(async function(results) {
         
                 await ctx.render(page, {
                     posts: results,
@@ -91,7 +91,7 @@ async function displayBreakfastPostTitles(ctx, adminUser, page) {
 }
 
 async function displayLunchPostTitles(ctx, adminUser, page) {
-    return Lunch.find({}).then(async function(results) {
+    return Lunch.find({}).sort({'date': -1}).then(async function(results) {
         
                 await ctx.render(page, {
                     posts: results,
@@ -101,7 +101,7 @@ async function displayLunchPostTitles(ctx, adminUser, page) {
 }
 
 async function displaySupperPostTitles(ctx, adminUser, page) {
-    return Supper.find({}).then(async function(results) {
+    return Supper.find({}).sort({'date': -1}).then(async function(results) {
         
                 await ctx.render(page, {
                     posts: results,
