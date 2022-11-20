@@ -537,25 +537,25 @@ route.post('/search', async (ctx, next) => {
                         console.log("Search1: " + hitsOnSearch1 + "\nSearch2: " + hitsOnSearch2 + "\nSearch3: " + hitsOnSearch3);
                         
                         if(results1 != "" || results2 != "" || results3 != "")
-                            {
-                                return await ctx.render('search', {
-                                    searchTerm: ctx.request.body.searchTerms,
-                                    posts1: results1,
-                                    posts2: results2,
-                                    posts3: results3,
-                                    hits1: hitsOnSearch1,
-                                    hits2: hitsOnSearch2,
-                                    hits3: hitsOnSearch3,
-                                    amdin: loggedUser
-                                });
-                            }   
-                            else
-                            {
-                                return await ctx.render('searchnone', {
-                                    searchTerm: ctx.request.body.searchTerms,
-                                    amdin: loggedUser
-                                });
-                            }
+                        {
+                            return await ctx.render('search', {
+                                searchTerm: ctx.request.body.searchTerms,
+                                posts1: results1,
+                                posts2: results2,
+                                posts3: results3,
+                                hits1: hitsOnSearch1,
+                                hits2: hitsOnSearch2,
+                                hits3: hitsOnSearch3,
+                                amdin: loggedUser
+                            });
+                        }   
+                        else
+                        {
+                            return await ctx.render('searchnone', {
+                                searchTerm: ctx.request.body.searchTerms,
+                                amdin: loggedUser
+                            });
+                        }
                         
                     });
                 });
@@ -566,8 +566,6 @@ route.post('/search', async (ctx, next) => {
             return Breakfast.find({}).then(async function(results1) {
                 return Lunch.find({}).then(async function(results2) {
                     return Supper.find({}).then(async function(results3) {
-                        console.log("Ingredients!");
-
                         var searchTerms = ctx.request.body.searchTerms.split(/[, ]+/);
                         var isIngredient = false;
                         var hitsOnSearch1 = [];
@@ -699,8 +697,6 @@ route.post('/search', async (ctx, next) => {
                                             break;
                                         }
                                     }
-                                    
-
                                     //console.log(dbIngredients[k].substring(startingIndex+1, dbIngredients[k].length).toLowerCase());
                                     if(searchTerms[j].toLowerCase() == dbIngredients[k].substring(startingIndex+1, dbIngredients[k].length).toLowerCase())
                                     {
@@ -719,16 +715,26 @@ route.post('/search', async (ctx, next) => {
                             isIngredient = false;
                         }
 
-                        return await ctx.render('search', {
-                            searchTerm: ctx.request.body.searchTerms,
-                            posts1: results1,
-                            posts2: results2,
-                            posts3: results3,
-                            hits1: hitsOnSearch1,
-                            hits2: hitsOnSearch2,
-                            hits3: hitsOnSearch3,
-                            admin: loggedUser
-                        });
+                        if(results1 != "" || results2 != "" || results3 != "")
+                        {
+                            return await ctx.render('search', {
+                                searchTerm: ctx.request.body.searchTerms,
+                                posts1: results1,
+                                posts2: results2,
+                                posts3: results3,
+                                hits1: hitsOnSearch1,
+                                hits2: hitsOnSearch2,
+                                hits3: hitsOnSearch3,
+                                amdin: loggedUser
+                            });
+                        }   
+                        else
+                        {
+                            return await ctx.render('searchnone', {
+                                searchTerm: ctx.request.body.searchTerms,
+                                amdin: loggedUser
+                            });
+                        }
 
                     });
                 });
