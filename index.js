@@ -1,18 +1,8 @@
-//////////////////////////
-//Initializing Environment Variables
-//npm i dotenv
-//npm i koa-methodoverride
-//npm i koa-bodyparser
-//////////////////////////
+//setup environmental variables and body parser
 require('dotenv').config();
-const override = require('koa-methodoverride');
 const parser = require('koa-bodyparser');
 
-
-//////////////////////////
-//Connecting the DB
-//npm i mongoose
-//////////////////////////
+//Setup Server
 const mongoose = require('mongoose');
 const db = mongoose.connection;
 const host = process.env.host;
@@ -28,40 +18,25 @@ db.on('connected', () => console.log ('connected to mongo'));
 db.on('disconnected', () => console.log ('Mongo is disconnected'));
 db.on('open', () => console.log ('Connection Made!'));
 
-//////////////////////////
-//Create Our Server Object
-//////////////////////////
+//Setup Koa and logger
 const logger = require('koa-logger')
 const koa = require('koa');
 const server = new koa();
 
-//////////////////////////
-//Bring in controllers
-//////////////////////////
+//import controllers
 const recipeController = require('./controller/recipecontroller');
 const userController = require('./controller/usercontroller');
 
-//////////////////////////
-//Create Our Static Folder
-//npm i koa-static
-//////////////////////////
+//Setup static folder
 const static = require('koa-static');
 
-//////////////////////////
-//Initializing views
-//npm i koa-views
-//npm i nunjucks
-//////////////////////////
+//setup templating
 const koaNunjucks = require('koa-nunjucks-2');
 const path = require('path');
-const { append } = require('koa/lib/response.js');
 
 
-//////////////////////////
 //Middleware
-//////////////////////////
 server.use(logger());
-server.use(override('_method'));
 server.use(parser());
 server.use(koaNunjucks({
     ext: 'njk',
@@ -75,7 +50,5 @@ server.use(userController.routes());
 server.use(static('./public'));
 
 
-//////////////////////////
-//Our Listener on Port 1985
-//////////////////////////
+//Listen
 server.listen(1985);
