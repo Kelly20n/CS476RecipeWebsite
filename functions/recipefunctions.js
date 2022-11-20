@@ -19,6 +19,98 @@ function createComment(ctx, username) {
     return;
 }
 
+function createToBeApproved(ctx, username) {
+    var newToBeApproved = new toBeApproved({
+        title: ctx.request.body.recipeTitle,
+        ingredients: ctx.request.body.recipeIngredients,
+        instructions: ctx.request.body.recipeInstructions,
+        type: ctx.request.body.database,
+        checked: 1,
+        image: ctx.file.filename,
+        date: new Date(),
+        user: username.name
+    });
+    newToBeApproved.save((err, res) => {
+        if(err) return handleError(err);
+        else return
+    });
+}
+
+function createBreakfast(ctx, username) {
+    var newBreakfast = new Breakfast({
+        title: ctx.request.body.recipeTitle,
+        ingredients: ctx.request.body.recipeIngredients,
+        instructions: ctx.request.body.recipeInstructions,
+        type: ctx.request.body.database,
+        checked: 0,
+        image: ctx.file.filename,
+        date: new Date(),
+        user: username.name
+    });
+    newBreakfast.save((err, res) => {
+        if(err) return handleError(err);
+        else return
+    });
+}
+
+function createLunch(ctx, username) {
+    var newLunch = new Lunch({
+        title: ctx.request.body.recipeTitle,
+        ingredients: ctx.request.body.recipeIngredients,
+        instructions: ctx.request.body.recipeInstructions,
+        type: ctx.request.body.database,
+        checked: 0,
+        image: ctx.file.filename,
+        date: new Date(),
+        user: username.name
+    });
+    newLunch.save((err, res) => {
+        if(err) return handleError(err);
+        else return
+    });
+}
+
+function createSupper(ctx, username) {
+    var newSupper = new Supper({
+        title: ctx.request.body.recipeTitle,
+        ingredients: ctx.request.body.recipeIngredients,
+        instructions: ctx.request.body.recipeInstructions,
+        type: ctx.request.body.database,
+        checked: 0,
+        image: ctx.file.filename,
+        date: new Date(),
+        user: username.name
+    });
+    newSupper.save((err, res) => {
+        if(err) return handleError(err);
+        else return
+    });
+}
+
+async function createRecipe(ctx, loggedUser) {
+    if(ctx.request.body.database == "breakfast")
+        {
+            createBreakfast(ctx, loggedUser);
+            createToBeApproved(ctx, loggedUser);
+            console.log('breakfast added');
+            await ctx.redirect('/');
+        }
+        else if(ctx.request.body.database == "lunch")
+        {
+            createLunch(ctx, loggedUser);
+            createToBeApproved(ctx, loggedUser);
+            console.log('lunch added');
+            await ctx.redirect('/');
+        }
+        else
+        {
+            createSupper(ctx, loggedUser);
+            createToBeApproved(ctx, loggedUser);
+            console.log('supper added');
+            await ctx.redirect('/');
+        }
+}
+
 //display post and comments uses the db tag to find which database its from and then sends the info to the page
 async function displayPostAndComments(ctx, adminUser, page) {
     if(ctx.params.check == 1)
@@ -117,7 +209,13 @@ async function displayPostTitles(ctx, adminUser, page) {
     });
 }
 
+
 module.exports.createComment = createComment;
+module.exports.createToBeApproved = createToBeApproved;
+module.exports.createBreakfast = createBreakfast;
+module.exports.createLunch = createLunch;
+module.exports.createSupper = createSupper;
+module.exports.createRecipe = createRecipe;
 module.exports.displayPostAndComments = displayPostAndComments;
 module.exports.displayPostTitles = displayPostTitles;
 module.exports.displayBreakfastPostTitles = displayBreakfastPostTitles;
