@@ -26,10 +26,9 @@ function verifyUser(ctx) {
             alert('Please sign in to complete this action');
             return await ctx.redirect('/login')
         } else {
-            console.log(info);
+
         }
     });
-    console.log(bool);
     return bool;
 }
 
